@@ -32,7 +32,26 @@ body {
   max-width: 400px !important;
 }
 
-/* Fix Payload admin search input */
-.payload-admin input[type='search'] {
+/* Fix Payload admin search input overlap with icon */
+.payload-admin .search-bar {
+  position: relative !important;
+}
+
+.payload-admin .search-bar .icon--search {
+  position: absolute !important;
+  left: 0.75rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10 !important;
+  width: 1rem !important;
+  height: 1rem !important;
+  pointer-events: none !important;
+}
+
+.payload-admin .search-bar .search-filter {
+  position: relative !important;
+}
+
+.payload-admin .search-bar .search-filter__input {
   padding: 0.5rem 1rem 0.5rem 2.5rem !important;
 }
