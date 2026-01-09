@@ -69,6 +69,8 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    bairros: Bairro;
+    imoveis: Imovei;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -78,13 +80,15 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    bairros: BairrosSelect<false> | BairrosSelect<true>;
+    imoveis: ImoveisSelect<false> | ImoveisSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: string;
+    defaultIDType: number;
   };
   fallbackLocale: null;
   globals: {};
@@ -121,7 +125,7 @@ export interface UserAuthOperations {
  * via the `definition` "users".
  */
 export interface User {
-  id: string;
+  id: number;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -145,7 +149,7 @@ export interface User {
  * via the `definition` "media".
  */
 export interface Media {
-  id: string;
+  id: number;
   alt: string;
   updatedAt: string;
   createdAt: string;
@@ -161,10 +165,167 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "bairros".
+ */
+export interface Bairro {
+  id: number;
+  /**
+   * Ex: Centro, Jardim dos Estados, Nova Lima
+   */
+  nome: string;
+  /**
+   * Gerado automaticamente
+   */
+  slug: string;
+  regiao: 'centro' | 'norte' | 'sul' | 'leste' | 'oeste' | 'anhanduizinho' | 'bandeira';
+  /**
+   * Informações sobre o bairro, pontos de interesse, etc.
+   */
+  descricao?: string | null;
+  /**
+   * Mostrar este bairro em destaque no site
+   */
+  destaque?: boolean | null;
+  /**
+   * Foto representativa do bairro (opcional)
+   */
+  imagem?: (number | null) | Media;
+  /**
+   * Centro geográfico do bairro
+   */
+  latitude?: number | null;
+  longitude?: number | null;
+  /**
+   * Menor número aparece primeiro
+   */
+  ordem?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "imoveis".
+ */
+export interface Imovei {
+  id: number;
+  /**
+   * Ex: Casa com 3 quartos no Centro
+   */
+  titulo: string;
+  /**
+   * Gerado automaticamente a partir do título
+   */
+  slug: string;
+  tipo: 'casa' | 'apartamento' | 'kitnet' | 'sobrado' | 'cobertura' | 'terreno' | 'comercial' | 'galpao' | 'chacara';
+  finalidade: 'aluguel' | 'venda' | 'ambos';
+  status: 'disponivel' | 'alugado' | 'vendido' | 'indisponivel' | 'rascunho';
+  /**
+   * Descreva os principais atrativos do imóvel
+   */
+  descricao: string;
+  /**
+   * Valor do aluguel ou venda
+   */
+  preco: number;
+  /**
+   * Deixe vazio se não houver
+   */
+  condominio?: number | null;
+  /**
+   * Valor mensal aproximado
+   */
+  iptu?: number | null;
+  quartos?: number | null;
+  suites?: number | null;
+  banheiros?: number | null;
+  vagas?: number | null;
+  area?: number | null;
+  areaConstruida?: number | null;
+  /**
+   * Selecione todas que se aplicam
+   */
+  caracteristicas?:
+    | (
+        | 'mobiliado'
+        | 'semi-mobiliado'
+        | 'ar-condicionado'
+        | 'piscina'
+        | 'churrasqueira'
+        | 'quintal'
+        | 'varanda'
+        | 'sacada'
+        | 'elevador'
+        | 'portaria'
+        | 'academia'
+        | 'salao-festas'
+        | 'playground'
+        | 'pet-friendly'
+        | 'financiamento'
+      )[]
+    | null;
+  /**
+   * Rua, número (opcional por privacidade)
+   */
+  endereco?: string | null;
+  /**
+   * Selecione o bairro
+   */
+  bairro: number | Bairro;
+  cep?: string | null;
+  /**
+   * Para mapa (opcional)
+   */
+  latitude?: number | null;
+  /**
+   * Para mapa (opcional)
+   */
+  longitude?: number | null;
+  /**
+   * Adicione fotos do imóvel (primeira será a capa)
+   */
+  fotos: {
+    imagem: number | Media;
+    /**
+     * Ex: Sala de estar, Cozinha, Quarto principal
+     */
+    legenda?: string | null;
+    destaque?: boolean | null;
+    id?: string | null;
+  }[];
+  /**
+   * Deixe vazio para usar o padrão
+   */
+  corretor?: string | null;
+  /**
+   * Ex: (67) 99999-9999
+   */
+  telefone?: string | null;
+  email?: string | null;
+  /**
+   * Título para Google (deixe vazio para usar o título)
+   */
+  metaTitle?: string | null;
+  /**
+   * Descrição para Google (156 caracteres)
+   */
+  metaDescription?: string | null;
+  /**
+   * Mostrar este imóvel em destaque
+   */
+  destaque?: boolean | null;
+  /**
+   * Contador automático de visualizações
+   */
+  visualizacoes?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
-  id: string;
+  id: number;
   key: string;
   data:
     | {
@@ -181,20 +342,28 @@ export interface PayloadKv {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: string;
+  id: number;
   document?:
     | ({
         relationTo: 'users';
-        value: string | User;
+        value: number | User;
       } | null)
     | ({
         relationTo: 'media';
-        value: string | Media;
+        value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'bairros';
+        value: number | Bairro;
+      } | null)
+    | ({
+        relationTo: 'imoveis';
+        value: number | Imovei;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -204,10 +373,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string;
+  id: number;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   key?: string | null;
   value?:
@@ -227,7 +396,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string;
+  id: number;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -272,6 +441,67 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "bairros_select".
+ */
+export interface BairrosSelect<T extends boolean = true> {
+  nome?: T;
+  slug?: T;
+  regiao?: T;
+  descricao?: T;
+  destaque?: T;
+  imagem?: T;
+  latitude?: T;
+  longitude?: T;
+  ordem?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "imoveis_select".
+ */
+export interface ImoveisSelect<T extends boolean = true> {
+  titulo?: T;
+  slug?: T;
+  tipo?: T;
+  finalidade?: T;
+  status?: T;
+  descricao?: T;
+  preco?: T;
+  condominio?: T;
+  iptu?: T;
+  quartos?: T;
+  suites?: T;
+  banheiros?: T;
+  vagas?: T;
+  area?: T;
+  areaConstruida?: T;
+  caracteristicas?: T;
+  endereco?: T;
+  bairro?: T;
+  cep?: T;
+  latitude?: T;
+  longitude?: T;
+  fotos?:
+    | T
+    | {
+        imagem?: T;
+        legenda?: T;
+        destaque?: T;
+        id?: T;
+      };
+  corretor?: T;
+  telefone?: T;
+  email?: T;
+  metaTitle?: T;
+  metaDescription?: T;
+  destaque?: T;
+  visualizacoes?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
