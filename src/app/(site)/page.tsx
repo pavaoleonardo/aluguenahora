@@ -33,7 +33,7 @@ export default async function HomePage() {
       </section>
 
       <section className="container mx-auto px-4 py-20">
-        <h2 className="text-4xl font-bold mb-12 text-center">Imoveis em Destaque</h2>
+        <h2 className="text-4xl font-bold mb-12 text-center">Imóveis em Destaque</h2>
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {imoveis.docs.map((imovel) => (
             <Link
@@ -85,9 +85,9 @@ export default async function HomePage() {
 
       <section className="bg-gray-900 text-white py-20">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-4">Anuncie Seu Imovel</h2>
+          <h2 className="text-4xl font-bold mb-4">Anuncie Seu Imóvel</h2>
           <p className="text-xl text-gray-300 mb-12">
-            Divulgue seu imovel para milhares de interessados
+            Divulgue seu imóvel para milhares de interessados
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-5xl mx-auto">
             <div className="text-center">
