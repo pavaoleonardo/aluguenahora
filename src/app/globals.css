@@ -17,11 +17,25 @@ body {
   overflow-x: hidden;
 }
 
-/* Fix Payload admin search input */
+/* Fix Payload admin search */
+.search-bar {
+  position: relative !important;
+}
+
+.search-bar .icon--search {
+  position: absolute !important;
+  left: 1rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10 !important;
+  pointer-events: none !important;
+}
+
 .search-filter__input {
   padding-left: 3rem !important;
   padding-right: 1rem !important;
   height: 2.75rem !important;
+  width: 100% !important;
   background-color: white !important;
   border: 1px solid #d1d5db !important;
   border-radius: 0.5rem !important;
