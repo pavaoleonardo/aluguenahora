@@ -4,15 +4,21 @@ import cloudinary from '../lib/cloudinary'
 export const Media: CollectionConfig = {
   slug: 'media',
 
+  access: {
+    read: () => true,
+    create: () => true,
+    update: () => true,
+  },
+
   upload: {
-    disableLocalStorage: true, // required for Vercel
+    disableLocalStorage: true,
   },
 
   fields: [
     {
       name: 'alt',
       type: 'text',
-      required: true,
+      // temporarily not required for debugging
     },
     {
       name: 'cloudinaryUrl',
@@ -50,7 +56,6 @@ export const Media: CollectionConfig = {
               },
             )
 
-            // IMPORTANT: use file.data, not file.buffer
             stream.end(file.data)
           })
 
