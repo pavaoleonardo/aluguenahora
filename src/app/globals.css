@@ -1,15 +1,9 @@
-@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body:not(.payload-admin) {
-  background-color: #f5f5f5;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-}
-
-body:not(.payload-admin) * {
-  box-sizing: border-box;
-}
+/* -------------------------------------------------
+   Base styles
+-------------------------------------------------- */
 
 html,
 body {
@@ -17,43 +11,15 @@ body {
   overflow-x: hidden;
 }
 
-/* Fix search bar */
-.search-bar {
-  display: flex !important;
-  align-items: center !important;
-  gap: 0.75rem !important;
-  padding: 0.5rem 1rem !important;
-  background-color: #f9fafb !important;
-  border-radius: 0.5rem !important;
+body {
+  margin: 0;
+  background-color: #f5f5f5;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
-.search-bar .icon--search {
-  flex-shrink: 0 !important;
-  width: 1.25rem !important;
-  height: 1.25rem !important;
-}
-
-.search-filter {
-  flex: 1 !important;
-}
-
-.search-filter__input {
-  width: 100% !important;
-  height: 2.5rem !important;
-  padding: 0.5rem 1rem !important;
-  background-color: white !important;
-  border: 1px solid #d1d5db !important;
-  border-radius: 0.375rem !important;
-}
-
-/* Fix number inputs */
-.payload-admin input[type="number"] {
-  padding-right: 2rem !important;
-}
-
-/* Fix collapsible labels */
-.payload-admin .row-label {
-  display: flex !important;
-  align-items: center !important;
-  gap: 0.5rem !important;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
