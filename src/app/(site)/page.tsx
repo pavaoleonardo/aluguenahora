@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
+import Image from 'next/image'
 
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise })
@@ -41,11 +42,24 @@ export default async function HomePage() {
               href={`/imoveis/${imovel.slug}`}
               className="group bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
             >
-              <div className="relative h-64 bg-gradient-to-br from-blue-400 to-blue-600">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-white text-sm">Foto em breve</span>
-                </div>
-                <div className="absolute top-4 left-4">
+              <div className="relative h-64 bg-gradient-to-br from-blue-400 to-blue-600 overflow-hidden">
+                {imovel.fotos &&
+                imovel.fotos.length > 0 &&
+                typeof imovel.fotos[0].imagem === 'object' &&
+                imovel.fotos[0].imagem?.cloudinaryUrl ? (
+                  <Image
+                    src={imovel.fotos[0].imagem.cloudinaryUrl}
+                    alt={imovel.titulo}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-white text-sm">Foto em breve</span>
+                  </div>
+                )}
+                <div className="absolute top-4 left-4 z-10">
                   <span
                     className={`px-4 py-2 rounded text-white text-xs font-bold ${imovel.finalidade === 'venda' ? 'bg-red-500' : 'bg-blue-500'}`}
                   >
