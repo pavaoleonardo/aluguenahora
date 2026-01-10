@@ -1,12 +1,14 @@
 import type { CollectionConfig } from 'payload'
 import cloudinary from '../lib/cloudinary'
-import path from 'path'
 
 export const Media: CollectionConfig = {
   slug: 'media',
+
   upload: {
     staticDir: 'media',
+    staticURL: '/media',
   },
+
   fields: [
     {
       name: 'alt',
@@ -21,35 +23,41 @@ export const Media: CollectionConfig = {
       },
     },
   ],
+
   hooks: {
     afterChange: [
-      async ({ doc, req }) => {
-        if (doc.filename && !doc.cloudinaryUrl) {
-          console.log('🔥 Upload para Cloudinary...')
+      async ({ doc, req, operation }) => {
+        // Only run on create, not on every update
+        if (operation !== 'create') return doc
 
-          try {
-            const filePath = path.join(process.cwd(), 'media', doc.filename)
+        // In Payload v3, the uploaded file is here:
+        const file = req.file
 
-            const result = await cloudinary.uploader.upload(filePath, {
-              folder: 'aluguenahora',
-              public_id: `media-${doc.id}`,
-            })
+        if (!file) {
+          console.error('❌ No file found in request')
+          return doc
+        }
 
-            console.log('✅ URL:', result.secure_url)
+        try {
+          console.log('🔥 Uploading to Cloudinary...')
 
-            // Atualizar sem await para não bloquear
-            req.payload
-              .update({
-                collection: 'media',
-                id: doc.id,
-                data: {
-                  cloudinaryUrl: result.secure_url,
-                },
-              })
-              .catch((err) => console.error('Erro ao salvar URL:', err))
-          } catch (error) {
-            console.error('❌ Erro:', error)
-          }
+          const result = await cloudinary.uploader.upload(file.path, {
+            folder: 'aluguenahora',
+            public_id: `media-${doc.id}`,
+          })
+
+          console.log('✅ Cloudinary URL:', result.secure_url)
+
+          // Update document with Cloudinary URL
+          await req.payload.update({
+            collection: 'media',
+            id: doc.id,
+            data: {
+              cloudinaryUrl: result.secure_url,
+            },
+          })
+        } catch (error) {
+          console.error('❌ Cloudinary upload failed:', error)
         }
 
         return doc
