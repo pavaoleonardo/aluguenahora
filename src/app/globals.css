@@ -50,3 +50,14 @@ body {
 .payload-admin input[type="number"] {
   padding-right: 2rem !important;
 }
+
+/* Fix collapsible field layout */
+.payload-admin .collapsible-field__row-label-wrap {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+
+.payload-admin .collapsible-field__row-label-wrap .row-label {
+  padding-left: 0 !important;
+}
