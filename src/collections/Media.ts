@@ -5,8 +5,8 @@ export const Media: CollectionConfig = {
   slug: 'media',
 
   upload: {
-    staticDir: 'media',
-    staticURL: '/media',
+    // Do NOT rely on local storage in Vercel
+    disableLocalStorage: true,
   },
 
   fields: [
@@ -27,33 +27,40 @@ export const Media: CollectionConfig = {
   hooks: {
     afterChange: [
       async ({ doc, req, operation }) => {
-        // Only run on create, not on every update
         if (operation !== 'create') return doc
 
-        // In Payload v3, the uploaded file is here:
         const file = req.file
 
-        if (!file) {
-          console.error('❌ No file found in request')
+        if (!file?.buffer) {
+          console.error('❌ No file buffer found')
           return doc
         }
 
         try {
-          console.log('🔥 Uploading to Cloudinary...')
+          console.log('🔥 Uploading to Cloudinary (Vercel-safe)...')
 
-          const result = await cloudinary.uploader.upload(file.path, {
-            folder: 'aluguenahora',
-            public_id: `media-${doc.id}`,
+          const uploadResult = await new Promise<any>((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+              {
+                folder: 'aluguenahora',
+                public_id: `media-${doc.id}`,
+              },
+              (error, result) => {
+                if (error) reject(error)
+                else resolve(result)
+              },
+            )
+
+            stream.end(file.buffer)
           })
 
-          console.log('✅ Cloudinary URL:', result.secure_url)
+          console.log('✅ Cloudinary URL:', uploadResult.secure_url)
 
-          // Update document with Cloudinary URL
           await req.payload.update({
             collection: 'media',
             id: doc.id,
             data: {
-              cloudinaryUrl: result.secure_url,
+              cloudinaryUrl: uploadResult.secure_url,
             },
           })
         } catch (error) {
