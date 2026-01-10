@@ -5,8 +5,7 @@ export const Media: CollectionConfig = {
   slug: 'media',
 
   upload: {
-    // Do NOT rely on local storage in Vercel
-    disableLocalStorage: true,
+    disableLocalStorage: true, // required for Vercel
   },
 
   fields: [
@@ -31,8 +30,8 @@ export const Media: CollectionConfig = {
 
         const file = req.file
 
-        if (!file?.buffer) {
-          console.error('❌ No file buffer found')
+        if (!file?.data) {
+          console.error('❌ No file data found')
           return doc
         }
 
@@ -51,7 +50,8 @@ export const Media: CollectionConfig = {
               },
             )
 
-            stream.end(file.buffer)
+            // IMPORTANT: use file.data, not file.buffer
+            stream.end(file.data)
           })
 
           console.log('✅ Cloudinary URL:', uploadResult.secure_url)
