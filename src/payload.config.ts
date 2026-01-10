@@ -14,6 +14,15 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
+  serverURL: process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000',
+
+  // 👇 THIS IS CRITICAL FOR FILE UPLOADS ON VERCEL
+  upload: {
+    limits: {
+      fileSize: 10 * 1024 * 1024, // 10MB (adjust as needed)
+    },
+  },
+
   admin: {
     user: Users.slug,
     importMap: {

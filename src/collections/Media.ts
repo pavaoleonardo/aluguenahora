@@ -11,14 +11,13 @@ export const Media: CollectionConfig = {
   },
 
   upload: {
-    disableLocalStorage: true,
+    disableLocalStorage: true, // required for Vercel
   },
 
   fields: [
     {
       name: 'alt',
       type: 'text',
-      // temporarily not required for debugging
     },
     {
       name: 'cloudinaryUrl',
@@ -42,7 +41,7 @@ export const Media: CollectionConfig = {
         }
 
         try {
-          console.log('🔥 Uploading to Cloudinary (Vercel-safe)...')
+          console.log('🔥 Uploading to Cloudinary...')
 
           const uploadResult = await new Promise<any>((resolve, reject) => {
             const stream = cloudinary.uploader.upload_stream(
@@ -58,8 +57,6 @@ export const Media: CollectionConfig = {
 
             stream.end(file.data)
           })
-
-          console.log('✅ Cloudinary URL:', uploadResult.secure_url)
 
           await req.payload.update({
             collection: 'media',
