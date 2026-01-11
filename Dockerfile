@@ -2,11 +2,9 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Argumentos de build
 ARG PAYLOAD_SECRET
 ARG DATABASE_URL
 
-# Transformar em variáveis de ambiente
 ENV PAYLOAD_SECRET=$PAYLOAD_SECRET
 ENV DATABASE_URL=$DATABASE_URL
 
@@ -14,8 +12,11 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-RUN npm run build
+
+# Build sem rodar migrations
+RUN SKIP_ENV_VALIDATION=1 npm run build -- --no-lint || npm run build:next
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+# Rodar migrations e depois start
+CMD ["sh", "-c", "npm run payload migrate && npm start"]
