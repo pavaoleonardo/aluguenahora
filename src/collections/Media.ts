@@ -11,5 +11,13 @@ export const Media: CollectionConfig = {
       type: 'text',
       required: true,
     },
+    {
+      name: 'cloudinaryUrl',
+      type: 'text',
+      admin: {
+        description: 'URL da imagem no Cloudinary',
+        readOnly: true,
+      },
+    },
   ],
 }
