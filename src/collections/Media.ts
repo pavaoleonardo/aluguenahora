@@ -11,7 +11,7 @@ export const Media: CollectionConfig = {
   },
 
   upload: {
-    disableLocalStorage: true, // required for Vercel
+    staticDir: 'media',
   },
 
   fields: [
