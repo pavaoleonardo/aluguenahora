@@ -306,6 +306,16 @@ export const Imoveis: CollectionConfig = {
                 step: 0.000001,
               },
             },
+            {
+              name: 'destaque',
+              type: 'checkbox',
+              label: 'Imóvel em Destaque',
+              defaultValue: false,
+              admin: {
+                description: 'Marque para exibir na página inicial',
+                position: 'sidebar',
+              },
+            },
           ],
         },
       ],
