@@ -15,7 +15,7 @@ export default async function HomePage() {
       status: { equals: 'disponivel' },
     },
     limit: 9,
-    depth: 1,
+    depth: 2,
   })
 
   return (
@@ -48,10 +48,10 @@ export default async function HomePage() {
                 {imovel.fotos &&
                 imovel.fotos.length > 0 &&
                 typeof imovel.fotos[0].imagem === 'object' &&
-                imovel.fotos[0].imagem?.cloudinaryUrl ? (
+                imovel.fotos[0].imagem?.url ? (
                   <Image
-                    src={imovel.fotos[0].imagem.cloudinaryUrl}
-                    alt={imovel.titulo}
+                    src={imovel.fotos[0].imagem.url}
+                    alt={imovel.fotos[0].imagem.alt || imovel.titulo}
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -61,6 +61,7 @@ export default async function HomePage() {
                     <span className="text-white text-sm">Foto em breve</span>
                   </div>
                 )}
+
                 <div className="absolute top-4 left-4 z-10">
                   <span
                     className={`px-4 py-2 rounded text-white text-xs font-bold ${imovel.finalidade === 'venda' ? 'bg-red-500' : 'bg-blue-500'}`}
