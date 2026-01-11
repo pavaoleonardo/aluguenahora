@@ -285,6 +285,10 @@ export interface Imovei {
    */
   longitude?: number | null;
   /**
+   * Marque para exibir na página inicial
+   */
+  destaque?: boolean | null;
+  /**
    * Adicione fotos do imóvel (primeira será a capa)
    */
   fotos: {
@@ -313,10 +317,6 @@ export interface Imovei {
    * Descrição para Google (156 caracteres)
    */
   metaDescription?: string | null;
-  /**
-   * Mostrar este imóvel em destaque
-   */
-  destaque?: boolean | null;
   /**
    * Contador automático de visualizações
    */
@@ -490,6 +490,7 @@ export interface ImoveisSelect<T extends boolean = true> {
   cep?: T;
   latitude?: T;
   longitude?: T;
+  destaque?: T;
   fotos?:
     | T
     | {
@@ -503,7 +504,6 @@ export interface ImoveisSelect<T extends boolean = true> {
   email?: T;
   metaTitle?: T;
   metaDescription?: T;
-  destaque?: T;
   visualizacoes?: T;
   updatedAt?: T;
   createdAt?: T;
