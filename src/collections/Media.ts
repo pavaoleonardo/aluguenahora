@@ -31,7 +31,7 @@ export const Media: CollectionConfig = {
 
         const file = req.file
 
-        if (!file?.buffer) {
+        if (!file?.data) {
           console.error('❌ No file buffer found')
           return doc
         }
@@ -51,7 +51,7 @@ export const Media: CollectionConfig = {
               },
             )
 
-            stream.end(file.buffer)
+            stream.end(file.data)
           })
 
           console.log('✅ Cloudinary URL:', uploadResult.secure_url)
