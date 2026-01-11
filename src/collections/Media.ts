@@ -4,20 +4,16 @@ import cloudinary from '../lib/cloudinary'
 export const Media: CollectionConfig = {
   slug: 'media',
 
-  access: {
-    read: () => true,
-    create: () => true,
-    update: () => true,
-  },
-
   upload: {
-    staticDir: 'media',
+    // Do NOT rely on local storage in Vercel
+    disableLocalStorage: true,
   },
 
   fields: [
     {
       name: 'alt',
       type: 'text',
+      required: true,
     },
     {
       name: 'cloudinaryUrl',
@@ -35,13 +31,13 @@ export const Media: CollectionConfig = {
 
         const file = req.file
 
-        if (!file?.data) {
-          console.error('❌ No file data found')
+        if (!file?.buffer) {
+          console.error('❌ No file buffer found')
           return doc
         }
 
         try {
-          console.log('🔥 Uploading to Cloudinary...')
+          console.log('🔥 Uploading to Cloudinary (Vercel-safe)...')
 
           const uploadResult = await new Promise<any>((resolve, reject) => {
             const stream = cloudinary.uploader.upload_stream(
@@ -55,8 +51,10 @@ export const Media: CollectionConfig = {
               },
             )
 
-            stream.end(file.data)
+            stream.end(file.buffer)
           })
+
+          console.log('✅ Cloudinary URL:', uploadResult.secure_url)
 
           await req.payload.update({
             collection: 'media',
