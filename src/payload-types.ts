@@ -150,7 +150,7 @@ export interface User {
  */
 export interface Media {
   id: number;
-  alt: string;
+  alt?: string | null;
   cloudinaryUrl?: string | null;
   updatedAt: string;
   createdAt: string;
