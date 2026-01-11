@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import Link from 'next/link'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
