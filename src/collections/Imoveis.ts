@@ -306,19 +306,21 @@ export const Imoveis: CollectionConfig = {
                 step: 0.000001,
               },
             },
-            {
-              name: 'destaque',
-              type: 'checkbox',
-              label: 'Imóvel em Destaque',
-              defaultValue: false,
-              admin: {
-                description: 'Marque para exibir na página inicial',
-                position: 'sidebar',
-              },
-            },
           ],
         },
       ],
+    },
+
+    // DESTAQUE (só uma vez, aqui)
+    {
+      name: 'destaque',
+      type: 'checkbox',
+      label: 'Imóvel em Destaque',
+      defaultValue: false,
+      admin: {
+        description: 'Marque para exibir na página inicial',
+        position: 'sidebar',
+      },
     },
 
     // Fotos
@@ -412,15 +414,6 @@ export const Imoveis: CollectionConfig = {
           admin: {
             description: 'Descrição para Google (156 caracteres)',
             rows: 3,
-          },
-        },
-        {
-          name: 'destaque',
-          type: 'checkbox',
-          label: 'Destacar na Homepage',
-          defaultValue: false,
-          admin: {
-            description: 'Mostrar este imóvel em destaque',
           },
         },
         {
