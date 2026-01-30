@@ -1,0 +1,98 @@
+{
+  "kind": "collectionType",
+  "collectionName": "imoveis",
+  "info": {
+    "singularName": "imovel",
+    "pluralName": "imoveis",
+    "displayName": "Imóvel"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "titulo": {
+      "type": "string",
+      "required": true
+    },
+    "descricao": {
+      "type": "blocks"
+    },
+    "tamanho": {
+      "type": "integer"
+    },
+    "quartos": {
+      "type": "integer"
+    },
+    "banheiros": {
+      "type": "integer"
+    },
+    "bairro": {
+      "type": "customField",
+      "customField": "global::bairro-regiao"
+    },
+    "cidade": {
+      "type": "string"
+    },
+    "preco": {
+      "type": "decimal"
+    },
+    "finalidade": {
+      "type": "enumeration",
+      "enum": [
+        "aluguel",
+        "venda"
+      ]
+    },
+    "tipo": {
+      "type": "enumeration",
+      "enum": [
+        "Apart Hotel / Flat / Loft",
+        "Apartamento",
+        "Apto. Cobertura / Duplex",
+        "Casa de Vila",
+        "Casa-Térrea",
+        "Casa-Térrea-Condomínio",
+        "Kitnet",
+        "Sobrado",
+        "Sobrado-Condomínio",
+        "Studio",
+        "Terreno",
+        "Terreno-Condomínio",
+        "Área",
+        "Casa Comercial",
+        "Galpão / Depósito",
+        "Imóvel Comercial",
+        "Indústria / Fábrica",
+        "Ponto Comercial / Box",
+        "Pousada / Hotel / Motel",
+        "Sala / Salão / Loja",
+        "Chácara",
+        "Fazenda",
+        "Haras",
+        "Pesqueiro",
+        "Sitio"
+      ]
+    },
+    "fotos": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "estatus": {
+      "type": "enumeration",
+      "enum": [
+        "rascunho",
+        "pendente",
+        "publicado"
+      ]
+    },
+    "usuario": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    }
+  }
+}
