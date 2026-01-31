@@ -32,7 +32,7 @@ export default function PropertyGallery({ fotos = [], titulo, finalidadeLabel }:
         const label = foto?.caption || foto?.alternativeText || foto?.name || ''
         return { url: large || url, thumb: thumb || url, label }
       })
-      .filter(Boolean) as { url: string; thumb: string }[]
+      .filter(Boolean) as { url: string; thumb: string; label: string }[]
   }, [fotos])
 
   const [activeIndex, setActiveIndex] = useState(0)
