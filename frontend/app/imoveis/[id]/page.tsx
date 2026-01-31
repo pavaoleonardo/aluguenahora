@@ -14,8 +14,21 @@ async function getProperty(id: string) {
     });
     return res.data.data;
   } catch (error) {
-    console.error("Error fetching property:", error);
-    return null;
+    // Fallback to find by documentId (works even if findOne is not public)
+    try {
+      const res = await api.get(`/api/imoveis`, {
+        params: {
+          populate: "fotos",
+          "filters[documentId][$eq]": id,
+          "filters[publishedAt][$notNull]": true,
+        },
+      });
+      const data = res.data.data;
+      return Array.isArray(data) ? data[0] : data || null;
+    } catch (fallbackError) {
+      console.error("Error fetching property:", fallbackError);
+      return null;
+    }
   }
 }
 
