@@ -63,7 +63,6 @@ export default function PropertyGallery({ fotos = [], titulo, finalidadeLabel }:
         ) : (
           <div className="flex h-full items-center justify-center text-gray-400">Sem Foto</div>
         )}
-        <div className="absolute inset-x-0 top-0 h-1 bg-secondary/90" />
         {finalidadeLabel ? (
           <span className="absolute left-3 top-3 rounded-sm bg-secondary px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow">
             {finalidadeLabel}
