@@ -28,7 +28,7 @@ async function getFeaturedProperties() {
         populate: "fotos",
         "pagination[limit]": 3,
         sort: "createdAt:desc",
-        "filters[estatus][$eq]": "publicado",
+        "filters[publishedAt][$notNull]": true,
       },
       timeout: 5000 
     });

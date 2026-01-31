@@ -21,7 +21,7 @@ async function getProperties() {
     const res = await api.get("/api/imoveis", {
       params: {
         populate: "fotos",
-        "filters[estatus][$eq]": "publicado",
+        "filters[publishedAt][$notNull]": true,
         sort: "createdAt:desc",
       },
       timeout: 5000,
