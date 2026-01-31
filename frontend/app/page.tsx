@@ -1,48 +1,10 @@
-import Link from "next/link";
-import Image from "next/image";
-import { api } from "../lib/api";
+import PropertyGrid from "@/components/PropertyGrid";
 import { MagnifyingGlassIcon, HomeIcon, CurrencyDollarIcon, CheckBadgeIcon } from '@heroicons/react/24/outline'
-
-// ... existing types ...
-interface ImovelData {
-  id: number;
-  documentId: string;
-  titulo: string;
-  bairro: string | { bairro: string; regiao?: string };
-  quartos: number;
-  banheiros: number;
-  preco: number;
-  finalidade?: string;
-  tipo?: string;
-  fotos: any[];
-}
 
 // Force dynamic rendering to ensure we don't cache 403 errors
 export const dynamic = 'force-dynamic';
 
-async function getFeaturedProperties() {
-  try {
-    // Fetch 3 latest properties
-    const res = await api.get("/api/imoveis", {
-      params: {
-        populate: "fotos",
-        "pagination[limit]": 3,
-        sort: "createdAt:desc",
-        "filters[publishedAt][$notNull]": true,
-      },
-      timeout: 5000 
-    });
-    return res.data.data || [];
-  } catch (error: any) {
-    console.error("Failed to fetch properties:", error.response?.status, error.response?.data);
-    // Return empty array instead of crashing/showing error page, or handle explicitly
-    return [];
-  }
-}
-
 export default async function Home() {
-  const properties = await getFeaturedProperties();
-
   return (
     <div className="bg-white">
       {/* Hero Section with Search */}
@@ -128,71 +90,7 @@ export default async function Home() {
           </p>
         </div>
         
-        <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-          {properties.length > 0 ? (
-            properties.map((property: ImovelData) => {
-              const bairroLabel =
-                typeof property.bairro === 'string' ? property.bairro : property.bairro?.bairro;
-              const finalidadeLabel =
-                property.finalidade === 'aluguel'
-                  ? 'Aluguel'
-                  : property.finalidade === 'venda'
-                    ? 'Venda'
-                    : '';
-              return (
-              <Link key={property.id || property.documentId} href={`/imoveis/${property.documentId || property.id}`} className="group flex flex-col items-start justify-between hover:shadow-lg transition-shadow rounded-2xl p-4 bg-white border border-gray-100">
-                <div className="relative w-full overflow-hidden rounded-xl bg-gray-200 aspect-[16/9]">
-                  {property.fotos && property.fotos[0]?.url ? (
-                    <Image
-                      src={property.fotos[0]?.url}
-                      alt={property.titulo}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-gray-400">
-                      Sem Foto
-                    </div>
-                  )}
-                  {finalidadeLabel ? (
-                    <span className="absolute left-3 top-3 rounded-full bg-secondary/90 px-3 py-1 text-xs font-semibold text-white shadow">
-                      {finalidadeLabel}
-                    </span>
-                  ) : null}
-                </div>
-                <div className="max-w-xl w-full">
-                  <div className="mt-6 flex items-center gap-x-4 text-xs">
-                    <span className="text-gray-500">{bairroLabel}</span>
-                    <span className="relative z-10 rounded-full bg-primary/10 px-3 py-1.5 font-medium text-primary">
-                      Disponível
-                    </span>
-                  </div>
-                  <div className="group relative">
-                    <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-primary transition-colors">
-                      {property.titulo}
-                    </h3>
-                    {property.tipo ? (
-                      <p className="mt-1 text-sm text-gray-600">{property.tipo}</p>
-                    ) : null}
-                    <p className="mt-2 text-lg font-bold text-gray-900">
-                      {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(property.preco || 0)}
-                    </p>
-                    <div className="mt-4 flex gap-4 text-sm text-gray-600">
-                        <span>{property.quartos} Quartos</span>
-                        <span>•</span>
-                        <span>{property.banheiros} Banheiros</span>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-              )
-            })
-          ) : (
-            <div className="col-span-full text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
-                <p className="text-gray-500">Nenhum imóvel em destaque encontrado no momento.</p>
-            </div>
-          )}
-        </div>
+        <PropertyGrid limit={3} emptyMessage="Nenhum imóvel em destaque encontrado no momento." />
       </div>
 
       {/* How It Works Section */}
