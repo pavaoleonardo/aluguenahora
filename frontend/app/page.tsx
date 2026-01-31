@@ -27,13 +27,21 @@ export default async function Home() {
             </p>
             
             {/* Search Box */}
-            <div className="mt-10 bg-white p-4 rounded-lg shadow-xl flex flex-col sm:flex-row gap-4 items-center">
+            <div className="mt-10 rounded-lg bg-white p-4 shadow-xl">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1.2fr_0.9fr_1.1fr_0.9fr_auto] sm:items-center">
                 <input 
                   type="text" 
-                  placeholder="Digite o bairro ou cidade..." 
-                  className="w-full sm:w-auto flex-1 rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                  placeholder="Digite o bairro..." 
+                  className="h-11 w-full rounded-md border-0 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                 />
-                <select className="w-full sm:w-auto rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6">
+                <input
+                  type="text"
+                  value="Campo Grande - MS"
+                  readOnly
+                  aria-readonly="true"
+                  className="h-11 w-full rounded-md border-0 bg-gray-50 pl-3 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-200 focus:outline-none sm:text-sm sm:leading-6"
+                />
+                <select className="h-11 w-full rounded-md border-0 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6">
                     <option>Todos os Tipos</option>
                     <optgroup label="--- RESIDENCIAL ---">
                       <option>Apart Hotel / Flat / Loft</option>
@@ -67,15 +75,16 @@ export default async function Home() {
                       <option>Sitio</option>
                     </optgroup>
                 </select>
-                 <select className="w-full sm:w-auto rounded-md border-0 py-2.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6">
+                <select className="h-11 w-full rounded-md border-0 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6">
                     <option>Aluguel ou Venda</option>
                     <option>Aluguel</option>
                     <option>Venda</option>
                 </select>
-                <button className="w-full sm:w-auto rounded-md bg-secondary px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary flex items-center justify-center gap-2">
+                <button className="flex h-11 w-full items-center justify-center gap-2 rounded-md bg-secondary px-6 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary sm:w-auto">
                     <MagnifyingGlassIcon className="h-5 w-5" />
                     Buscar
                 </button>
+              </div>
             </div>
           </div>
         </div>
