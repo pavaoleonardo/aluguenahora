@@ -2,6 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { api } from "@/lib/api";
 
+// Force dynamic rendering to avoid build-time fetches on Vercel
+export const dynamic = 'force-dynamic';
+
 type Imovel = {
   id: number;
   documentId: string;
