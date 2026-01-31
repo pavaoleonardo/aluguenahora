@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { bairrosPorRegiao } from '@/lib/bairrosCampoGrande'
 
 type BairroValue = { regiao: string; bairro: string } | string | null
 
@@ -17,97 +18,6 @@ type ImovelForm = {
   finalidade: string
   tipo: string
   tamanho: string
-}
-
-const bairrosPorRegiao: Record<string, string[]> = {
-  Centro: [
-    'Amambaí',
-    'Bela Vista',
-    'Cabreúva',
-    'Carvalho',
-    'Centro',
-    'Cruzeiro',
-    'Glória',
-    'Itanhangá',
-    'Jardim dos Estados',
-    'Monte Líbano',
-    'Planalto',
-    'São Bento',
-    'São Francisco',
-  ],
-  Segredo: [
-    'Coronel Antonino',
-    'José Abrão',
-    'Mata do Segredo',
-    'Monte Castelo',
-    'Nasser',
-    'Nova Lima',
-    'Seminário',
-  ],
-  Prosa: [
-    'Autonomista',
-    'Carandá',
-    'Chácara Cachoeira',
-    'Chácara dos Poderes',
-    'Estrela Dalva',
-    'Margarida',
-    'Mata do Jacinto',
-    'Noroeste',
-    'Novos Estados',
-    'Santa Fé',
-    'Veraneio',
-  ],
-  Bandeira: [
-    'Carlota',
-    'Dr. Albuquerque',
-    'Jardim Paulista',
-    'Maria Aparecida Pedrossian',
-    'Moreninha',
-    'Rita Vieira',
-    'São Lourenço',
-    'TV Morena',
-    'Tiradentes',
-    'Universitário',
-    'Vilasboas',
-  ],
-  Anhanduizinho: [
-    'Aero Rancho',
-    'Alves Pereira',
-    'América',
-    'Centenário',
-    'Centro-Oeste',
-    'Guanandi',
-    'Jacy',
-    'Jockey Club',
-    'Lageado',
-    'Los Angeles',
-    'Parati',
-    'Pioneiros',
-    'Piratininga',
-    'Taquarussu',
-  ],
-  Lagoa: [
-    'Bandeirantes',
-    'Batistão',
-    'Caiobá',
-    'Caiçara',
-    'Coophavila II',
-    'Leblon',
-    'São Conrado',
-    'Tarumã',
-    'Taveirópolis',
-    'Tijuca',
-    'União',
-  ],
-  Imbirussu: [
-    'Nova Campo Grande',
-    'Núcleo Industrial',
-    'Panamá',
-    'Popular',
-    'Santo Amaro',
-    'Santo Antônio',
-    'Sobrinho',
-  ],
 }
 
 export default function EditPropertyPage({ params }: { params: { id: string } }) {

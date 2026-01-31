@@ -1,5 +1,6 @@
 import PropertyGrid from "@/components/PropertyGrid";
 import { MagnifyingGlassIcon, HomeIcon, CurrencyDollarIcon, CheckBadgeIcon } from '@heroicons/react/24/outline'
+import { bairrosPorRegiao } from '@/lib/bairrosCampoGrande'
 
 // Force dynamic rendering to ensure we don't cache 403 errors
 export const dynamic = 'force-dynamic';
@@ -28,18 +29,25 @@ export default async function Home() {
             
             {/* Search Box */}
             <div className="mt-10 rounded-lg bg-white p-4 shadow-xl">
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1.2fr_0.9fr_1.1fr_0.9fr_auto] sm:items-center">
-                <input 
-                  type="text" 
-                  placeholder="Digite o bairro..." 
-                  className="h-11 w-full rounded-md border-0 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                />
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1.2fr_1.35fr_1.1fr_0.9fr_auto] sm:items-center">
+                <select className="h-11 w-full rounded-md border-0 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6">
+                  <option value="">Todos os Bairros</option>
+                  {Object.entries(bairrosPorRegiao).map(([regiao, bairros]) => (
+                    <optgroup key={regiao} label={`--- ${regiao.toUpperCase()} ---`}>
+                      {bairros.map((bairro) => (
+                        <option key={`${regiao}-${bairro}`} value={bairro}>
+                          {bairro}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
                 <input
                   type="text"
                   value="Campo Grande - MS"
                   readOnly
                   aria-readonly="true"
-                  className="h-11 w-full rounded-md border-0 bg-gray-50 pl-3 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-200 focus:outline-none sm:text-sm sm:leading-6"
+                  className="h-11 w-full min-w-[190px] rounded-md border-0 bg-gray-50 pl-3 pr-3 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-200 focus:outline-none sm:text-sm sm:leading-6"
                 />
                 <select className="h-11 w-full rounded-md border-0 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6">
                     <option>Todos os Tipos</option>
