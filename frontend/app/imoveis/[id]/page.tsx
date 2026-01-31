@@ -1,7 +1,7 @@
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { api } from "@/lib/api";
+import PropertyGallery from "@/components/PropertyGallery";
 
 // Fetch property by Document ID (Strapi 5 standard) or ID depending on how user navigates
 // For Strapi 5, `documentId` is preferred for stable ID. URL /imoveis/[id] probably uses documentId.
@@ -58,37 +58,11 @@ export default async function PropertyDetailsPage({
     <div className="bg-white py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="lg:grid lg:grid-cols-2 lg:gap-x-8">
-          {/* Image Gallery */}
-          <div className="flex flex-col gap-4">
-             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-gray-100">
-                {property.fotos && property.fotos[0]?.url ? (
-                  <Image
-                    src={property.fotos[0].url}
-                    alt={property.titulo}
-                    fill
-                    className="object-cover"
-                    priority
-                  />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-gray-400">Sem Foto</div>
-                )}
-                {finalidadeLabel ? (
-                  <span className="absolute left-3 top-3 rounded-full bg-secondary/90 px-3 py-1 text-xs font-semibold text-white shadow">
-                    {finalidadeLabel}
-                  </span>
-                ) : null}
-             </div>
-             {/* Thumbnails (Static for now if multiple) */}
-             {property.fotos && property.fotos.length > 1 && (
-                 <div className="grid grid-cols-4 gap-4">
-                     {property.fotos.slice(1, 5).map((foto: any, idx: number) => (
-                         <div key={idx} className="relative aspect-square overflow-hidden rounded-md bg-gray-100">
-                            <Image src={foto.url} alt={`Foto ${idx + 2}`} fill className="object-cover" />
-                         </div>
-                     ))}
-                 </div>
-             )}
-          </div>
+          <PropertyGallery
+            fotos={property.fotos}
+            titulo={property.titulo}
+            finalidadeLabel={finalidadeLabel}
+          />
 
           {/* Property Info */}
           <div className="mt-10 lg:mt-0 lg:pl-8">
