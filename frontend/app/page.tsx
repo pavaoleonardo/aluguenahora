@@ -19,7 +19,7 @@ export default async function Home() {
         </div>
         
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl py-20 sm:py-32 lg:py-40 text-center">
+          <div className="mx-auto max-w-4xl py-20 sm:py-32 lg:py-40 text-center">
             <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
               Encontre o Imóvel Ideal
             </h1>
@@ -28,9 +28,9 @@ export default async function Home() {
             </p>
             
             {/* Search Box */}
-            <div className="mt-10 rounded-lg bg-white p-4 shadow-xl">
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1.2fr_1.35fr_1.1fr_0.9fr_auto] sm:items-center">
-                <select className="h-11 w-full rounded-md border-0 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6">
+            <div className="mx-auto mt-10 max-w-4xl rounded-lg bg-white p-4 shadow-xl">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(220px,1.6fr)_minmax(190px,1.1fr)_minmax(210px,1.2fr)_minmax(180px,1fr)_auto] sm:items-center">
+                <select className="h-11 w-full min-w-[220px] rounded-md border-0 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6">
                   <option value="">Todos os Bairros</option>
                   {Object.entries(bairrosPorRegiao).map(([regiao, bairros]) => (
                     <optgroup key={regiao} label={`--- ${regiao.toUpperCase()} ---`}>
@@ -47,9 +47,9 @@ export default async function Home() {
                   value="Campo Grande - MS"
                   readOnly
                   aria-readonly="true"
-                  className="h-11 w-full min-w-[190px] rounded-md border-0 bg-gray-50 pl-3 pr-3 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-200 focus:outline-none sm:text-sm sm:leading-6"
+                  className="h-11 w-full min-w-[200px] rounded-md border-0 bg-gray-50 pl-3 pr-3 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-200 focus:outline-none sm:text-sm sm:leading-6"
                 />
-                <select className="h-11 w-full rounded-md border-0 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6">
+                <select className="h-11 w-full min-w-[210px] rounded-md border-0 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6">
                     <option>Todos os Tipos</option>
                     <optgroup label="--- RESIDENCIAL ---">
                       <option>Apart Hotel / Flat / Loft</option>
@@ -83,7 +83,7 @@ export default async function Home() {
                       <option>Sitio</option>
                     </optgroup>
                 </select>
-                <select className="h-11 w-full rounded-md border-0 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6">
+                <select className="h-11 w-full min-w-[180px] rounded-md border-0 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6">
                     <option>Aluguel ou Venda</option>
                     <option>Aluguel</option>
                     <option>Venda</option>
