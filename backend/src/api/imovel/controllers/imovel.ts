@@ -12,8 +12,8 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
       ctx.query.filters = {
         ...(ctx.query.filters as any || {}),
         usuario: {
-          documentId: {
-            $eq: ctx.state.user.documentId
+          id: {
+            $eq: ctx.state.user.id
           }
         }
       };
@@ -42,8 +42,8 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
   },
   async create(ctx) {
     if (ctx.state.user) {
-      // Force the usuario to be the current user
-      ctx.request.body.data.usuario = ctx.state.user.documentId;
+      // Force the usuario to be the current user (users-permissions uses numeric id)
+      ctx.request.body.data.usuario = ctx.state.user.id;
     }
     
     try {
