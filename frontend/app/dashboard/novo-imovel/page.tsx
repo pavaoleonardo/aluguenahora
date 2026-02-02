@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { bairrosPorRegiao } from '@/lib/bairrosCampoGrande'
+import { API_BASE_URL } from '@/lib/apiBase'
 
 export default function NewPropertyPage() {
   const router = useRouter()
@@ -64,7 +65,7 @@ export default function NewPropertyPage() {
       const user = JSON.parse(userStr)
 
       // 1. Create Property
-      const res = await fetch('http://localhost:1337/api/imoveis', {
+      const res = await fetch(`${API_BASE_URL}/api/imoveis`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -113,7 +114,7 @@ export default function NewPropertyPage() {
         uploadForm.append('refId', String(propertyId))
         uploadForm.append('field', 'fotos')
 
-        const uploadRes = await fetch('http://localhost:1337/api/upload', {
+        const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,

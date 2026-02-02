@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { bairrosPorRegiao } from '@/lib/bairrosCampoGrande'
+import { API_BASE_URL } from '@/lib/apiBase'
 
 type BairroValue = { regiao: string; bairro: string } | string | null
 
@@ -45,7 +46,7 @@ export default function EditPropertyPage({ params }: { params: { id: string } })
       return
     }
 
-    fetch(`http://localhost:1337/api/imoveis/${params.id}?populate=fotos`, {
+    fetch(`${API_BASE_URL}/api/imoveis/${params.id}?populate=fotos`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -103,7 +104,7 @@ export default function EditPropertyPage({ params }: { params: { id: string } })
       const token = localStorage.getItem('token')
       if (!token) throw new Error('Not authenticated')
 
-      const res = await fetch(`http://localhost:1337/api/imoveis/${params.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/imoveis/${params.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

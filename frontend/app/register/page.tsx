@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
+import { API_BASE_URL } from '@/lib/apiBase'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -20,7 +21,7 @@ export default function RegisterPage() {
     setError('')
 
     try {
-      const res = await fetch('http://localhost:1337/api/auth/local/register', {
+      const res = await fetch(`${API_BASE_URL}/api/auth/local/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password }),

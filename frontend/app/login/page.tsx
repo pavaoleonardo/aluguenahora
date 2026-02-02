@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { api } from '@/lib/api'
 import { useAuth } from '@/context/AuthContext'
+import { API_BASE_URL } from '@/lib/apiBase'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -27,7 +27,7 @@ export default function LoginPage() {
       // or we can just use `api.post` if the hardcoded token allows auth requests (usually yes).
       
       // Let's use `fetch` to be safe and raw.
-      const res = await fetch('http://localhost:1337/api/auth/local', {
+      const res = await fetch(`${API_BASE_URL}/api/auth/local`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ identifier: email, password }),

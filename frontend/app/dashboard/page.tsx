@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAuth } from '@/context/AuthContext'
+import { API_BASE_URL } from '@/lib/apiBase'
 
 interface Attributes {
   titulo: string;
@@ -45,7 +46,7 @@ export default function DashboardPage() {
     }
 
     // Simplified fetch: backend automatically filters by the authenticated user
-    fetch(`http://localhost:1337/api/imoveis?populate=fotos`, {
+    fetch(`${API_BASE_URL}/api/imoveis?populate=fotos`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
