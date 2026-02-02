@@ -29,3 +29,19 @@ body {
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
+
+.force-light {
+  color-scheme: light;
+}
+
+.force-light input,
+.force-light select,
+.force-light textarea {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+.force-light input::placeholder,
+.force-light textarea::placeholder {
+  color: #6b7280;
+}
