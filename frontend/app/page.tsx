@@ -29,8 +29,15 @@ export default async function Home() {
             
             {/* Search Box */}
             <div className="mx-auto mt-10 max-w-5xl rounded-2xl border border-white/30 bg-white/95 p-4 shadow-2xl ring-1 ring-black/5 backdrop-blur">
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[1.4fr_1.2fr_1.2fr_1fr_auto] lg:items-center">
-                <select className="h-11 w-full min-w-0 rounded-md border-0 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 lg:min-w-[220px]">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(200px,1fr)_minmax(230px,1.4fr)_minmax(220px,1.2fr)_minmax(180px,1fr)_auto] lg:items-center">
+                <input
+                  type="text"
+                  value="Campo Grande - MS"
+                  readOnly
+                  aria-readonly="true"
+                  className="h-11 w-full min-w-0 rounded-md border-0 bg-gray-50 pl-3 pr-3 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-200 focus:outline-none sm:text-sm sm:leading-6 lg:min-w-[200px]"
+                />
+                <select className="h-11 w-full min-w-0 rounded-md border-0 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 lg:min-w-[230px]">
                   <option value="">Todos os Bairros</option>
                   {Object.entries(bairrosPorRegiao).map(([regiao, bairros]) => (
                     <optgroup key={regiao} label={`--- ${regiao.toUpperCase()} ---`}>
@@ -42,13 +49,6 @@ export default async function Home() {
                     </optgroup>
                   ))}
                 </select>
-                <input
-                  type="text"
-                  value="Campo Grande - MS"
-                  readOnly
-                  aria-readonly="true"
-                  className="h-11 w-full min-w-0 rounded-md border-0 bg-gray-50 pl-3 pr-3 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-200 focus:outline-none sm:text-sm sm:leading-6 lg:min-w-[200px]"
-                />
                 <select className="h-11 w-full min-w-0 rounded-md border-0 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 lg:min-w-[220px]">
                     <option>Todos os Tipos</option>
                     <optgroup label="--- RESIDENCIAL ---">
