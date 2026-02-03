@@ -129,9 +129,7 @@ export default function PropertyDetailClient({ id }: { id: string }) {
                 <span className="flex items-center gap-2" title="Quartos">
                    {/* Bed Icon */}
                    <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                     <path strokeLinecap="round" strokeLinejoin="round" d="M22.5 12a2.25 2.25 0 01-2.25 2.25H21V21h-2.25V14.25h-13.5V21H3v-6.75H2.25a2.25 2.25 0 01-2.25-2.25v-4.5a2.25 2.25 0 012.25-2.25H3V5.25A2.25 2.25 0 015.25 3h13.5A2.25 2.25 0 0121 5.25v3h.75a2.25 2.25 0 012.25 2.25v4.5z" style={{display: 'none'}} /> 
-                     {/* Simpler Bed Path */}
-                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 20v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8M3 10V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4M14 10V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4" />
                    </svg>
                    {property.quartos} Quartos
                 </span>
