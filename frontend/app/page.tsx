@@ -29,7 +29,7 @@ export default async function Home() {
             
             {/* Search Box */}
             <div className="mx-auto mt-10 max-w-5xl rounded-2xl border border-white/30 bg-white/95 p-4 shadow-2xl ring-1 ring-black/5 backdrop-blur">
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(200px,1fr)_minmax(230px,1.4fr)_minmax(220px,1.2fr)_minmax(180px,1fr)_auto] lg:items-center">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:items-center">
                 <input
                   type="text"
                   value="Campo Grande - MS"
@@ -88,7 +88,7 @@ export default async function Home() {
                     <option>Aluguel</option>
                     <option>Venda</option>
                 </select>
-                <button className="flex h-11 w-full items-center justify-center gap-2 rounded-md bg-secondary px-6 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary sm:col-span-2 lg:col-auto lg:w-auto">
+                <button className="flex h-11 w-full items-center justify-center gap-2 rounded-md bg-secondary px-6 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary sm:col-span-2 lg:col-span-4 lg:justify-self-center lg:w-48">
                     <MagnifyingGlassIcon className="h-5 w-5" />
                     Buscar
                 </button>
