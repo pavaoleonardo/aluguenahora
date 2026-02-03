@@ -68,11 +68,7 @@ export default function PropertyGallery({ fotos = [], titulo, finalidadeLabel }:
             {finalidadeLabel}
           </span>
         ) : null}
-        {active?.label ? (
-          <span className="absolute left-3 bottom-3 rounded-sm bg-black/70 px-3 py-1 text-xs font-medium text-white">
-            {active.label}
-          </span>
-        ) : null}
+
         {total > 0 ? (
           <span className="absolute right-3 top-3 rounded-sm bg-black/70 px-2.5 py-1 text-xs font-semibold text-white">
             {activeIndex + 1}/{total}

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { api } from '@/lib/api'
 import PropertyGallery from '@/components/PropertyGallery'
+import { UserGroupIcon, SparklesIcon, ArrowsPointingOutIcon } from '@heroicons/react/24/outline'
 
 type BairroValue = string | { bairro: string; regiao?: string }
 
@@ -124,10 +125,19 @@ export default function PropertyDetailClient({ id }: { id: string }) {
 
             <div className="mt-4 border-t border-b border-gray-200 py-4 flex items-center justify-between text-sm text-gray-500">
               <span>{bairroLabel}</span>
-              <div className="flex gap-4">
-                <span>{property.quartos} Quartos</span>
-                <span>{property.banheiros} Banheiros</span>
-                <span>{property.tamanho} m²</span>
+              <div className="flex gap-6">
+                <span className="flex items-center gap-2" title="Quartos">
+                   <UserGroupIcon className="h-5 w-5 text-gray-400" />
+                   {property.quartos} Quartos
+                </span>
+                <span className="flex items-center gap-2" title="Banheiros">
+                   <SparklesIcon className="h-5 w-5 text-gray-400" />
+                   {property.banheiros} Banheiros
+                </span>
+                <span className="flex items-center gap-2" title="Área Total">
+                   <ArrowsPointingOutIcon className="h-5 w-5 text-gray-400" />
+                   {property.tamanho} m²
+                </span>
               </div>
             </div>
             {property.tipo ? (
