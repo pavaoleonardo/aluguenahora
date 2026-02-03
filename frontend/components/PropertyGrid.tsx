@@ -108,9 +108,33 @@ export default function PropertyGrid({ limit, emptyMessage }: PropertyGridProps)
                     )}
                   </p>
                   <div className="mt-4 flex gap-4 text-sm text-gray-600">
-                    <span>{property.quartos} Quartos</span>
+                    <span className="flex items-center gap-1">
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 20v-5.26a3 3 0 011.08-2.32L10 9.05V6a1 1 0 00-1-1H4a1 1 0 00-1 1v14h2zm6 0v-4.66a2.98 2.98 0 01.32-1.32l1.62-3.23a1 1 0 01.9-.55h4.3a1 1 0 01.9.55l1.62 3.23a2.98 2.98 0 01.32 1.32V20H11z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 20h18" />
+                        {/* Alternative simpler Bed icon */}
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2 22v-8c0-3.3 2.7-6 6-6h8c3.3 0 6 2.7 6 6v8M2 14h20" style={{ display: 'none' }} /> 
+                        {/* Using explicit simple bed path */}
+                        <path d="M3 10V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v5" opacity="0" /> {/* Spacer */}
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21H3v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8z M21 11v10 M3 11v10 M6 8v3 M18 8v3" />
+                      </svg>
+                      {/* Using a cleaner Bed SVG */}
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                      </svg>
+                      <span>{property.quartos} Quartos</span>
+                    </span>
                     <span>•</span>
-                    <span>{property.banheiros} Banheiros</span>
+                    <span className="flex items-center gap-1">
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 13v-1m4 1v-3m4 3V8M8 21l-1.375-3A2.625 2.625 0 0 1 9 14.375h6A2.625 2.625 0 0 1 17.375 18L16 21M3 21h18M6 10H5a2 2 0 0 0-2 2v9M19 10h1a2 2 0 0 1 2 2v9" />
+                      </svg>
+                       {/* Better Shower/Bath SVG */}
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
+                      </svg>
+                      <span>{property.banheiros} Banheiros</span>
+                    </span>
                   </div>
                 </div>
               </div>
