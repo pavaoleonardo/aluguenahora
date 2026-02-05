@@ -114,7 +114,7 @@ export default function SearchBar() {
         <div className="mt-6">
             <button className="flex h-[56px] w-full items-center justify-center gap-2 rounded-xl bg-secondary px-8 text-lg font-bold text-white shadow-lg transition-all hover:bg-orange-700 hover:shadow-orange-500/30 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 active:scale-95">
               <MagnifyingGlassIcon className="h-6 w-6 stroke-[2.5]" />
-              <span>CONFIRMAR BUSCA</span>
+              <span>BUSCAR</span>
             </button>
         </div>
       </div>
