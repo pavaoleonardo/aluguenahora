@@ -128,15 +128,15 @@ export default function PropertyDetailClient({ id }: { id: string }) {
               <div className="flex gap-6">
                 <span className="flex items-center gap-2" title="Quartos">
                    {/* Bed Icon */}
-                   <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 20v-8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8M3 10V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4M14 10V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4" />
+                   <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                     <path d="M3 7h18a2 2 0 0 1 2 2v10h-2v-3H3v3H1V9a2 2 0 0 1 2-2zm2 2v3h6V9H5zm8 0v3h6V9h-6z" />
                    </svg>
                    {property.quartos} Quartos
                 </span>
                 <span className="flex items-center gap-2" title="Banheiros">
                    {/* Shower Icon */}
                    <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 4a4 4 0 014 4v2a2 2 0 002 2h4a2 2 0 002-2V8a4 4 0 00-4-4H8zm0 0V2m4 2V2m4 2V2M12 16v6M8 18v4M16 18v4" />
                    </svg>
                    {property.banheiros} Banheiros
                 </span>
