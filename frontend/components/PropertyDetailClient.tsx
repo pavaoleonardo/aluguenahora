@@ -4,7 +4,17 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { api } from '@/lib/api'
 import PropertyGallery from '@/components/PropertyGallery'
-import { ArrowsPointingOutIcon } from '@heroicons/react/24/outline'
+import { ArrowsPointingOutIcon, MapPinIcon } from '@heroicons/react/24/outline'
+import dynamic from 'next/dynamic'
+
+const PropertyMap = dynamic(() => import('@/components/PropertyMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[400px] w-full bg-gray-100 animate-pulse rounded-xl border border-gray-200 flex items-center justify-center text-gray-400">
+      Carregando mapa...
+    </div>
+  ),
+})
 
 type BairroValue = string | { bairro: string; regiao?: string }
 
@@ -21,6 +31,9 @@ type ImovelDetail = {
   finalidade?: string
   tipo?: string
   fotos?: any[]
+  endereco?: string
+  latitude?: number
+  longitude?: number
 }
 
 export default function PropertyDetailClient({ id }: { id: string }) {
@@ -165,6 +178,27 @@ export default function PropertyDetailClient({ id }: { id: string }) {
             </div>
           </div>
         </div>
+        
+        {/* Map Section */}
+        {property.latitude && property.longitude && (
+          <div className="mt-16 lg:mt-24">
+             <div className="border-t border-gray-200 pt-10">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">Localização</h3>
+                {property.endereco && (
+                  <p className="mb-6 text-gray-600 flex items-start gap-2 text-lg">
+                    <MapPinIcon className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" /> 
+                    {property.endereco}
+                  </p>
+                )}
+                <PropertyMap 
+                  latitude={property.latitude} 
+                  longitude={property.longitude} 
+                  titulo={property.titulo} 
+                />
+             </div>
+          </div>
+        )}
+
       </div>
     </div>
   )

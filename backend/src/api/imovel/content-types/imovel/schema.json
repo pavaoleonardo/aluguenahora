@@ -44,6 +44,15 @@
         "venda"
       ]
     },
+    "endereco": {
+      "type": "string"
+    },
+    "latitude": {
+      "type": "decimal"
+    },
+    "longitude": {
+      "type": "decimal"
+    },
     "tipo": {
       "type": "enumeration",
       "enum": [
