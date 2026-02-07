@@ -12,7 +12,7 @@ export default function NewPropertyPage() {
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
   const [formData, setFormData] = useState({
     titulo: '',
-    descricao: '', // Note: Textarea for rich text field
+    descricao: '',
     preco: '',
     quartos: '',
     banheiros: '',
@@ -22,7 +22,28 @@ export default function NewPropertyPage() {
     finalidade: '',
     tipo: '',
     tamanho: '',
+    endereco: '',
   })
+  const [geocoding, setGeocoding] = useState(false)
+
+  // Geocode address using OpenStreetMap Nominatim API (free)
+  const geocodeAddress = async (address: string): Promise<{ lat: number; lon: number } | null> => {
+    if (!address.trim()) return null
+    try {
+      const fullAddress = `${address}, ${formData.bairro}, Campo Grande, MS, Brasil`
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}&limit=1`,
+        { headers: { 'User-Agent': 'AlugueNaHora/1.0' } }
+      )
+      const data = await response.json()
+      if (data && data.length > 0) {
+        return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) }
+      }
+    } catch (error) {
+      console.error('Geocoding error:', error)
+    }
+    return null
+  }
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -56,6 +77,7 @@ export default function NewPropertyPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setGeocoding(true)
 
     try {
       const token = localStorage.getItem('token')
@@ -64,7 +86,19 @@ export default function NewPropertyPage() {
       
       const user = JSON.parse(userStr)
 
-      // 1. Create Property
+      // Geocode the address to get coordinates
+      let latitude: number | null = null
+      let longitude: number | null = null
+      if (formData.endereco) {
+        const coords = await geocodeAddress(formData.endereco)
+        if (coords) {
+          latitude = coords.lat
+          longitude = coords.lon
+        }
+      }
+      setGeocoding(false)
+
+      // Create Property
       const res = await fetch(`${API_BASE_URL}/api/imoveis`, {
         method: 'POST',
         headers: {
@@ -74,12 +108,6 @@ export default function NewPropertyPage() {
         body: JSON.stringify({
           data: {
             titulo: formData.titulo,
-            // descricao: needs to be blocks format for Strapi 5 rich text or string if changed. 
-            // Assuming string/text first or we'll send a simple block.
-            // If schema "descricao" is blocks, we must send structured data or clean text.
-            // For now, let's assume I can send text or I need to format it.
-            // If it's a "blocks" field, strict format is required. 
-            // Workaround: Send a dummy block. Or check schema. Schema said `blocks`.
             descricao: [
                 {
                     type: 'paragraph',
@@ -94,7 +122,10 @@ export default function NewPropertyPage() {
             finalidade: formData.finalidade,
             tipo: formData.tipo,
             tamanho: Number(formData.tamanho),
-            estatus: 'pendente'
+            estatus: 'pendente',
+            endereco: formData.endereco || null,
+            latitude: latitude,
+            longitude: longitude,
           }
         })
       })
@@ -269,6 +300,19 @@ export default function NewPropertyPage() {
                     </select>
                 </div>
 
+                <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Endereço Completo</label>
+                    <input
+                      type="text"
+                      name="endereco"
+                      placeholder="Ex: Rua das Flores, 123"
+                      value={formData.endereco}
+                      onChange={handleChange}
+                      className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">O endereço será usado para mostrar a localização no mapa</p>
+                </div>
+
                 <div>
                     <label className="block text-sm font-medium leading-6 text-gray-900">Quartos</label>
                     <input type="number" name="quartos" value={formData.quartos} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
@@ -321,7 +365,7 @@ export default function NewPropertyPage() {
                   disabled={loading}
                   className="rounded-md bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 >
-                  {loading ? 'Enviando...' : 'Enviar para Aprovação'}
+                  {loading ? (geocoding ? 'Localizando endereço...' : 'Enviando...') : 'Enviar para Aprovação'}
                 </button>
             </div>
          </form>
