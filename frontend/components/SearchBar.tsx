@@ -1,9 +1,27 @@
 "use client";
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { MagnifyingGlassIcon, MapPinIcon, HomeIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
 import { bairrosPorRegiao } from '@/lib/bairrosCampoGrande';
 
 export default function SearchBar() {
+  const router = useRouter();
+  const [filters, setFilters] = useState({
+    bairro: '',
+    tipo: '',
+    finalidade: ''
+  });
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (filters.bairro) params.set('bairro', filters.bairro);
+    if (filters.tipo) params.set('tipo', filters.tipo);
+    if (filters.finalidade) params.set('finalidade', filters.finalidade);
+    
+    router.push(`/imoveis?${params.toString()}`);
+  };
+
   return (
     <div className="w-full max-w-5xl mx-auto">
       {/* Main Search Bar */}
@@ -33,7 +51,11 @@ export default function SearchBar() {
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <MapPinIcon className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
                 </div>
-                <select className="block w-full rounded-xl border-0 bg-gray-50 py-3 pl-10 pr-4 text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-primary sm:text-sm sm:leading-6 transition-all hover:bg-gray-100 cursor-pointer appearance-none">
+                <select 
+                  value={filters.bairro}
+                  onChange={(e) => setFilters({ ...filters, bairro: e.target.value })}
+                  className="block w-full rounded-xl border-0 bg-gray-50 py-3 pl-10 pr-4 text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-primary sm:text-sm sm:leading-6 transition-all hover:bg-gray-100 cursor-pointer appearance-none"
+                >
                 <option value="">Todos os Bairros</option>
                 {Object.entries(bairrosPorRegiao).map(([regiao, bairros]) => (
                     <optgroup key={regiao} label={regiao}>
@@ -60,24 +82,29 @@ export default function SearchBar() {
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <HomeIcon className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
                 </div>
-                <select className="block w-full rounded-xl border-0 bg-gray-50 py-3 pl-10 pr-8 text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-primary sm:text-sm sm:leading-6 transition-all hover:bg-gray-100 cursor-pointer appearance-none">
-                <option>Todos os Tipos</option>
+                <select 
+                  value={filters.tipo}
+                  onChange={(e) => setFilters({ ...filters, tipo: e.target.value })}
+                  className="block w-full rounded-xl border-0 bg-gray-50 py-3 pl-10 pr-8 text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-primary sm:text-sm sm:leading-6 transition-all hover:bg-gray-100 cursor-pointer appearance-none"
+                >
+                <option value="">Todos os Tipos</option>
                 <optgroup label="Residencial">
-                    <option>Apartamento</option>
-                    <option>Casa</option>
-                    <option>Sobrado</option>
-                    <option>Kitnet</option>
-                    <option>Studio</option>
+                    <option value="Apartamento">Apartamento</option>
+                    <option value="Casa-Térrea">Casa</option>
+                    <option value="Sobrado">Sobrado</option>
+                    <option value="Kitnet">Kitnet</option>
+                    <option value="Studio">Studio</option>
+                    <option value="Apart Hotel / Flat / Loft">Flat / Loft</option>
                 </optgroup>
                 <optgroup label="Comercial">
-                    <option>Sala Comercial</option>
-                    <option>Galpão</option>
-                    <option>Prédio Inteiro</option>
+                    <option value="Sala / Salão / Loja">Sala Comercial</option>
+                    <option value="Galpão / Depósito">Galpão</option>
+                    <option value="Imóvel Comercial">Prédio / Comercial</option>
                 </optgroup>
                 <optgroup label="Rural">
-                    <option>Chácara</option>
-                    <option>Sítio</option>
-                    <option>Fazenda</option>
+                    <option value="Chácara">Chácara</option>
+                    <option value="Fazenda">Fazenda</option>
+                    <option value="Sitio">Sítio</option>
                 </optgroup>
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -95,7 +122,11 @@ export default function SearchBar() {
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <CurrencyDollarIcon className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
                 </div>
-                <select className="block w-full rounded-xl border-0 bg-gray-50 py-3 pl-10 pr-8 text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-primary sm:text-sm sm:leading-6 transition-all hover:bg-gray-100 cursor-pointer appearance-none">
+                <select 
+                  value={filters.finalidade}
+                  onChange={(e) => setFilters({ ...filters, finalidade: e.target.value })}
+                  className="block w-full rounded-xl border-0 bg-gray-50 py-3 pl-10 pr-8 text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-primary sm:text-sm sm:leading-6 transition-all hover:bg-gray-100 cursor-pointer appearance-none"
+                >
                     <option value="">Aluguel ou Venda</option>
                     <option value="aluguel">Aluguel</option>
                     <option value="venda">Venda</option>
@@ -112,7 +143,10 @@ export default function SearchBar() {
 
         {/* Search Button Row */}
         <div className="mt-6">
-            <button className="flex h-[56px] w-full items-center justify-center gap-2 rounded-xl bg-secondary px-8 text-lg font-bold text-white shadow-lg transition-all hover:bg-orange-700 hover:shadow-orange-500/30 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 active:scale-95">
+            <button 
+              onClick={handleSearch}
+              className="flex h-[56px] w-full items-center justify-center gap-2 rounded-xl bg-secondary px-8 text-lg font-bold text-white shadow-lg transition-all hover:bg-orange-700 hover:shadow-orange-500/30 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 active:scale-95"
+            >
               <MagnifyingGlassIcon className="h-6 w-6 stroke-[2.5]" />
               <span>BUSCAR</span>
             </button>
@@ -121,3 +155,4 @@ export default function SearchBar() {
     </div>
   );
 }
+

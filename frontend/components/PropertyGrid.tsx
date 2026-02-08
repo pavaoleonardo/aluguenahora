@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useSearchParams } from 'next/navigation'
 import { api } from '@/lib/api'
 
 type ImovelData = {
@@ -23,9 +24,10 @@ type PropertyGridProps = {
   emptyMessage: string
 }
 
-export default function PropertyGrid({ limit, emptyMessage }: PropertyGridProps) {
+function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
   const [properties, setProperties] = useState<ImovelData[]>([])
   const [loading, setLoading] = useState(true)
+  const searchParams = useSearchParams()
 
   useEffect(() => {
     const params: Record<string, string | number | boolean> = {
@@ -33,6 +35,22 @@ export default function PropertyGrid({ limit, emptyMessage }: PropertyGridProps)
       sort: 'createdAt:desc',
       'filters[publishedAt][$notNull]': true,
     }
+
+    // Add filters from search params
+    const bairro = searchParams.get('bairro')
+    const tipo = searchParams.get('tipo')
+    const finalidade = searchParams.get('finalidade')
+
+    if (bairro) {
+      params['filters[bairro][bairro][$eq]'] = bairro
+    }
+    if (tipo) {
+      params['filters[tipo][$eq]'] = tipo
+    }
+    if (finalidade) {
+      params['filters[finalidade][$eq]'] = finalidade
+    }
+
     if (limit) {
       params['pagination[limit]'] = limit
     }
@@ -45,7 +63,7 @@ export default function PropertyGrid({ limit, emptyMessage }: PropertyGridProps)
         setProperties([])
       })
       .finally(() => setLoading(false))
-  }, [limit])
+  }, [limit, searchParams])
 
   if (loading) {
     return (
@@ -144,5 +162,17 @@ export default function PropertyGrid({ limit, emptyMessage }: PropertyGridProps)
         </div>
       )}
     </div>
+  )
+}
+
+export default function PropertyGrid(props: PropertyGridProps) {
+  return (
+    <Suspense fallback={
+      <div className="col-span-full text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
+        <p className="text-gray-500">Carregando...</p>
+      </div>
+    }>
+      <PropertyGridContent {...props} />
+    </Suspense>
   )
 }

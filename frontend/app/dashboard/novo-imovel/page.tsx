@@ -29,18 +29,27 @@ export default function NewPropertyPage() {
   // Geocode address using OpenStreetMap Nominatim API (free)
   const geocodeAddress = async (address: string): Promise<{ lat: number; lon: number } | null> => {
     if (!address.trim()) return null
-    try {
-      const fullAddress = `${address}, ${formData.bairro}, Campo Grande, MS, Brasil`
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}&limit=1`,
-        { headers: { 'User-Agent': 'AlugueNaHora/1.0' } }
-      )
-      const data = await response.json()
-      if (data && data.length > 0) {
-        return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) }
+    
+    // Try different address formats
+    const addressVariations = [
+      `${address}, ${formData.bairro}, ${formData.cidade}, MS, Brasil`,
+      `${address}, ${formData.cidade}, MS, Brasil`,
+      `${address}, ${formData.cidade}, Brasil`
+    ].filter(v => v.length > 0);
+
+    for (const fullAddress of addressVariations) {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}&limit=1`,
+          { headers: { 'User-Agent': 'AlugueNaHora-App/1.0 (pavaoleonardo@gmail.com)' } }
+        )
+        const data = await response.json()
+        if (data && data.length > 0) {
+          return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) }
+        }
+      } catch (error) {
+        console.error('Geocoding error variation:', fullAddress, error)
       }
-    } catch (error) {
-      console.error('Geocoding error:', error)
     }
     return null
   }
