@@ -127,89 +127,108 @@ export default async function Home() {
         </div>
       </div>
 
-       {/* Newsletter/Blog Preview (Improved) */}
-       <div className="bg-slate-900 py-24 sm:py-32 relative overflow-hidden">
+       {/* Newsletter/Blog Preview (Real News) */}
+       <div id="noticias" className="bg-slate-50 py-24 sm:py-32 relative overflow-hidden border-t border-gray-100">
          {/* Background accent */}
-         <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-20 pointer-events-none">
+         <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-5 pointer-events-none">
             <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-secondary blur-[100px]"></div>
             <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-primary blur-[100px]"></div>
          </div>
 
         <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Notícias & Tendências</h2>
-            <p className="mt-2 text-lg leading-8 text-gray-300">
-              Fique por dentro das últimas novidades do mercado imobiliário de Campo Grande.
+            <span className="text-primary font-bold tracking-wider uppercase text-sm mb-2 block">Mercado Local</span>
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Notícias de Campo Grande</h2>
+            <p className="mt-2 text-lg leading-8 text-slate-600">
+              Fique por dentro das tendências e oportunidades no mercado imobiliário da nossa capital.
             </p>
           </div>
-          <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-             <article className="flex flex-col items-start justify-between bg-white/5 p-6 rounded-2xl hover:bg-white/10 transition-colors border border-white/10">
+          <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-12 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+             <a 
+               href="https://www.campograndenews.com.br/economia/valorizacao-de-imoveis-no-brasil-passa-de-5-com-bairros-de-cg-em-alta" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               className="flex flex-col items-start justify-between bg-white p-6 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border border-gray-100"
+             >
                 <div className="relative w-full">
-                    <div className="aspect-[16/9] w-full rounded-xl bg-gray-800 object-cover sm:aspect-[2/1] lg:aspect-[3/2] flex items-center justify-center text-gray-400">
-                        <NewspaperIcon className="h-12 w-12 opacity-50" />
+                    <div className="aspect-[16/9] w-full rounded-2xl bg-primary/5 object-cover flex items-center justify-center text-primary group overflow-hidden">
+                        <NewspaperIcon className="h-12 w-12 opacity-40 group-hover:scale-110 transition-transform" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent"></div>
                     </div>
                 </div>
                 <div className="max-w-xl">
                     <div className="mt-8 flex items-center gap-x-4 text-xs">
-                        <time dateTime="2023-01-01" className="text-gray-400">16 de Jan, 2026</time>
-                        <span className="relative z-10 rounded-full bg-primary/20 px-3 py-1.5 font-medium text-blue-300">Dicas</span>
+                        <time dateTime="2025-12-16" className="text-gray-500 font-medium">16 de Jan, 2026</time>
+                        <span className="relative z-10 rounded-full bg-blue-50 px-3 py-1.5 font-bold text-primary">Valorização</span>
                     </div>
                     <div className="group relative">
-                        <h3 className="mt-3 text-lg font-semibold leading-6 text-white group-hover:text-blue-300 transition-colors">
-                            Guia completo para o primeiro aluguel
+                        <h3 className="mt-3 text-lg font-bold leading-6 text-slate-900 group-hover:text-primary transition-colors">
+                            Valorização em Campo Grande supera média nacional em 2025
                         </h3>
-                        <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-400">
-                            Tudo o que você precisa saber antes de assinar o contrato: documentos, taxas, vistoria e garantias locatícias.
+                        <p className="mt-4 line-clamp-3 text-sm leading-6 text-slate-600">
+                            Bairros como São Francisco e Planalto registram altas de até 35%. Preço médio do m² na capital atinge R$ 6.330.
                         </p>
                     </div>
                 </div>
-             </article>
+             </a>
              
-             {/* Mock 2 */}
-              <article className="flex flex-col items-start justify-between bg-white/5 p-6 rounded-2xl hover:bg-white/10 transition-colors border border-white/10">
+             {/* Link 2 */}
+              <a 
+                href="https://www.campograndenews.com.br/economia/mercado-imobiliario-atrai-r-1-7-bilhao-em-investimentos-em-um-ano" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex flex-col items-start justify-between bg-white p-6 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border border-gray-100"
+              >
                 <div className="relative w-full">
-                    <div className="aspect-[16/9] w-full rounded-xl bg-gray-800 object-cover sm:aspect-[2/1] lg:aspect-[3/2] flex items-center justify-center text-gray-400">
-                         <HomeIcon className="h-12 w-12 opacity-50" />
+                    <div className="aspect-[16/9] w-full rounded-2xl bg-secondary/5 object-cover flex items-center justify-center text-secondary group overflow-hidden">
+                         <CurrencyDollarIcon className="h-12 w-12 opacity-40 group-hover:scale-110 transition-transform" />
+                         <div className="absolute inset-0 bg-gradient-to-t from-secondary/10 to-transparent"></div>
                     </div>
                 </div>
                 <div className="max-w-xl">
                     <div className="mt-8 flex items-center gap-x-4 text-xs">
-                        <time dateTime="2023-01-01" className="text-gray-400">14 de Jan, 2026</time>
-                        <span className="relative z-10 rounded-full bg-secondary/20 px-3 py-1.5 font-medium text-orange-300">Mercado</span>
+                        <time dateTime="2025-12-14" className="text-gray-500 font-medium">14 de Jan, 2026</time>
+                        <span className="relative z-10 rounded-full bg-orange-50 px-3 py-1.5 font-bold text-secondary">Investimento</span>
                     </div>
                     <div className="group relative">
-                        <h3 className="mt-3 text-lg font-semibold leading-6 text-white group-hover:text-orange-300 transition-colors">
-                            Valorização imobiliária em 2026
+                        <h3 className="mt-3 text-lg font-bold leading-6 text-slate-900 group-hover:text-secondary transition-colors">
+                            Mercado imobiliário atrai R$ 1,7 bilhão em investimentos na Capital
                         </h3>
-                        <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-400">
-                            Descubra quais bairros de Campo Grande estão em alta e onde é o melhor lugar para investir seu dinheiro este ano.
+                        <p className="mt-4 line-clamp-3 text-sm leading-6 text-slate-600">
+                            O volume recorde de negócios impulsiona novos lançamentos e movimenta a economia local através da construção civil.
                         </p>
                     </div>
                 </div>
-             </article>
+              </a>
 
-              {/* Mock 3 */}
-              <article className="flex flex-col items-start justify-between bg-white/5 p-6 rounded-2xl hover:bg-white/10 transition-colors border border-white/10">
+              {/* Link 3 */}
+              <a 
+                href="https://www.campograndenews.com.br/economia/estoque-de-imoveis-em-campo-grande-pode-se-esgotar-em-quatro-meses" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex flex-col items-start justify-between bg-white p-6 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border border-gray-100"
+              >
                 <div className="relative w-full">
-                    <div className="aspect-[16/9] w-full rounded-xl bg-gray-800 object-cover sm:aspect-[2/1] lg:aspect-[3/2] flex items-center justify-center text-gray-400">
-                         <CheckBadgeIcon className="h-12 w-12 opacity-50" />
+                    <div className="aspect-[16/9] w-full rounded-2xl bg-green-50 object-cover flex items-center justify-center text-green-600 group overflow-hidden">
+                         <HomeIcon className="h-12 w-12 opacity-40 group-hover:scale-110 transition-transform" />
+                         <div className="absolute inset-0 bg-gradient-to-t from-green-600/10 to-transparent"></div>
                     </div>
                 </div>
                 <div className="max-w-xl">
                     <div className="mt-8 flex items-center gap-x-4 text-xs">
-                        <time dateTime="2023-01-01" className="text-gray-400">10 de Jan, 2026</time>
-                        <span className="relative z-10 rounded-full bg-green-500/20 px-3 py-1.5 font-medium text-green-300">Financiamento</span>
+                        <time dateTime="2025-12-10" className="text-gray-500 font-medium">10 de Jan, 2026</time>
+                        <span className="relative z-10 rounded-full bg-green-50 px-3 py-1.5 font-bold text-green-700">Alta Demanda</span>
                     </div>
                     <div className="group relative">
-                        <h3 className="mt-3 text-lg font-semibold leading-6 text-white group-hover:text-green-300 transition-colors">
-                            Novas regras de financiamento
+                        <h3 className="mt-3 text-lg font-bold leading-6 text-slate-900 group-hover:text-green-700 transition-colors">
+                            Alta demanda: Estoque de imóveis na Capital pode acabar em 4 meses
                         </h3>
-                        <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-400">
-                            Entenda as mudanças nas taxas de juros e como elas afetam o seu poder de compra na hora de adquirir a casa própria.
+                        <p className="mt-4 line-clamp-3 text-sm leading-6 text-slate-600">
+                            Com vendas aquecidas, o mercado imobiliário de Campo Grande atinge níveis recordes de procura por novos lares.
                         </p>
                     </div>
                 </div>
-             </article>
+              </a>
           </div>
         </div>
       </div>

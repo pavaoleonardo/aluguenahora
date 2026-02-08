@@ -19,7 +19,7 @@ export default function Navbar() {
   const { user, logout, loading } = useAuth()
 
   return (
-    <header className="bg-gray-50 sticky top-0 z-50 border-b border-gray-100">
+    <header className="bg-white/95 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-100 shadow-sm transition-all duration-300">
       <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8">
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-2 p-1.5 flex flex-col items-center group transition-transform hover:scale-105">
