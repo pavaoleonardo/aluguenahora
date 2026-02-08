@@ -41,6 +41,12 @@ export default function PropertyDetailClient({ id }: { id: string }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!id || id === 'undefined') {
+      setLoading(false)
+      setProperty(null)
+      return
+    }
+
     let active = true
     const fetchProperty = async () => {
       try {
@@ -50,7 +56,8 @@ export default function PropertyDetailClient({ id }: { id: string }) {
         if (active) {
           setProperty(res.data.data || null)
         }
-      } catch {
+      } catch (err: any) {
+        // Fallback for documentId search if the primary fetch by ID/documentId failed
         try {
           const res = await api.get('/api/imoveis', {
             params: {
@@ -61,7 +68,9 @@ export default function PropertyDetailClient({ id }: { id: string }) {
           })
           const data = res.data.data
           if (active) {
-            setProperty(Array.isArray(data) ? data[0] : data || null)
+            // Ensure we got the specific property we filtered for
+            const foundProperty = Array.isArray(data) ? data.find((p: any) => p.documentId === id) : data
+            setProperty(foundProperty || null)
           }
         } catch {
           if (active) setProperty(null)

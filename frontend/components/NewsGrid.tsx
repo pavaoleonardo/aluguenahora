@@ -22,6 +22,37 @@ export default function NewsGrid() {
   const [news, setNews] = useState<NoticiaData[]>([])
   const [loading, setLoading] = useState(true)
 
+  // Initial real news data for Campo Grande as fallback
+  const initialNews: NoticiaData[] = [
+    {
+      id: 101,
+      documentId: 'noticia-1',
+      titulo: 'Valorização em Campo Grande supera média nacional em 2025',
+      resumo: 'Bairros como São Francisco e Planalto registram altas de até 35%. Preço médio do m² na capital atinge R$ 6.330.',
+      link: 'https://www.campograndenews.com.br/economia/valorizacao-de-imoveis-no-brasil-passa-de-5-com-bairros-de-cg-em-alta',
+      categoria: 'Valorização',
+      data: '2026-01-16'
+    },
+    {
+      id: 102,
+      documentId: 'noticia-2',
+      titulo: 'Mercado imobiliário atrai R$ 1,7 bilhão em investimentos na Capital',
+      resumo: 'O volume recorde de negócios impulsiona novos lançamentos e movimenta a economia local através da construção civil.',
+      link: 'https://www.campograndenews.com.br/economia/mercado-imobiliario-atrai-r-1-7-bilhao-em-investimentos-em-um-ano',
+      categoria: 'Investimento',
+      data: '2026-01-14'
+    },
+    {
+      id: 103,
+      documentId: 'noticia-3',
+      titulo: 'Alta demanda: Estoque de imóveis na Capital pode acabar em 4 meses',
+      resumo: 'Com vendas aquecidas, o mercado imobiliário de Campo Grande atinge níveis recordes de procura por novos lares.',
+      link: 'https://www.campograndenews.com.br/economia/estoque-de-imoveis-em-campo-grande-pode-se-esgotar-em-quatro-meses',
+      categoria: 'Alta Demanda',
+      data: '2026-01-10'
+    }
+  ]
+
   useEffect(() => {
     api.get('/api/noticias', { 
       params: { 
@@ -30,10 +61,14 @@ export default function NewsGrid() {
         'pagination[limit]': 3
       } 
     })
-    .then(res => setNews(res.data.data || []))
+    .then(res => {
+      const apiNews = res.data.data || []
+      // If we have news in Strapi, use them. Otherwise, use our curated initial news.
+      setNews(apiNews.length > 0 ? apiNews : initialNews)
+    })
     .catch(err => {
       console.error('Error fetching news:', err)
-      setNews([])
+      setNews(initialNews)
     })
     .finally(() => setLoading(false))
   }, [])

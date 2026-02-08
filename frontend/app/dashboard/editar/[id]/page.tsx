@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import { bairrosPorRegiao } from '@/lib/bairrosCampoGrande'
 import { API_BASE_URL } from '@/lib/apiBase'
 
@@ -21,8 +21,10 @@ type ImovelForm = {
   tamanho: string
 }
 
-export default function EditPropertyPage({ params }: { params: { id: string } }) {
+export default function EditPropertyPage() {
   const router = useRouter()
+  const params = useParams()
+  const id = params?.id as string
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [formData, setFormData] = useState<ImovelForm>({
@@ -46,7 +48,9 @@ export default function EditPropertyPage({ params }: { params: { id: string } })
       return
     }
 
-    fetch(`${API_BASE_URL}/api/imoveis/${params.id}?populate=fotos`, {
+    if (!id) return
+
+    fetch(`${API_BASE_URL}/api/imoveis/${id}?populate=fotos`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -82,7 +86,7 @@ export default function EditPropertyPage({ params }: { params: { id: string } })
         router.push('/dashboard')
       })
       .finally(() => setLoading(false))
-  }, [params.id, router])
+  }, [id, router])
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -104,7 +108,7 @@ export default function EditPropertyPage({ params }: { params: { id: string } })
       const token = localStorage.getItem('token')
       if (!token) throw new Error('Not authenticated')
 
-      const res = await fetch(`${API_BASE_URL}/api/imoveis/${params.id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/imoveis/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

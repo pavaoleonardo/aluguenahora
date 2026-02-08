@@ -8,7 +8,8 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
   async find(ctx) {
     // If the request is coming from the dashboard (user is authenticated)
     // we automatically filter by their properties.
-    if (ctx.state.user) {
+    // Only filter by user properties if explicitly requested (e.g., via ?myProperties=true)
+    if (ctx.state.user && ctx.query.myProperties === 'true') {
       ctx.query.filters = {
         ...(ctx.query.filters as any || {}),
         usuario: {
