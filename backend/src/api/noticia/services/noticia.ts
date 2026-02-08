@@ -4,4 +4,4 @@
 
 import { factories } from '@strapi/strapi';
 
-export default factories.createCoreService('api::noticia.noticia');
+export default factories.createCoreService('api::noticia.noticia' as any);
