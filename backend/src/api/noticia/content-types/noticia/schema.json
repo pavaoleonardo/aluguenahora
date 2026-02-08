@@ -1,0 +1,46 @@
+{
+  "kind": "collectionType",
+  "collectionName": "noticias",
+  "info": {
+    "singularName": "noticia",
+    "pluralName": "noticias",
+    "displayName": "Notícia",
+    "description": "Notícias do mercado imobiliário"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "titulo": {
+      "type": "string",
+      "required": true
+    },
+    "resumo": {
+      "type": "text"
+    },
+    "link": {
+      "type": "string"
+    },
+    "categoria": {
+      "type": "enumeration",
+      "enum": [
+        "Valorização",
+        "Investimento",
+        "Alta Demanda",
+        "Dicas",
+        "Mercado"
+      ]
+    },
+    "data": {
+      "type": "date"
+    },
+    "imagem": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    }
+  }
+}

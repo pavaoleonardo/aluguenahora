@@ -1,6 +1,7 @@
 import PropertyGrid from "@/components/PropertyGrid";
 import SearchBar from "@/components/SearchBar";
-import { HomeIcon, CurrencyDollarIcon, CheckBadgeIcon, NewspaperIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
+import NewsGrid from "@/components/NewsGrid";
+import { HomeIcon, CurrencyDollarIcon, CheckBadgeIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 
 // Force dynamic rendering to ensure we don't cache 403 errors
 export const dynamic = 'force-dynamic';
@@ -127,7 +128,7 @@ export default async function Home() {
         </div>
       </div>
 
-       {/* Newsletter/Blog Preview (Real News) */}
+       {/* Newsletter/Blog Preview (Dynamic News) */}
        <div id="noticias" className="bg-slate-50 py-24 sm:py-32 relative overflow-hidden border-t border-gray-100">
          {/* Background accent */}
          <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-5 pointer-events-none">
@@ -143,93 +144,9 @@ export default async function Home() {
               Fique por dentro das tendências e oportunidades no mercado imobiliário da nossa capital.
             </p>
           </div>
-          <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-12 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-             <a 
-               href="https://www.campograndenews.com.br/economia/valorizacao-de-imoveis-no-brasil-passa-de-5-com-bairros-de-cg-em-alta" 
-               target="_blank" 
-               rel="noopener noreferrer"
-               className="flex flex-col items-start justify-between bg-white p-6 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border border-gray-100"
-             >
-                <div className="relative w-full">
-                    <div className="aspect-[16/9] w-full rounded-2xl bg-primary/5 object-cover flex items-center justify-center text-primary group overflow-hidden">
-                        <NewspaperIcon className="h-12 w-12 opacity-40 group-hover:scale-110 transition-transform" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent"></div>
-                    </div>
-                </div>
-                <div className="max-w-xl">
-                    <div className="mt-8 flex items-center gap-x-4 text-xs">
-                        <time dateTime="2025-12-16" className="text-gray-500 font-medium">16 de Jan, 2026</time>
-                        <span className="relative z-10 rounded-full bg-blue-50 px-3 py-1.5 font-bold text-primary">Valorização</span>
-                    </div>
-                    <div className="group relative">
-                        <h3 className="mt-3 text-lg font-bold leading-6 text-slate-900 group-hover:text-primary transition-colors">
-                            Valorização em Campo Grande supera média nacional em 2025
-                        </h3>
-                        <p className="mt-4 line-clamp-3 text-sm leading-6 text-slate-600">
-                            Bairros como São Francisco e Planalto registram altas de até 35%. Preço médio do m² na capital atinge R$ 6.330.
-                        </p>
-                    </div>
-                </div>
-             </a>
-             
-             {/* Link 2 */}
-              <a 
-                href="https://www.campograndenews.com.br/economia/mercado-imobiliario-atrai-r-1-7-bilhao-em-investimentos-em-um-ano" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex flex-col items-start justify-between bg-white p-6 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border border-gray-100"
-              >
-                <div className="relative w-full">
-                    <div className="aspect-[16/9] w-full rounded-2xl bg-secondary/5 object-cover flex items-center justify-center text-secondary group overflow-hidden">
-                         <CurrencyDollarIcon className="h-12 w-12 opacity-40 group-hover:scale-110 transition-transform" />
-                         <div className="absolute inset-0 bg-gradient-to-t from-secondary/10 to-transparent"></div>
-                    </div>
-                </div>
-                <div className="max-w-xl">
-                    <div className="mt-8 flex items-center gap-x-4 text-xs">
-                        <time dateTime="2025-12-14" className="text-gray-500 font-medium">14 de Jan, 2026</time>
-                        <span className="relative z-10 rounded-full bg-orange-50 px-3 py-1.5 font-bold text-secondary">Investimento</span>
-                    </div>
-                    <div className="group relative">
-                        <h3 className="mt-3 text-lg font-bold leading-6 text-slate-900 group-hover:text-secondary transition-colors">
-                            Mercado imobiliário atrai R$ 1,7 bilhão em investimentos na Capital
-                        </h3>
-                        <p className="mt-4 line-clamp-3 text-sm leading-6 text-slate-600">
-                            O volume recorde de negócios impulsiona novos lançamentos e movimenta a economia local através da construção civil.
-                        </p>
-                    </div>
-                </div>
-              </a>
+          
+          <NewsGrid />
 
-              {/* Link 3 */}
-              <a 
-                href="https://www.campograndenews.com.br/economia/estoque-de-imoveis-em-campo-grande-pode-se-esgotar-em-quatro-meses" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex flex-col items-start justify-between bg-white p-6 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border border-gray-100"
-              >
-                <div className="relative w-full">
-                    <div className="aspect-[16/9] w-full rounded-2xl bg-green-50 object-cover flex items-center justify-center text-green-600 group overflow-hidden">
-                         <HomeIcon className="h-12 w-12 opacity-40 group-hover:scale-110 transition-transform" />
-                         <div className="absolute inset-0 bg-gradient-to-t from-green-600/10 to-transparent"></div>
-                    </div>
-                </div>
-                <div className="max-w-xl">
-                    <div className="mt-8 flex items-center gap-x-4 text-xs">
-                        <time dateTime="2025-12-10" className="text-gray-500 font-medium">10 de Jan, 2026</time>
-                        <span className="relative z-10 rounded-full bg-green-50 px-3 py-1.5 font-bold text-green-700">Alta Demanda</span>
-                    </div>
-                    <div className="group relative">
-                        <h3 className="mt-3 text-lg font-bold leading-6 text-slate-900 group-hover:text-green-700 transition-colors">
-                            Alta demanda: Estoque de imóveis na Capital pode acabar em 4 meses
-                        </h3>
-                        <p className="mt-4 line-clamp-3 text-sm leading-6 text-slate-600">
-                            Com vendas aquecidas, o mercado imobiliário de Campo Grande atinge níveis recordes de procura por novos lares.
-                        </p>
-                    </div>
-                </div>
-              </a>
-          </div>
         </div>
       </div>
     </div>
