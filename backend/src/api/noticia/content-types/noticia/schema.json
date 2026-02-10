@@ -22,6 +22,9 @@
     "link": {
       "type": "string"
     },
+    "conteudo": {
+      "type": "text"
+    },
     "categoria": {
       "type": "enumeration",
       "enum": [
