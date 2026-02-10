@@ -486,17 +486,20 @@ export interface ApiImovelImovel extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     descricao: Schema.Attribute.Blocks;
+    endereco: Schema.Attribute.String;
     estatus: Schema.Attribute.Enumeration<
       ['rascunho', 'pendente', 'publicado']
     >;
     finalidade: Schema.Attribute.Enumeration<['aluguel', 'venda']>;
     fotos: Schema.Attribute.Media<'images', true>;
+    latitude: Schema.Attribute.Decimal;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::imovel.imovel'
     > &
       Schema.Attribute.Private;
+    longitude: Schema.Attribute.Decimal;
     preco: Schema.Attribute.Decimal;
     publishedAt: Schema.Attribute.DateTime;
     quartos: Schema.Attribute.Integer;
@@ -538,6 +541,49 @@ export interface ApiImovelImovel extends Struct.CollectionTypeSchema {
       'manyToOne',
       'plugin::users-permissions.user'
     >;
+  };
+}
+
+export interface ApiNoticiaNoticia extends Struct.CollectionTypeSchema {
+  collectionName: 'noticias';
+  info: {
+    description: 'Not\u00EDcias do mercado imobili\u00E1rio';
+    displayName: 'Not\u00EDcia';
+    pluralName: 'noticias';
+    singularName: 'noticia';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    categoria: Schema.Attribute.Enumeration<
+      [
+        'Valoriza\u00E7\u00E3o',
+        'Investimento',
+        'Alta Demanda',
+        'Dicas',
+        'Mercado',
+      ]
+    >;
+    conteudo: Schema.Attribute.Text;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    data: Schema.Attribute.Date;
+    imagem: Schema.Attribute.Media<'images'>;
+    link: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::noticia.noticia'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    resumo: Schema.Attribute.Text;
+    titulo: Schema.Attribute.String & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
   };
 }
 
@@ -1053,6 +1099,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::imovel.imovel': ApiImovelImovel;
+      'api::noticia.noticia': ApiNoticiaNoticia;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

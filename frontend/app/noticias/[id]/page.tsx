@@ -68,9 +68,13 @@ export default function NoticiaDetailPage() {
     )
   }
 
-  const imageUrl = noticia.imagem?.url.startsWith('/') 
-    ? noticia.imagem.url 
-    : (noticia.imagem?.url.startsWith('http') ? noticia.imagem.url : `${API_BASE_URL}${noticia.imagem?.url}`);
+  const imageUrl = noticia.imagem?.url
+    ? (noticia.imagem.url.startsWith('http') 
+        ? noticia.imagem.url 
+        : (noticia.imagem.url.startsWith('/uploads/') 
+            ? `${API_BASE_URL}${noticia.imagem.url}` 
+            : noticia.imagem.url))
+    : null;
 
   return (
     <article className="min-h-screen bg-white pb-20">

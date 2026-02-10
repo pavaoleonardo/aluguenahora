@@ -51,7 +51,8 @@ export default function NewsGrid() {
   const getImageUrl = (url?: string) => {
     if (!url) return null;
     if (url.startsWith('http')) return url;
-    return `${API_BASE_URL}${url}`;
+    if (url.startsWith('/uploads/')) return `${API_BASE_URL}${url}`;
+    return url;
   }
 
   if (loading) {
