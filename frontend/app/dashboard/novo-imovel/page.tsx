@@ -72,7 +72,7 @@ export default function NewPropertyPage() {
       setBairroSuggestions(filtered)
       setShowBairroSuggestions(true)
     } else {
-      setBairroSuggestions(todosBairros.slice(0, 50)) // Show more initially
+      setBairroSuggestions(todosBairros) // Show all
       setShowBairroSuggestions(true)
     }
   }
@@ -235,7 +235,7 @@ export default function NewPropertyPage() {
                 </div>
 
                 <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Tipo de Imóvel</label>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Tipo do imóvel</label>
                     <select
                       name="tipo"
                       required
@@ -300,7 +300,7 @@ export default function NewPropertyPage() {
                       onChange={(e) => handleBairroChange(e.target.value)}
                       onFocus={() => {
                         if (formData.bairro.length === 0) {
-                          setBairroSuggestions(todosBairros.slice(0, 50));
+                          setBairroSuggestions(todosBairros);
                         }
                         setShowBairroSuggestions(true);
                       }}

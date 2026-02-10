@@ -25,7 +25,7 @@ export default function SearchBar() {
       setSuggestions(filtered);
       setShowSuggestions(true);
     } else {
-      setSuggestions(todosBairros.slice(0, 50)); // Show more items initially
+      setSuggestions(todosBairros); // Show all neighborhoods
       setShowSuggestions(true);
     }
   };
@@ -92,7 +92,7 @@ export default function SearchBar() {
                   onChange={(e) => handleBairroChange(e.target.value)}
                   onFocus={() => {
                     if (filters.bairro.length === 0) {
-                      setSuggestions(todosBairros.slice(0, 50));
+                      setSuggestions(todosBairros);
                     }
                     setShowSuggestions(true);
                   }}
@@ -125,7 +125,7 @@ export default function SearchBar() {
 
           {/* Type Input */}
           <div className="relative group">
-            <label className="block text-xs font-medium text-gray-500 mb-1 ml-10">Tipo de Imóvel</label>
+            <label className="block text-xs font-medium text-gray-500 mb-1 ml-10">Tipo do imóvel</label>
              <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <HomeIcon className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
