@@ -42,13 +42,23 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
     const finalidade = searchParams.get('finalidade')
 
     if (bairro) {
-      params['filters[bairro][bairro][$eq]'] = bairro
+      // Search in both object structure and simple string structure, case-insensitive
+      params['filters[$or][0][bairro][bairro][$containsi]'] = bairro
+      params['filters[$or][1][bairro][$containsi]'] = bairro
     }
     if (tipo) {
       params['filters[tipo][$eq]'] = tipo
     }
+    // Only filter by finalidade if it's explicitly set and we have data for it.
+    // If it's 'aluguel', we might want to also show items where finalidade is null 
+    // to avoid hiding legacy data that is theoretically for rent.
     if (finalidade) {
-      params['filters[finalidade][$eq]'] = finalidade
+      if (finalidade === 'aluguel') {
+        params['filters[$or][0][finalidade][$eq]'] = 'aluguel'
+        params['filters[$or][1][finalidade][$null]'] = true
+      } else {
+        params['filters[finalidade][$eq]'] = finalidade
+      }
     }
 
     if (limit) {
