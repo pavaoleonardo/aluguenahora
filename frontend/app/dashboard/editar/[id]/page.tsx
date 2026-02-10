@@ -109,7 +109,8 @@ export default function EditPropertyPage() {
       setBairroSuggestions(filtered)
       setShowBairroSuggestions(true)
     } else {
-      setShowBairroSuggestions(false)
+      setBairroSuggestions(todosBairros.slice(0, 5)) // Show first 5 alphabetically
+      setShowBairroSuggestions(true)
     }
   }
 
@@ -226,16 +227,14 @@ export default function EditPropertyPage() {
                 required
                 value={formData.finalidade}
                 onChange={handleChange}
-                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 cursor-default pointer-events-none bg-gray-50"
               >
-                <option value="">Selecione</option>
                 <option value="aluguel">Aluguel</option>
-                <option value="venda">Venda</option>
               </select>
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium leading-6 text-gray-900">Tipo de Imóvel</label>
+              <label className="block text-sm font-medium leading-6 text-gray-900">Residencial / Apartamento</label>
               <select
                 name="tipo"
                 required
@@ -298,7 +297,12 @@ export default function EditPropertyPage() {
                 placeholder="Comece a digitar o bairro..."
                 value={formData.bairro}
                 onChange={(e) => handleBairroChange(e.target.value)}
-                onFocus={() => formData.bairro && setShowBairroSuggestions(true)}
+                onFocus={() => {
+                  if (formData.bairro.length === 0) {
+                    setBairroSuggestions(todosBairros.slice(0, 5));
+                  }
+                  setShowBairroSuggestions(true);
+                }}
                 className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
               />
               {showBairroSuggestions && bairroSuggestions.length > 0 && (

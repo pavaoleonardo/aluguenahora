@@ -10,7 +10,7 @@ export default function SearchBar() {
   const [filters, setFilters] = useState({
     bairro: '',
     tipo: '',
-    finalidade: ''
+    finalidade: 'aluguel'
   });
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -21,12 +21,12 @@ export default function SearchBar() {
     if (val.length > 0) {
       const filtered = todosBairros.filter(b => 
         b.toLowerCase().includes(val.toLowerCase())
-      ).slice(0, 10); // Limit to 10 suggestions for performance/UI
+      ).slice(0, 10);
       setSuggestions(filtered);
       setShowSuggestions(true);
     } else {
-      setSuggestions([]);
-      setShowSuggestions(false);
+      setSuggestions(todosBairros.slice(0, 10)); // Show first 10 alphabetically
+      setShowSuggestions(true);
     }
   };
 
@@ -90,7 +90,12 @@ export default function SearchBar() {
                   placeholder="Qual bairro busca?"
                   value={filters.bairro}
                   onChange={(e) => handleBairroChange(e.target.value)}
-                  onFocus={() => filters.bairro && setShowSuggestions(true)}
+                  onFocus={() => {
+                    if (filters.bairro.length === 0) {
+                      setSuggestions(todosBairros.slice(0, 10));
+                    }
+                    setShowSuggestions(true);
+                  }}
                   className="block w-full rounded-xl border-0 bg-gray-50 py-3 pl-10 pr-10 text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-primary sm:text-sm sm:leading-6 transition-all hover:bg-gray-100"
                 />
                 {filters.bairro && (
@@ -120,7 +125,7 @@ export default function SearchBar() {
 
           {/* Type Input */}
           <div className="relative group">
-            <label className="block text-xs font-medium text-gray-500 mb-1 ml-10">Tipo de Imóvel</label>
+            <label className="block text-xs font-medium text-gray-500 mb-1 ml-10">Residencial / Apartamento</label>
              <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <HomeIcon className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
@@ -168,11 +173,9 @@ export default function SearchBar() {
                 <select 
                   value={filters.finalidade}
                   onChange={(e) => setFilters({ ...filters, finalidade: e.target.value })}
-                  className="block w-full rounded-xl border-0 bg-gray-50 py-3 pl-10 pr-8 text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-primary sm:text-sm sm:leading-6 transition-all hover:bg-gray-100 cursor-pointer appearance-none"
+                  className="block w-full rounded-xl border-0 bg-gray-50 py-3 pl-10 pr-8 text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-primary sm:text-sm sm:leading-6 transition-all hover:bg-gray-100 cursor-default appearance-none pointer-events-none"
                 >
-                    <option value="">Aluguel ou Venda</option>
                     <option value="aluguel">Aluguel</option>
-                    <option value="venda">Venda</option>
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                     <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
