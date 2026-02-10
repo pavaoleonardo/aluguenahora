@@ -242,7 +242,7 @@ export default function EditPropertyPage() {
                 onChange={handleChange}
                 className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
               >
-                <option value="">Quais imóveis voce procura?</option>
+                <option value="">Quais imóveis você procura?</option>
                 <optgroup label="--- RESIDENCIAL ---">
                   <option value="Apart Hotel / Flat / Loft">Apart Hotel / Flat / Loft</option>
                   <option value="Apartamento">Apartamento</option>

@@ -135,7 +135,7 @@ export default function SearchBar() {
                   onChange={(e) => setFilters({ ...filters, tipo: e.target.value })}
                   className="block w-full rounded-xl border-0 bg-gray-50 py-3 pl-10 pr-8 text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-primary sm:text-sm sm:leading-6 transition-all hover:bg-gray-100 cursor-pointer appearance-none"
                 >
-                <option value="">Quais imóveis voce procura?</option>
+                <option value="">Quais imóveis você procura?</option>
                 <optgroup label="Residencial">
                     <option value="Apartamento">Apartamento</option>
                     <option value="Casa-Térrea">Casa</option>
