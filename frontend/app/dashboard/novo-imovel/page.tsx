@@ -72,7 +72,7 @@ export default function NewPropertyPage() {
       setBairroSuggestions(filtered)
       setShowBairroSuggestions(true)
     } else {
-      setBairroSuggestions(todosBairros.slice(0, 5)) // Show first 5 alphabetically
+      setBairroSuggestions(todosBairros.slice(0, 50)) // Show more initially
       setShowBairroSuggestions(true)
     }
   }
@@ -235,7 +235,7 @@ export default function NewPropertyPage() {
                 </div>
 
                 <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Residencial / Apartamento</label>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Tipo de Imóvel</label>
                     <select
                       name="tipo"
                       required
@@ -243,7 +243,7 @@ export default function NewPropertyPage() {
                       onChange={handleChange}
                       className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                     >
-                      <option value="">Selecione</option>
+                      <option value="">Quais imóveis voce procura?</option>
                       <optgroup label="--- RESIDENCIAL ---">
                         <option value="Apart Hotel / Flat / Loft">Apart Hotel / Flat / Loft</option>
                         <option value="Apartamento">Apartamento</option>
@@ -300,7 +300,7 @@ export default function NewPropertyPage() {
                       onChange={(e) => handleBairroChange(e.target.value)}
                       onFocus={() => {
                         if (formData.bairro.length === 0) {
-                          setBairroSuggestions(todosBairros.slice(0, 5));
+                          setBairroSuggestions(todosBairros.slice(0, 50));
                         }
                         setShowBairroSuggestions(true);
                       }}

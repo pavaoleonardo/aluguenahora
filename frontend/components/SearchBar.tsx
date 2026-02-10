@@ -25,7 +25,7 @@ export default function SearchBar() {
       setSuggestions(filtered);
       setShowSuggestions(true);
     } else {
-      setSuggestions(todosBairros.slice(0, 10)); // Show first 10 alphabetically
+      setSuggestions(todosBairros.slice(0, 50)); // Show more items initially
       setShowSuggestions(true);
     }
   };
@@ -92,7 +92,7 @@ export default function SearchBar() {
                   onChange={(e) => handleBairroChange(e.target.value)}
                   onFocus={() => {
                     if (filters.bairro.length === 0) {
-                      setSuggestions(todosBairros.slice(0, 10));
+                      setSuggestions(todosBairros.slice(0, 50));
                     }
                     setShowSuggestions(true);
                   }}
@@ -125,7 +125,7 @@ export default function SearchBar() {
 
           {/* Type Input */}
           <div className="relative group">
-            <label className="block text-xs font-medium text-gray-500 mb-1 ml-10">Residencial / Apartamento</label>
+            <label className="block text-xs font-medium text-gray-500 mb-1 ml-10">Tipo de Imóvel</label>
              <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <HomeIcon className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
@@ -135,7 +135,7 @@ export default function SearchBar() {
                   onChange={(e) => setFilters({ ...filters, tipo: e.target.value })}
                   className="block w-full rounded-xl border-0 bg-gray-50 py-3 pl-10 pr-8 text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-primary sm:text-sm sm:leading-6 transition-all hover:bg-gray-100 cursor-pointer appearance-none"
                 >
-                <option value="">Todos os Tipos</option>
+                <option value="">Quais imóveis voce procura?</option>
                 <optgroup label="Residencial">
                     <option value="Apartamento">Apartamento</option>
                     <option value="Casa-Térrea">Casa</option>
