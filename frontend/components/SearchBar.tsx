@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { MagnifyingGlassIcon, MapPinIcon, HomeIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline';
-import { bairrosPorRegiao } from '@/lib/bairrosCampoGrande';
+import { MagnifyingGlassIcon, MapPinIcon, HomeIcon, CurrencyDollarIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { todosBairros } from '@/lib/bairrosCampoGrande';
 
 export default function SearchBar() {
   const router = useRouter();
@@ -12,6 +12,29 @@ export default function SearchBar() {
     tipo: '',
     finalidade: ''
   });
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const handleBairroChange = (val: string) => {
+    setFilters({ ...filters, bairro: val });
+    if (val.length > 0) {
+      const filtered = todosBairros.filter(b => 
+        b.toLowerCase().includes(val.toLowerCase())
+      ).slice(0, 10); // Limit to 10 suggestions for performance/UI
+      setSuggestions(filtered);
+      setShowSuggestions(true);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const selectSuggestion = (bairro: string) => {
+    setFilters({ ...filters, bairro });
+    setShowSuggestions(false);
+    setSuggestions([]);
+  };
 
   const handleSearch = () => {
     const params = new URLSearchParams();
@@ -21,6 +44,17 @@ export default function SearchBar() {
     
     router.push(`/imoveis?${params.toString()}`);
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <div className="w-full max-w-5xl mx-auto">
@@ -44,34 +78,43 @@ export default function SearchBar() {
             </div>
           </div>
 
-          {/* District Input */}
-          <div className="relative group">
+          {/* District Input (Searchable) */}
+          <div className="relative group" ref={dropdownRef}>
             <label className="block text-xs font-medium text-gray-500 mb-1 ml-10">Bairro</label>
             <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <MapPinIcon className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" />
                 </div>
-                <select 
+                <input 
+                  type="text"
+                  placeholder="Qual bairro busca?"
                   value={filters.bairro}
-                  onChange={(e) => setFilters({ ...filters, bairro: e.target.value })}
-                  className="block w-full rounded-xl border-0 bg-gray-50 py-3 pl-10 pr-4 text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-primary sm:text-sm sm:leading-6 transition-all hover:bg-gray-100 cursor-pointer appearance-none"
-                >
-                <option value="">Todos os Bairros</option>
-                {Object.entries(bairrosPorRegiao).map(([regiao, bairros]) => (
-                    <optgroup key={regiao} label={regiao}>
-                    {bairros.map((bairro) => (
-                        <option key={`${regiao}-${bairro}`} value={bairro}>
+                  onChange={(e) => handleBairroChange(e.target.value)}
+                  onFocus={() => filters.bairro && setShowSuggestions(true)}
+                  className="block w-full rounded-xl border-0 bg-gray-50 py-3 pl-10 pr-10 text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-primary sm:text-sm sm:leading-6 transition-all hover:bg-gray-100"
+                />
+                {filters.bairro && (
+                  <button 
+                    onClick={() => { setFilters({...filters, bairro: ''}); setSuggestions([]); setShowSuggestions(false); }}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  >
+                    <XMarkIcon className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                  </button>
+                )}
+                
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="absolute z-50 mt-2 w-full bg-white rounded-xl shadow-2xl border border-gray-100 py-2 max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+                    {suggestions.map((bairro: string, idx: number) => (
+                      <button
+                        key={idx}
+                        onClick={() => selectSuggestion(bairro)}
+                        className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-primary/5 hover:text-primary hover:font-bold transition-all border-b border-gray-50 last:border-0"
+                      >
                         {bairro}
-                        </option>
+                      </button>
                     ))}
-                    </optgroup>
-                ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                    <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                </div>
+                  </div>
+                )}
             </div>
           </div>
 

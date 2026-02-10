@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { bairrosPorRegiao } from '@/lib/bairrosCampoGrande'
+import { todosBairros } from '@/lib/bairrosCampoGrande'
 import { API_BASE_URL } from '@/lib/apiBase'
 
 export default function NewPropertyPage() {
@@ -17,7 +17,6 @@ export default function NewPropertyPage() {
     quartos: '',
     banheiros: '',
     bairro: '',
-    regiao: '',
     cidade: 'Campo Grande',
     finalidade: '',
     tipo: '',
@@ -25,6 +24,9 @@ export default function NewPropertyPage() {
     endereco: '',
   })
   const [geocoding, setGeocoding] = useState(false)
+  const [showBairroSuggestions, setShowBairroSuggestions] = useState(false)
+  const [bairroSuggestions, setBairroSuggestions] = useState<string[]>([])
+  const bairroRef = useRef<HTMLDivElement>(null)
 
   // Geocode address using OpenStreetMap Nominatim API (free)
   const geocodeAddress = async (address: string): Promise<{ lat: number; lon: number } | null> => {
@@ -58,13 +60,31 @@ export default function NewPropertyPage() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target
-    setFormData(prev => {
-      if (name === 'regiao') {
-        return { ...prev, regiao: value, bairro: '' }
-      }
-      return { ...prev, [name]: value }
-    })
+    setFormData(prev => ({ ...prev, [name]: value }))
   }
+
+  const handleBairroChange = (val: string) => {
+    setFormData({ ...formData, bairro: val })
+    if (val.length > 0) {
+      const filtered = todosBairros.filter(b => 
+        b.toLowerCase().includes(val.toLowerCase())
+      ).slice(0, 5)
+      setBairroSuggestions(filtered)
+      setShowBairroSuggestions(true)
+    } else {
+      setShowBairroSuggestions(false)
+    }
+  }
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (bairroRef.current && !bairroRef.current.contains(event.target as Node)) {
+        setShowBairroSuggestions(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const handleFotosChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
@@ -126,7 +146,7 @@ export default function NewPropertyPage() {
             preco: Number(formData.preco),
             quartos: Number(formData.quartos),
             banheiros: Number(formData.banheiros),
-            bairro: { regiao: formData.regiao, bairro: formData.bairro },
+            bairro: { regiao: '', bairro: formData.bairro },
             cidade: formData.cidade,
             finalidade: formData.finalidade,
             tipo: formData.tipo,
@@ -259,7 +279,7 @@ export default function NewPropertyPage() {
                     </select>
                 </div>
 
-                <div>
+                <div className="sm:col-span-2">
                     <label className="block text-sm font-medium leading-6 text-gray-900">Cidade</label>
                     <input
                       type="text"
@@ -270,43 +290,32 @@ export default function NewPropertyPage() {
                     />
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Região</label>
-                    <select
-                      name="regiao"
-                      required
-                      value={formData.regiao}
-                      onChange={handleChange}
-                      className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                    >
-                      <option value="">Selecione a região</option>
-                      {Object.keys(bairrosPorRegiao).map((regiao) => (
-                        <option key={regiao} value={regiao}>
-                          {regiao}
-                        </option>
-                      ))}
-                    </select>
-                </div>
-
-                <div>
+                <div className="sm:col-span-2 relative" ref={bairroRef}>
                     <label className="block text-sm font-medium leading-6 text-gray-900">Bairro</label>
-                    <select
+                    <input
+                      type="text"
                       name="bairro"
                       required
+                      placeholder="Comece a digitar o bairro..."
                       value={formData.bairro}
-                      onChange={handleChange}
-                      disabled={!formData.regiao}
-                      className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 disabled:bg-gray-50 disabled:text-gray-400 disabled:ring-gray-200"
-                    >
-                      <option value="">
-                        {formData.regiao ? 'Selecione o bairro' : 'Selecione a região primeiro'}
-                      </option>
-                      {(bairrosPorRegiao[formData.regiao] || []).map((bairro) => (
-                        <option key={bairro} value={bairro}>
-                          {bairro}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(e) => handleBairroChange(e.target.value)}
+                      onFocus={() => formData.bairro && setShowBairroSuggestions(true)}
+                      className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                    />
+                    {showBairroSuggestions && bairroSuggestions.length > 0 && (
+                      <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg border border-gray-200 py-1 max-h-48 overflow-y-auto">
+                        {bairroSuggestions.map((suggestion: string) => (
+                          <button
+                            key={suggestion}
+                            type="button"
+                            onClick={() => { setFormData({...formData, bairro: suggestion}); setShowBairroSuggestions(false); }}
+                            className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-primary hover:text-white transition-colors"
+                          >
+                            {suggestion}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                 </div>
 
                 <div className="sm:col-span-2">
