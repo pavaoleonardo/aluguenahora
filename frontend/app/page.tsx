@@ -20,8 +20,8 @@ export default async function Home() {
             <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
                 <div className="mx-auto max-w-4xl text-center mb-16 px-4 animate-in hover:-translate-y-1 transition-transform duration-500">
                     <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-6xl mb-6 drop-shadow-sm whitespace-normal">
-                        <span className="block">Seu Novo Lar</span>
-                        <span className="block text-primary mt-2">Começa Aqui</span>
+                        <span className="block">Achei, gostei e</span>
+                        <span className="block text-primary mt-2">aluguei na hora.</span>
                     </h1>
                 </div>
                 
