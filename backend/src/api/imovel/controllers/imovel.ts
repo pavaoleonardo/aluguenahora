@@ -9,28 +9,23 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
     try {
       const sanitizedQuery = await this.sanitizeQuery(ctx);
       
-      // If the request is coming from the dashboard (user is authenticated)
-      // we automatically filter by their properties if ?myProperties=true is passed.
+      let status = 'published';
+
       if (ctx.state.user && ctx.query.myProperties === 'true') {
-        const userId = ctx.state.user.id;
         const userDocId = ctx.state.user.documentId;
         
-        // Strapi 5 Document Service filters for relations work best with documentId.
-        // If we don't have documentId, we fall back to numeric ID.
-        const filterValue = userDocId || userId;
-
         sanitizedQuery.filters = {
           ...(sanitizedQuery.filters as any || {}),
-          usuario: filterValue
+          usuario: {
+            documentId: {
+              $eq: userDocId
+            }
+          }
         };
         
-        console.log(`[Dashboard Filter] User: ${ctx.state.user.username}`);
-        console.log(`[Dashboard Filter] IDs: { id: ${userId}, documentId: ${userDocId} }`);
-        console.log(`[Dashboard Filter] Using filter value: ${filterValue}`);
+        status = ctx.query.status as string || 'all';
+        console.log(`[Dashboard Filter] Filtering for user DocID: ${userDocId}, Status: ${status}`);
       }
-
-      // Strapi 5 Document Service needs an explicit status.
-      const status = ctx.query.status || (ctx.state.user && ctx.query.myProperties === 'true' ? 'all' : 'published');
       console.log(`[Dashboard Filter] Final status: ${status}`);
 
       const results = await strapi.documents('api::imovel.imovel').findMany({
