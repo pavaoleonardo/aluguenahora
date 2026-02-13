@@ -19,17 +19,10 @@ export default async function Home() {
         <div className="pb-24 pt-24 sm:pb-32 lg:pb-40 relative">
             <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
                 <div className="mx-auto max-w-4xl text-center mb-16 animate-in hover:-translate-y-1 transition-transform duration-500">
-                    <div className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold leading-6 text-primary ring-1 ring-inset ring-blue-600/10 mb-6 hover:bg-blue-100 transition-colors">
-                        Novidade: Imóveis exclusivos em Campo Grande <span aria-hidden="true">&rarr;</span>
-                    </div>
                     <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-6xl mb-6 drop-shadow-sm">
                         <span className="block">Seu Novo Lar</span>
                         <span className="block text-primary mt-2">Começa Aqui</span>
                     </h1>
-                    <p className="mt-6 text-lg leading-8 text-slate-600 max-w-2xl mx-auto">
-                        A maneira mais fácil, rápida e segura de alugar ou comprar imóveis. 
-                        Conectamos você às melhores oportunidades da cidade.
-                    </p>
                 </div>
                 
                 {/* Search Bar Component */}
@@ -37,21 +30,7 @@ export default async function Home() {
                     <SearchBar />
                 </div>
 
-                {/* Trust/Stats indicators */}
-                <div className="mt-16 border-t border-gray-200/60 pt-8 flex justify-center gap-8 text-sm font-medium text-slate-500 sm:gap-16">
-                    <div className="flex items-center gap-2">
-                         <div className="h-1.5 w-1.5 rounded-full bg-green-500"></div>
-                         + 1000 Imóveis Disponíveis
-                    </div>
-                    <div className="flex items-center gap-2 hidden sm:flex">
-                         <div className="h-1.5 w-1.5 rounded-full bg-blue-500"></div>
-                         Visitas Online
-                    </div>
-                    <div className="flex items-center gap-2">
-                         <div className="h-1.5 w-1.5 rounded-full bg-secondary"></div>
-                         Atendimento Humanizado
-                    </div>
-                </div>
+
             </div>
         </div>
         
@@ -84,8 +63,8 @@ export default async function Home() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
                 <span className="text-secondary font-semibold tracking-wide uppercase text-sm">Passo a Passo</span>
-                <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Como funciona</h2>
-                <p className="mt-4 text-lg leading-8 text-slate-600">A jornada para o seu novo imóvel é simples e transparente.</p>
+                <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Traga o seu imóvel e Alugue na Hora!</h2>
+                <p className="mt-4 text-lg leading-8 text-slate-600">Transforme seu imóvel vazio em renda imediata.</p>
             </div>
             
             <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
@@ -95,7 +74,7 @@ export default async function Home() {
                             <div className="absolute left-0 top-0 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
                                 <HomeIcon className="h-6 w-6" aria-hidden="true" />
                             </div>
-                            1. Cadastre-se
+                            1. Como funciona
                         </dt>
                         <dd className="mt-2 text-base leading-7 text-slate-600">
                             Crie sua conta gratuitamente em poucos segundos. Tenha acesso a painéis exclusivos de favoritos e alertas.
@@ -106,7 +85,7 @@ export default async function Home() {
                             <div className="absolute left-0 top-0 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
                                 <CheckBadgeIcon className="h-6 w-6" aria-hidden="true" />
                             </div>
-                            2. Escolha ou Anuncie
+                            2. Anuncie seu Imóvel
                         </dt>
                         <dd className="mt-2 text-base leading-7 text-slate-600">
                             Utilize nossa busca inteligente para encontrar imóveis ou anuncie o seu com fotos profissionais e descrição detalhada.
@@ -138,8 +117,7 @@ export default async function Home() {
 
         <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
           <div className="mx-auto max-w-2xl text-center">
-            <span className="text-primary font-bold tracking-wider uppercase text-sm mb-2 block">Mercado Local</span>
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Notícias de Campo Grande</h2>
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Noticias do Mercado Imobiliario</h2>
             <p className="mt-2 text-lg leading-8 text-slate-600">
               Fique por dentro das tendências e oportunidades no mercado imobiliário da nossa capital.
             </p>

@@ -9,8 +9,8 @@ import { useAuth } from '@/context/AuthContext'
 
 const navigation = [
   { name: 'Home', href: '/' },
-  { name: 'Imóveis', href: '/imoveis' },
-  { name: 'Anunciar', href: '/dashboard/novo-imovel' },
+  { name: 'Buscar Imóveis', href: '/imoveis' },
+  { name: 'Anunciar Imóveis', href: '/dashboard/novo-imovel' },
   { name: 'Sobre', href: '/sobre' },
 ]
 
@@ -80,7 +80,7 @@ export default function Navbar() {
                   Entrar
                 </Link>
                 <Link href="/register" className="rounded-full bg-primary px-4 py-2 text-base font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors">
-                  Cadastrar
+                  Cadastrar Imóveis
                 </Link>
               </>
             )
@@ -159,7 +159,7 @@ export default function Navbar() {
                         onClick={() => setMobileMenuOpen(false)}
                         className="mt-2 text-center block rounded-lg px-3 py-2.5 text-base font-semibold text-white bg-primary hover:bg-primary-hover transition-colors shadow-sm"
                       >
-                        Cadastrar
+                        Cadastrar Imóveis
                       </Link>
                     </>
                   )
