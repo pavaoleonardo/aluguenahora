@@ -690,61 +690,58 @@ const todosBairros: string[] = [
   "Zona Rural"
 ];
 
-const Input = React.forwardRef<HTMLSelectElement, InputProps>(
-  ({ attribute, disabled, intlLabel, name, onChange, required, value }, ref) => {
-    const { formatMessage } = useIntl();
-    const label =
-      intlLabel && intlLabel.id
-        ? formatMessage(intlLabel)
-        : intlLabel?.defaultMessage || 'Bairro';
-    
-    // Value handling for compatibility: {regiao, bairro} or string
-    const currentBairro = value && typeof value === 'object' 
-      ? value.bairro 
-      : (typeof value === 'string' ? value : '');
+const Input = ({ attribute, disabled, intlLabel, name, onChange, required, value }: InputProps) => {
+  const { formatMessage } = useIntl();
+  const label =
+    intlLabel && intlLabel.id
+      ? formatMessage(intlLabel)
+      : (intlLabel as any)?.defaultMessage || 'Bairro';
+  
+  // Value handling for compatibility: {regiao, bairro} or string
+  const currentBairro = value && typeof value === 'object' 
+    ? value.bairro 
+    : (typeof value === 'string' ? value : '');
 
-    const handleBairroChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-      const bairro = event.target.value;
-      // We keep sending the object structure to maintain backend compatibility if needed,
-      // but regiao is now always empty.
-      onChange({
-        target: {
-          name,
-          type: attribute.type,
-          value: { regiao: '', bairro },
-        },
-      });
-    };
+  const handleBairroChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const bairro = event.target.value;
+    // We keep sending the object structure to maintain backend compatibility if needed,
+    // but regiao is now always empty.
+    onChange({
+      target: {
+        name,
+        type: attribute.type,
+        value: { regiao: '', bairro },
+      },
+    });
+  };
 
-    return (
-      <div style={{ display: 'grid', gap: '8px' }}>
-        <label style={{ fontWeight: 600, fontSize: '0.75rem', color: '#4b5563' }}>{label}</label>
-        <select
-          ref={ref}
-          name={name}
-          value={currentBairro}
-          onChange={handleBairroChange}
-          disabled={disabled}
-          required={required}
-          style={{ 
-            width: '100%', 
-            padding: '8px 12px', 
-            borderRadius: '4px', 
-            border: '1px solid #d1d5db',
-            backgroundColor: disabled ? '#f3f4f6' : 'white'
-          }}
-        >
-          <option value="">Selecione o bairro</option>
-          {todosBairros.map((bairro) => (
-            <option key={bairro} value={bairro}>
-              {bairro}
-            </option>
-          ))}
-        </select>
-      </div>
-    );
-  }
-);
+  return (
+    <div style={{ display: 'grid', gap: '8px' }}>
+      <label style={{ fontWeight: 600, fontSize: '0.75rem', color: '#4b5563' }}>{label}</label>
+      <select
+        name={name}
+        value={currentBairro}
+        onChange={handleBairroChange}
+        disabled={disabled}
+        required={required}
+        style={{ 
+          width: '100%', 
+          padding: '8px 12px', 
+          borderRadius: '4px', 
+          border: '1px solid #d1d5db',
+          backgroundColor: disabled ? '#f3f4f6' : 'white'
+        }}
+      >
+        <option value="">Selecione o bairro</option>
+        {todosBairros.map((bairro) => (
+          <option key={bairro} value={bairro}>
+            {bairro}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+};
 
 Input.displayName = 'BairroRegiaoInput';
 

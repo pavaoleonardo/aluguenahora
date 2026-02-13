@@ -17,7 +17,7 @@ export default {
         defaultMessage: 'Selecione o bairro',
       },
       components: {
-        Input: async () => import('./components/BairroRegiaoInput'),
+        Input: async () => import('./components/BairroRegiaoInput') as any,
       },
     });
   },
