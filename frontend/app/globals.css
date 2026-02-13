@@ -22,16 +22,21 @@
   }
 }
 
-body {
+html, body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100%;
+  width: 100%;
+  position: relative;
+  margin: 0;
+  padding: 0;
 }
 
-html {
+/* Specific safety class for elements that might overflow */
+.no-overflow {
   overflow-x: hidden;
   max-width: 100%;
 }

@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   return (
-    <div className="bg-white overflow-x-hidden">
+    <div className="bg-white overflow-x-clip">
       {/* Hero Section */}
       <div className="relative isolate overflow-hidden">
         {/* Modern Gradient Background */}
