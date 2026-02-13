@@ -123,21 +123,42 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
   },
 
   async create(ctx) {
-    if (ctx.state.user) {
-      // Force the usuario to be the current user
-      ctx.request.body.data.usuario = ctx.state.user.documentId || ctx.state.user.id;
-    }
+    console.log('[Create Imovel] Received request');
     
     try {
+      if (!ctx.request.body || !ctx.request.body.data) {
+        console.error('[Create Imovel] Missing body or data');
+        return ctx.badRequest('Dados do imóvel não encontrados no corpo da requisição.');
+      }
+
+      // 1. Sanitize the user input (removes forbidden fields)
       const sanitizedInput = await this.sanitizeInput(ctx.request.body.data, ctx);
+      
+      // 2. Add system-controlled fields (owner and status)
+      const ownerId = ctx.state.user.documentId || ctx.state.user.id;
+      
+      const propertyData = {
+        ...(sanitizedInput as any),
+        usuario: ownerId,
+        estatus: 'pendente' // All new properties from the site start as pending
+      };
+
+      console.log(`[Create Imovel] Creating property for user: ${ctx.state.user.username} (ownerId: ${ownerId})`);
+
+      // 3. Save to database using Strapi 5 Document Service
       const result = await strapi.documents('api::imovel.imovel').create({
-        data: sanitizedInput as any,
+        data: propertyData,
       });
+
+      console.log(`[Create Imovel] Successfully created property: ${result.documentId}`);
+
+      // 4. Sanitize and return response
       const sanitizedResult = await this.sanitizeOutput(result, ctx);
       return this.transformResponse(sanitizedResult);
     } catch (err: any) {
-      console.error('Custom create error', err);
-      ctx.badRequest('Erro ao criar imóvel: ' + err.message);
+      console.error('[Create Imovel] ERROR:', err);
+      // Detailed error for debugging, though we might want to mask this in pure production
+      ctx.badRequest('Erro ao processar criação de imóvel: ' + (err.message || 'Erro interno'));
     }
-  }
+  },
 }));
