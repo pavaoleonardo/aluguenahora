@@ -13,32 +13,37 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
       // we automatically filter by their properties if ?myProperties=true is passed.
       if (ctx.state.user && ctx.query.myProperties === 'true') {
         const userId = ctx.state.user.id;
-        const documentId = ctx.state.user.documentId;
+        const userDocId = ctx.state.user.documentId;
         
+        // Strapi 5 Document Service filters for relations work best with documentId.
+        // If we don't have documentId, we fall back to numeric ID.
+        const filterValue = userDocId || userId;
+
         sanitizedQuery.filters = {
           ...(sanitizedQuery.filters as any || {}),
-          $or: [
-            { usuario: { id: { $eq: userId } } },
-            { usuario: { documentId: { $eq: documentId } } }
-          ]
+          usuario: filterValue
         };
-        console.log(`[Dashboard Filter] Filtering properties for user: ${ctx.state.user.username} (ID: ${userId}, DocID: ${documentId})`);
+        
+        console.log(`[Dashboard Filter] User: ${ctx.state.user.username}`);
+        console.log(`[Dashboard Filter] IDs: { id: ${userId}, documentId: ${userDocId} }`);
+        console.log(`[Dashboard Filter] Using filter value: ${filterValue}`);
       }
 
       // Strapi 5 Document Service needs an explicit status.
-      // For public requests, we only want 'published'.
-      // For authenticated dashboard, we usually want 'all' (draft + published).
       const status = ctx.query.status || (ctx.state.user && ctx.query.myProperties === 'true' ? 'all' : 'published');
+      console.log(`[Dashboard Filter] Final status: ${status}`);
 
       const results = await strapi.documents('api::imovel.imovel').findMany({
         ...sanitizedQuery,
         status: status as any,
       });
+
+      console.log(`[Dashboard Filter] Found ${results?.length || 0} properties`);
       
       const sanitizedResults = await this.sanitizeOutput(results, ctx);
       return this.transformResponse(sanitizedResults);
     } catch (err: any) {
-      console.error('Custom find error', err);
+      console.error('[Custom Find Error]', err);
       ctx.badRequest('Erro ao buscar imóveis: ' + err.message);
     }
   },
