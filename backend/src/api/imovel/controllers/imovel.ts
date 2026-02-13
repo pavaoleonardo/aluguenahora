@@ -12,17 +12,17 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
       // If the request is coming from the dashboard (user is authenticated)
       // we automatically filter by their properties if ?myProperties=true is passed.
       if (ctx.state.user && ctx.query.myProperties === 'true') {
-        // In Strapi 5, relations in Document Service findMany filter usually use the documentId
-        // or the numeric ID if handled correctly. We'll try both via $eq.
-        const userId = ctx.state.user.documentId || ctx.state.user.id;
+        const userId = ctx.state.user.id;
+        const documentId = ctx.state.user.documentId;
         
         sanitizedQuery.filters = {
           ...(sanitizedQuery.filters as any || {}),
-          usuario: {
-            $eq: userId
-          }
+          $or: [
+            { usuario: { id: { $eq: userId } } },
+            { usuario: { documentId: { $eq: documentId } } }
+          ]
         };
-        console.log(`[Dashboard Filter] Filtering properties for user: ${ctx.state.user.username} (ID: ${userId})`);
+        console.log(`[Dashboard Filter] Filtering properties for user: ${ctx.state.user.username} (ID: ${userId}, DocID: ${documentId})`);
       }
 
       // Strapi 5 Document Service needs an explicit status.
