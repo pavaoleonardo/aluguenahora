@@ -59,7 +59,7 @@ export default function SearchBar() {
   return (
     <div className="w-full max-w-5xl mx-auto">
       {/* Main Search Bar */}
-      <div className="bg-white rounded-3xl p-6 shadow-2xl ring-1 ring-black/5 mx-4 sm:mx-0 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="bg-white rounded-3xl p-6 shadow-2xl ring-1 ring-black/5 mx-2 sm:mx-0 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
           
           {/* Purpose (Finalidade) Input - First Item */}

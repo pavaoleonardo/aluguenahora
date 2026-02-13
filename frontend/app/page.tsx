@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   return (
-    <div className="bg-white">
+    <div className="bg-white overflow-x-hidden">
       {/* Hero Section */}
       <div className="relative isolate overflow-hidden">
         {/* Modern Gradient Background */}
@@ -18,8 +18,8 @@ export default async function Home() {
         
         <div className="pb-24 pt-24 sm:pb-32 lg:pb-40 relative">
             <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
-                <div className="mx-auto max-w-4xl text-center mb-16 animate-in hover:-translate-y-1 transition-transform duration-500">
-                    <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-6xl mb-6 drop-shadow-sm">
+                <div className="mx-auto max-w-4xl text-center mb-16 px-4 animate-in hover:-translate-y-1 transition-transform duration-500">
+                    <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-6xl mb-6 drop-shadow-sm whitespace-normal">
                         <span className="block">Seu Novo Lar</span>
                         <span className="block text-primary mt-2">Começa Aqui</span>
                     </h1>
