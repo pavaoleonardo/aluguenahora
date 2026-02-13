@@ -126,6 +126,9 @@ export default function Footer() {
           <p className="text-xs leading-5 text-gray-400">
             &copy; {new Date().getFullYear()} Alugue Na Hora. Todos os direitos reservados.
           </p>
+          <p className="mt-2 text-xs leading-5 text-gray-500">
+            Made with <span className="text-red-500">❤️</span> by ALL Marketing
+          </p>
         </div>
       </div>
     </footer>
