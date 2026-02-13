@@ -193,7 +193,12 @@ export default function NewPropertyPage() {
       router.push('/dashboard')
 
     } catch (error: any) {
-      alert(error.message)
+      console.error('Submit error:', error)
+      let message = error.message
+      if (message === 'Failed to fetch') {
+        message = 'Não foi possível conectar ao servidor. Verifique sua conexão ou se o servidor está online. (Se estiver usando o Render gratuito, o servidor pode estar "acordando")'
+      }
+      alert(message)
     } finally {
       setLoading(false)
     }

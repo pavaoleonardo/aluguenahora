@@ -168,7 +168,12 @@ export default function EditPropertyPage() {
       alert('Imóvel atualizado. Aguardando aprovação.')
       router.push('/dashboard')
     } catch (error: any) {
-      alert(error.message)
+      console.error('Update error:', error)
+      let message = error.message
+      if (message === 'Failed to fetch') {
+        message = 'Não foi possível conectar ao servidor. Verifique sua conexão ou se o servidor está online. (Se estiver usando o Render gratuito, o servidor pode estar "acordando")'
+      }
+      alert(message)
     } finally {
       setSaving(false)
     }
