@@ -505,7 +505,7 @@ export interface ApiImovelImovel extends Struct.CollectionTypeSchema {
     preco: Schema.Attribute.Decimal;
     publishedAt: Schema.Attribute.DateTime;
     quartos: Schema.Attribute.Integer;
-    tamanho: Schema.Attribute.Decimal;
+    tamanho: Schema.Attribute.Integer;
     tipo: Schema.Attribute.Enumeration<
       [
         'Apart Hotel / Flat / Loft',
