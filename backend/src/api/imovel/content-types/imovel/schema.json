@@ -21,13 +21,6 @@
     "tamanho": {
       "type": "decimal"
     },
-    "unidade_medida": {
-      "type": "enumeration",
-      "enum": [
-        "m²"
-      ],
-      "default": "m²"
-    },
     "condominio": {
       "type": "decimal"
     },
