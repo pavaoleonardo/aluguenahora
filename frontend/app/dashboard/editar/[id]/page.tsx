@@ -22,7 +22,6 @@ type ImovelForm = {
   finalidade: string
   tipo: string
   tamanho: string
-  unidade_medida: string
 }
 
 export default function EditPropertyPage() {
@@ -45,7 +44,6 @@ export default function EditPropertyPage() {
     finalidade: '',
     tipo: '',
     tamanho: '',
-    unidade_medida: 'm²',
   })
   const [showBairroSuggestions, setShowBairroSuggestions] = useState(false)
   const [bairroSuggestions, setBairroSuggestions] = useState<string[]>([])
@@ -92,7 +90,6 @@ export default function EditPropertyPage() {
           finalidade: item.finalidade || '',
           tipo: item.tipo || '',
           tamanho: item.tamanho != null ? String(item.tamanho).replace('.', ',') : '',
-          unidade_medida: item.unidade_medida || 'm²',
         })
       })
       .catch((err) => {
@@ -173,7 +170,6 @@ export default function EditPropertyPage() {
             finalidade: formData.finalidade,
             tipo: formData.tipo,
             tamanho: Number(formData.tamanho.replace(',', '.')),
-            unidade_medida: formData.unidade_medida,
             estatus: 'pendente',
           },
         }),

@@ -24,7 +24,6 @@ export default function NewPropertyPage() {
     finalidade: 'aluguel',
     tipo: '',
     tamanho: '',
-    unidade_medida: 'm²',
     endereco: '',
   })
   const [geocoding, setGeocoding] = useState(false)
@@ -173,7 +172,6 @@ export default function NewPropertyPage() {
             finalidade: formData.finalidade,
             tipo: formData.tipo,
             tamanho: Number(formData.tamanho.replace(',', '.')),
-            unidade_medida: formData.unidade_medida,
             estatus: 'pendente',
             endereco: formData.endereco || null,
             latitude: latitude,
