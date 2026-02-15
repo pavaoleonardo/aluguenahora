@@ -19,7 +19,7 @@
       "type": "blocks"
     },
     "tamanho": {
-      "type": "integer"
+      "type": "decimal"
     },
     "unidade_medida": {
       "type": "enumeration",
