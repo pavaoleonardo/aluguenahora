@@ -58,7 +58,8 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
 
       const property = await strapi.documents('api::imovel.imovel').findOne({
         documentId: id,
-        populate: populate
+        populate: populate,
+        status: (ctx.query.status as any) || 'draft'
       });
 
       if (!property) {
