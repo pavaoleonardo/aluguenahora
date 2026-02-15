@@ -536,7 +536,7 @@ export interface ApiImovelImovel extends Struct.CollectionTypeSchema {
       ]
     >;
     titulo: Schema.Attribute.String & Schema.Attribute.Required;
-    unidade_medida: Schema.Attribute.Enumeration<['m\u00B2', 'cm']> &
+    unidade_medida: Schema.Attribute.Enumeration<['m\u00B2']> &
       Schema.Attribute.DefaultTo<'m\u00B2'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &

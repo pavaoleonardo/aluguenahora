@@ -24,8 +24,7 @@
     "unidade_medida": {
       "type": "enumeration",
       "enum": [
-        "m²",
-        "cm"
+        "m²"
       ],
       "default": "m²"
     },
