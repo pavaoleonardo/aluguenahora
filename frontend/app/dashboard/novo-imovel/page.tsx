@@ -11,6 +11,8 @@ export default function NewPropertyPage() {
   const [loading, setLoading] = useState(false)
   const [fotos, setFotos] = useState<File[]>([])
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
+  const [fotoFachada, setFotoFachada] = useState<File | null>(null)
+  const [previewFachada, setPreviewFachada] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     titulo: '',
     descricao: '',
@@ -101,13 +103,12 @@ export default function NewPropertyPage() {
     setFotos(files)
   }
 
-  const setAsMain = (index: number) => {
-    setFotos(prev => {
-      const newFotos = [...prev]
-      const [item] = newFotos.splice(index, 1)
-      newFotos.unshift(item)
-      return newFotos
-    })
+  const handleFachadaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setFotoFachada(file)
+      setPreviewFachada(URL.createObjectURL(file))
+    }
   }
 
   useEffect(() => {
@@ -146,7 +147,39 @@ export default function NewPropertyPage() {
       }
       setGeocoding(false)
 
-      // Create Property
+      // 1. Upload Fachada
+      let uploadedFachadaId = null
+      if (fotoFachada) {
+        const fachadaFormData = new FormData()
+        fachadaFormData.append('files', fotoFachada)
+        const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: fachadaFormData,
+        })
+        const uploadData = await uploadRes.json()
+        if (uploadData && uploadData[0]) {
+          uploadedFachadaId = uploadData[0].id
+        }
+      }
+
+      // 2. Upload Outras Fotos
+      const uploadedFotoIds: any[] = []
+      if (fotos.length > 0) {
+        const uploadForm = new FormData()
+        fotos.forEach((file) => uploadForm.append('files', file))
+        const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: uploadForm,
+        })
+        const uploadData = await uploadRes.json()
+        if (Array.isArray(uploadData)) {
+          uploadData.forEach(f => uploadedFotoIds.push(f.id))
+        }
+      }
+
+      // 3. Create Property
       const res = await fetch(`${API_BASE_URL}/api/imoveis`, {
         method: 'POST',
         headers: {
@@ -176,37 +209,15 @@ export default function NewPropertyPage() {
             endereco: formData.endereco || null,
             latitude: latitude,
             longitude: longitude,
-          }
-        })
+            foto_fachada: uploadedFachadaId,
+            fotos: uploadedFotoIds,
+          },
+        }),
       })
 
       if (!res.ok) {
         const err = await res.json()
         throw new Error(err.error?.message || 'Erro ao criar imóvel')
-      }
-      
-      const createdProperty = await res.json()
-      const propertyId = createdProperty?.data?.id
-
-      if (propertyId && fotos.length > 0) {
-        const uploadForm = new FormData()
-        fotos.forEach((file) => uploadForm.append('files', file))
-        uploadForm.append('ref', 'api::imovel.imovel')
-        uploadForm.append('refId', String(propertyId))
-        uploadForm.append('field', 'fotos')
-
-        const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: uploadForm,
-        })
-
-        if (!uploadRes.ok) {
-          const err = await uploadRes.json().catch(() => ({}))
-          throw new Error(err.error?.message || 'Erro ao enviar fotos')
-        }
       }
       
       alert('Imóvel cadastrado com sucesso! Aguardando aprovação.')
@@ -387,7 +398,30 @@ export default function NewPropertyPage() {
                 </div>
 
                 <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Fotos</label>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Foto da Fachada (Principal)</label>
+                    <input
+                      type="file"
+                      name="fotoFachada"
+                      accept="image/*"
+                      onChange={handleFachadaChange}
+                      className="mt-2 block w-full text-sm text-gray-900 file:mr-4 file:rounded-md file:border-0 file:bg-gray-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-gray-700 hover:file:bg-gray-200"
+                    />
+                    {previewFachada && (
+                      <div className="mt-3 relative aspect-[4/3] w-48 overflow-hidden rounded-md border-2 border-primary">
+                        <img
+                          src={previewFachada}
+                          alt="Prévia da Fachada"
+                          className="h-full w-full object-cover"
+                        />
+                        <div className="absolute top-0 left-0 bg-primary text-white text-[10px] px-2 py-0.5 font-bold uppercase rounded-br-md">
+                            Fachada
+                        </div>
+                      </div>
+                    )}
+                </div>
+
+                <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Outras Fotos (Opcional)</label>
                     <input
                       type="file"
                       name="fotos"
@@ -404,25 +438,12 @@ export default function NewPropertyPage() {
                     {previewUrls.length > 0 ? (
                       <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
                         {previewUrls.map((url, idx) => (
-                          <div key={url} className={`relative aspect-[4/3] overflow-hidden rounded-md border-2 ${idx === 0 ? 'border-primary' : 'border-gray-200'}`}>
+                          <div key={url} className="relative aspect-[4/3] overflow-hidden rounded-md border border-gray-200">
                             <img
                               src={url}
                               alt={`Prévia ${idx + 1}`}
                               className="h-full w-full object-cover"
                             />
-                            {idx === 0 ? (
-                                <div className="absolute top-0 left-0 bg-primary text-white text-[10px] px-2 py-0.5 font-bold uppercase rounded-br-md">
-                                    Fachada
-                                </div>
-                            ) : (
-                                <button
-                                    type="button"
-                                    onClick={() => setAsMain(idx)}
-                                    className="absolute bottom-1 right-1 bg-black/60 text-white text-[10px] px-2 py-1 rounded hover:bg-primary transition-colors"
-                                >
-                                    Usar como Fachada
-                                </button>
-                            )}
                           </div>
                         ))}
                       </div>

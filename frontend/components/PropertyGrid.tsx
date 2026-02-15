@@ -20,6 +20,7 @@ type ImovelData = {
   iptu?: number
   finalidade?: string
   fotos: any[]
+  foto_fachada?: any
 }
 
 type PropertyGridProps = {
@@ -33,8 +34,8 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    const params: Record<string, string | number | boolean> = {
-      populate: 'fotos',
+    const params: any = {
+      populate: ['fotos', 'foto_fachada'],
       sort: 'createdAt:desc',
       'filters[publishedAt][$notNull]': true,
     }
@@ -105,9 +106,9 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
               className="group flex flex-col items-start justify-between hover:shadow-lg transition-shadow rounded-2xl p-4 bg-white border border-gray-100"
             >
               <div className="relative w-full overflow-hidden rounded-xl bg-gray-200 aspect-[16/9]">
-                {property.fotos && property.fotos[0]?.url ? (
+                {property.foto_fachada?.url || (property.fotos && property.fotos[0]?.url) ? (
                   <Image
-                    src={property.fotos[0]?.url}
+                    src={property.foto_fachada?.url || property.fotos[0]?.url}
                     alt={property.titulo}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"

@@ -38,6 +38,7 @@ type ImovelDetail = {
   longitude?: number
   condominio?: number
   iptu?: number
+  foto_fachada?: any
   unidade_medida?: string
 }
 
@@ -56,7 +57,7 @@ export default function PropertyDetailClient({ id }: { id: string }) {
     const fetchProperty = async () => {
       try {
         const res = await api.get(`/api/imoveis/${id}`, {
-          params: { populate: 'fotos' },
+          params: { populate: ['fotos', 'foto_fachada'] },
         })
         if (active) {
           setProperty(res.data.data || null)
@@ -66,7 +67,7 @@ export default function PropertyDetailClient({ id }: { id: string }) {
         try {
           const res = await api.get('/api/imoveis', {
             params: {
-              populate: 'fotos',
+              populate: ['fotos', 'foto_fachada'],
               'filters[documentId][$eq]': id,
               'filters[publishedAt][$notNull]': true,
             },
@@ -130,6 +131,7 @@ export default function PropertyDetailClient({ id }: { id: string }) {
         <div className="lg:grid lg:grid-cols-2 lg:gap-x-8">
           <PropertyGallery
             fotos={property.fotos}
+            foto_fachada={property.foto_fachada}
             titulo={property.titulo}
             finalidadeLabel={finalidadeLabel}
           />

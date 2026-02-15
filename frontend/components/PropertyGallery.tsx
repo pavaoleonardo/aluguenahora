@@ -17,23 +17,38 @@ type FotoItem = {
 
 type PropertyGalleryProps = {
   fotos?: FotoItem[]
+  foto_fachada?: FotoItem
   titulo: string
   finalidadeLabel?: string
 }
 
-export default function PropertyGallery({ fotos = [], titulo, finalidadeLabel }: PropertyGalleryProps) {
+export default function PropertyGallery({ fotos = [], foto_fachada, titulo, finalidadeLabel }: PropertyGalleryProps) {
   const items = useMemo(() => {
-    return (fotos || [])
+    const allItems = []
+
+    // Add fachada first if exists
+    if (foto_fachada?.url) {
+      const url = foto_fachada.url
+      const thumb = foto_fachada.formats?.thumbnail?.url || url
+      const large = foto_fachada.formats?.medium?.url || foto_fachada.formats?.small?.url || url
+      allItems.push({ url: large || url, thumb: thumb || url, label: 'Fachada frontal' })
+    }
+
+    // Add other photos
+    const otherPhotos = (fotos || [])
       .map((foto) => {
         const url = foto?.url
+        // Skip if this is the same as the fachada to avoid duplication
+        if (!url || url === foto_fachada?.url) return null
         const thumb = foto?.formats?.thumbnail?.url || url
         const large = foto?.formats?.medium?.url || foto?.formats?.small?.url || url
-        if (!url) return null
         const label = foto?.caption || foto?.alternativeText || foto?.name || ''
         return { url: large || url, thumb: thumb || url, label }
       })
       .filter(Boolean) as { url: string; thumb: string; label: string }[]
-  }, [fotos])
+
+    return [...allItems, ...otherPhotos]
+  }, [fotos, foto_fachada])
 
   const [activeIndex, setActiveIndex] = useState(0)
   const active = items[activeIndex]
