@@ -23,7 +23,7 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
           }
         };
         
-        status = ctx.query.status as string || 'all';
+        status = ctx.query.status as string || 'draft';
         console.log(`[Dashboard Filter] Filtering for user DocID: ${userDocId}, Status: ${status}`);
       }
       console.log(`[Dashboard Filter] Final status: ${status}`);
