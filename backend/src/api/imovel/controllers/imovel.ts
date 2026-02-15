@@ -1,5 +1,5 @@
 /**
- * imovel controller
+ * imovel controller - BUILD TRIGGER v2
  */
 
 import { factories } from '@strapi/strapi';
