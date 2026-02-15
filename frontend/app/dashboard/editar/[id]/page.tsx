@@ -394,26 +394,15 @@ export default function EditPropertyPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium leading-6 text-gray-900">Metragem</label>
-              <div className="mt-2 flex rounded-md shadow-sm">
-                <input
-                  type="text"
-                  name="tamanho"
-                  value={formData.tamanho}
-                  onChange={handleChange}
-                  placeholder="0,00"
-                  className="block w-full rounded-none rounded-l-md border-0 py-1.5 pl-3 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                />
-                <select
-                  name="unidade_medida"
-                  value={formData.unidade_medida}
-                  onChange={handleChange}
-                  className="flex-shrink-0 inline-flex items-center rounded-r-md border-0 bg-gray-50 py-1.5 pl-2 pr-2 text-sm font-medium text-gray-500 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary"
-                >
-                  <option value="m²">m²</option>
-                  <option value="cm">cm</option>
-                </select>
-              </div>
+              <label className="block text-sm font-medium leading-6 text-gray-900">Metragem (m²)</label>
+              <input
+                type="text"
+                name="tamanho"
+                value={formData.tamanho}
+                onChange={handleChange}
+                placeholder="0,00"
+                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+              />
             </div>
           </div>
 
