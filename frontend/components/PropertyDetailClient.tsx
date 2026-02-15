@@ -57,7 +57,7 @@ export default function PropertyDetailClient({ id }: { id: string }) {
     const fetchProperty = async () => {
       try {
         const res = await api.get(`/api/imoveis/${id}`, {
-          params: { populate: ['fotos', 'foto_fachada'] },
+          params: { populate: '*' },
         })
         if (active) {
           setProperty(res.data.data || null)
@@ -67,9 +67,9 @@ export default function PropertyDetailClient({ id }: { id: string }) {
         try {
           const res = await api.get('/api/imoveis', {
             params: {
-              populate: ['fotos', 'foto_fachada'],
+              populate: '*',
               'filters[documentId][$eq]': id,
-              'filters[publishedAt][$notNull]': true,
+              'filters[status][$in]': ['published', 'draft'],
             },
           })
           const data = res.data.data
@@ -143,11 +143,6 @@ export default function PropertyDetailClient({ id }: { id: string }) {
             <p className="mt-4 text-3xl font-bold text-primary">
               {formatCurrency(property.preco || 0)}
             </p>
-            {finalidadeLabel ? (
-              <span className="mt-2 inline-flex rounded-full bg-secondary/10 px-3 py-1 text-xs font-semibold text-secondary">
-                {finalidadeLabel}
-              </span>
-            ) : null}
 
             <div className="mt-8 overflow-hidden rounded-lg border border-gray-200">
               <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">

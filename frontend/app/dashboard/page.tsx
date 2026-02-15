@@ -47,7 +47,7 @@ export default function DashboardPage() {
     }
 
     // Simplified fetch: backend automatically filters by the authenticated user when ?myProperties=true is passed
-    fetch(`${API_BASE_URL}/api/imoveis?populate=fotos,foto_fachada&myProperties=true`, {
+    fetch(`${API_BASE_URL}/api/imoveis?populate=*&myProperties=true`, {
       headers: {
         Authorization: `Bearer ${token}`
       }

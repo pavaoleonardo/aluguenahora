@@ -58,7 +58,7 @@ export default function EditPropertyPage() {
 
     if (!id) return
 
-    fetch(`${API_BASE_URL}/api/imoveis/${id}?populate=*`, {
+    fetch(`${API_BASE_URL}/api/imoveis/${id}?populate=*&status=draft`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

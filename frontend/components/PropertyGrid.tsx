@@ -35,7 +35,7 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
 
   useEffect(() => {
     const params: any = {
-      populate: ['fotos', 'foto_fachada'],
+      populate: '*',
       sort: 'createdAt:desc',
       'filters[publishedAt][$notNull]': true,
     }
