@@ -85,14 +85,9 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
         ) : (
           <div className="flex h-full items-center justify-center text-gray-400">Sem Foto</div>
         )}
-        {finalidadeLabel ? (
-          <span className="absolute left-3 top-3 rounded-sm bg-secondary px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow">
-            {finalidadeLabel}
-          </span>
-        ) : null}
 
         {total > 0 ? (
-          <span className="absolute right-3 top-3 rounded-sm bg-black/70 px-2.5 py-1 text-xs font-semibold text-white">
+          <span className="absolute left-3 top-3 rounded-sm bg-black/70 px-2.5 py-1 text-xs font-semibold text-white">
             {activeIndex + 1}/{total}
           </span>
         ) : null}

@@ -28,6 +28,7 @@ interface Imovel {
   finalidade?: string;
   tipo?: string;
   fotos: any[];
+  foto_fachada?: any;
 }
 
 export default function DashboardPage() {
@@ -46,7 +47,7 @@ export default function DashboardPage() {
     }
 
     // Simplified fetch: backend automatically filters by the authenticated user when ?myProperties=true is passed
-    fetch(`${API_BASE_URL}/api/imoveis?populate=fotos&myProperties=true`, {
+    fetch(`${API_BASE_URL}/api/imoveis?populate=fotos,foto_fachada&myProperties=true`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -101,9 +102,9 @@ export default function DashboardPage() {
                         return (
                         <div key={property.id || property.documentId} className="relative flex flex-col overflow-hidden rounded-lg border border-gray-200">
                              <div className="aspect-[16/9] bg-gray-200 relative">
-                                {property.fotos && property.fotos[0] ? (
+                                {property.foto_fachada?.url || (property.fotos && property.fotos[0]?.url) ? (
                                     <Image 
-                                      src={property.fotos[0]?.url} 
+                                      src={property.foto_fachada?.url || property.fotos[0]?.url} 
                                       alt={property.titulo}
                                       fill
                                       className="object-cover"
