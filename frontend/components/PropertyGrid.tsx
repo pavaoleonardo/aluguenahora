@@ -14,7 +14,10 @@ type ImovelData = {
   quartos: number
   banheiros: number
   tamanho?: number
+  unidade_medida?: string
   preco: number
+  condominio?: number
+  iptu?: number
   finalidade?: string
   fotos: any[]
 }
@@ -103,12 +106,17 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
             >
               <div className="relative w-full overflow-hidden rounded-xl bg-gray-200 aspect-[16/9]">
                 {property.fotos && property.fotos[0]?.url ? (
-                  <Image
-                    src={property.fotos[0]?.url}
-                    alt={property.titulo}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
+                  <>
+                    <Image
+                      src={property.fotos[0]?.url}
+                      alt={property.titulo}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute left-0 top-0 bg-black/60 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white rounded-br-md">
+                      Fachada frontal
+                    </div>
+                  </>
                 ) : (
                   <div className="flex h-full items-center justify-center text-gray-400">
                     Sem Foto
@@ -158,7 +166,7 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
                        </svg>
-                       <span>{property.tamanho} m²</span>
+                       <span>{property.tamanho} {property.unidade_medida || 'm²'}</span>
                     </span>
                   </div>
                 </div>

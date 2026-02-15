@@ -53,13 +53,20 @@ export default function PropertyGallery({ fotos = [], titulo, finalidadeLabel }:
     <div className="flex flex-col gap-4">
       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md border border-gray-200 bg-gray-100">
         {active ? (
-          <Image
-            src={active.url}
-            alt={titulo}
-            fill
-            className="object-cover"
-            priority
-          />
+          <>
+            <Image
+              src={active.url}
+              alt={titulo}
+              fill
+              className="object-cover"
+              priority
+            />
+            {activeIndex === 0 && (
+              <div className="absolute left-0 top-0 bg-black/60 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white rounded-br-md z-10">
+                Fachada frontal
+              </div>
+            )}
+          </>
         ) : (
           <div className="flex h-full items-center justify-center text-gray-400">Sem Foto</div>
         )}

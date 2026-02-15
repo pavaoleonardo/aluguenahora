@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { todosBairros } from '@/lib/bairrosCampoGrande'
 import { API_BASE_URL } from '@/lib/apiBase'
+import { formatCurrency, parseCurrency } from '@/lib/format'
 
 type BairroValue = { regiao: string; bairro: string } | string | null
 
@@ -11,6 +12,8 @@ type ImovelForm = {
   titulo: string
   descricao: string
   preco: string
+  condominio: string
+  iptu: string
   quartos: string
   banheiros: string
   bairro: string
@@ -19,6 +22,7 @@ type ImovelForm = {
   finalidade: string
   tipo: string
   tamanho: string
+  unidade_medida: string
 }
 
 export default function EditPropertyPage() {
@@ -31,6 +35,8 @@ export default function EditPropertyPage() {
     titulo: '',
     descricao: '',
     preco: '',
+    condominio: '',
+    iptu: '',
     quartos: '',
     banheiros: '',
     bairro: '',
@@ -39,6 +45,7 @@ export default function EditPropertyPage() {
     finalidade: '',
     tipo: '',
     tamanho: '',
+    unidade_medida: 'm²',
   })
   const [showBairroSuggestions, setShowBairroSuggestions] = useState(false)
   const [bairroSuggestions, setBairroSuggestions] = useState<string[]>([])
@@ -74,7 +81,9 @@ export default function EditPropertyPage() {
           descricao: Array.isArray(item.descricao)
             ? item.descricao.map((b: any) => b?.children?.map((c: any) => c.text).join('')).join('\n\n')
             : item.descricao || '',
-          preco: item.preco != null ? String(item.preco) : '',
+          preco: item.preco != null ? formatCurrency(item.preco) : '',
+          condominio: item.condominio != null ? formatCurrency(item.condominio) : '',
+          iptu: item.iptu != null ? formatCurrency(item.iptu) : '',
           quartos: item.quartos != null ? String(item.quartos) : '',
           banheiros: item.banheiros != null ? String(item.banheiros) : '',
           bairro,
@@ -82,7 +91,8 @@ export default function EditPropertyPage() {
           cidade: item.cidade || 'Campo Grande',
           finalidade: item.finalidade || '',
           tipo: item.tipo || '',
-          tamanho: item.tamanho != null ? String(item.tamanho) : '',
+          tamanho: item.tamanho != null ? String(item.tamanho).replace('.', ',') : '',
+          unidade_medida: item.unidade_medida || 'm²',
         })
       })
       .catch((err) => {
@@ -98,6 +108,12 @@ export default function EditPropertyPage() {
   ) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    const formatted = formatCurrency(value)
+    setFormData(prev => ({ ...prev, [name]: formatted }))
   }
 
   const handleBairroChange = (val: string) => {
@@ -147,14 +163,17 @@ export default function EditPropertyPage() {
                 children: [{ type: 'text', text: formData.descricao }],
               },
             ],
-            preco: Number(formData.preco),
+            preco: parseCurrency(formData.preco),
+            condominio: parseCurrency(formData.condominio),
+            iptu: parseCurrency(formData.iptu),
             quartos: Number(formData.quartos),
             banheiros: Number(formData.banheiros),
             bairro: { regiao: '', bairro: formData.bairro },
             cidade: formData.cidade,
             finalidade: formData.finalidade,
             tipo: formData.tipo,
-            tamanho: Number(formData.tamanho),
+            tamanho: Number(formData.tamanho.replace(',', '.')),
+            unidade_medida: formData.unidade_medida,
             estatus: 'pendente',
           },
         }),
@@ -214,13 +233,14 @@ export default function EditPropertyPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium leading-6 text-gray-900">Preço (R$)</label>
+              <label className="block text-sm font-medium leading-6 text-gray-900">Preço do Aluguel (R$)</label>
               <input
-                type="number"
+                type="text"
                 name="preco"
                 required
                 value={formData.preco}
-                onChange={handleChange}
+                onChange={handlePriceChange}
+                placeholder="R$ 0,00"
                 className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
               />
             </div>
@@ -235,7 +255,32 @@ export default function EditPropertyPage() {
                 className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 cursor-default pointer-events-none bg-gray-50"
               >
                 <option value="aluguel">Aluguel</option>
+                <option value="venda">Venda</option>
               </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium leading-6 text-gray-900">Condomínio (Mensal)</label>
+              <input
+                type="text"
+                name="condominio"
+                value={formData.condominio}
+                onChange={handlePriceChange}
+                placeholder="R$ 0,00"
+                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium leading-6 text-gray-900">IPTU (Mensal)</label>
+              <input
+                type="text"
+                name="iptu"
+                value={formData.iptu}
+                onChange={handlePriceChange}
+                placeholder="R$ 0,00"
+                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+              />
             </div>
 
             <div className="sm:col-span-2">
@@ -349,14 +394,26 @@ export default function EditPropertyPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium leading-6 text-gray-900">Tamanho (m²)</label>
-              <input
-                type="number"
-                name="tamanho"
-                value={formData.tamanho}
-                onChange={handleChange}
-                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-              />
+              <label className="block text-sm font-medium leading-6 text-gray-900">Metragem</label>
+              <div className="mt-2 flex rounded-md shadow-sm">
+                <input
+                  type="text"
+                  name="tamanho"
+                  value={formData.tamanho}
+                  onChange={handleChange}
+                  placeholder="0,00"
+                  className="block w-full rounded-none rounded-l-md border-0 py-1.5 pl-3 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                />
+                <select
+                  name="unidade_medida"
+                  value={formData.unidade_medida}
+                  onChange={handleChange}
+                  className="flex-shrink-0 inline-flex items-center rounded-r-md border-0 bg-gray-50 py-1.5 pl-2 pr-2 text-sm font-medium text-gray-500 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary"
+                >
+                  <option value="m²">m²</option>
+                  <option value="cm">cm</option>
+                </select>
+              </div>
             </div>
           </div>
 

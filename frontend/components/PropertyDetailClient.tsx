@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { api } from '@/lib/api'
 import PropertyGallery from '@/components/PropertyGallery'
 import { ArrowsPointingOutIcon, MapPinIcon } from '@heroicons/react/24/outline'
+import { formatCurrency, formatNumber } from '@/lib/format'
 import dynamic from 'next/dynamic'
 
 const PropertyMap = dynamic(() => import('@/components/PropertyMap'), {
@@ -27,6 +28,7 @@ type ImovelDetail = {
   quartos?: number
   banheiros?: number
   bairro?: BairroValue
+  cidade?: string
   preco?: number
   finalidade?: string
   tipo?: string
@@ -34,6 +36,9 @@ type ImovelDetail = {
   endereco?: string
   latitude?: number
   longitude?: number
+  condominio?: number
+  iptu?: number
+  unidade_medida?: string
 }
 
 export default function PropertyDetailClient({ id }: { id: string }) {
@@ -133,11 +138,8 @@ export default function PropertyDetailClient({ id }: { id: string }) {
             <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
               {property.titulo}
             </h1>
-            <p className="mt-4 text-2xl font-bold text-primary">
-              {new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL',
-              }).format(property.preco || 0)}
+            <p className="mt-4 text-3xl font-bold text-primary">
+              {formatCurrency(property.preco || 0)}
             </p>
             {finalidadeLabel ? (
               <span className="mt-2 inline-flex rounded-full bg-secondary/10 px-3 py-1 text-xs font-semibold text-secondary">
@@ -145,18 +147,59 @@ export default function PropertyDetailClient({ id }: { id: string }) {
               </span>
             ) : null}
 
-            <div className="mt-4 border-t border-b border-gray-200 py-4 flex items-center justify-between text-sm text-gray-500">
-              <span>{bairroLabel}</span>
-              <div className="flex gap-6">
+            <div className="mt-8 overflow-hidden rounded-lg border border-gray-200">
+              <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-700">Dados do Imóvel</h3>
+              </div>
+              <table className="min-w-full divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  <tr>
+                    <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50 w-1/3">Tipo</td>
+                    <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{property.tipo}</td>
+                  </tr>
+                  <tr>
+                    <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">Cidade/UF</td>
+                    <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{property.cidade} - MS</td>
+                  </tr>
+                  <tr>
+                    <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">Bairro</td>
+                    <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{bairroLabel}</td>
+                  </tr>
+                  {property.endereco && (
+                    <tr>
+                      <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">Endereço</td>
+                      <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{property.endereco}</td>
+                    </tr>
+                  )}
+                  <tr>
+                    <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">Área útil</td>
+                    <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{formatNumber(property.tamanho || 0)} {property.unidade_medida || 'm²'}</td>
+                  </tr>
+                  {property.condominio ? (
+                    <tr>
+                      <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">Condomínio</td>
+                      <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{formatCurrency(property.condominio)}</td>
+                    </tr>
+                  ) : null}
+                  {property.iptu ? (
+                    <tr>
+                      <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">IPTU</td>
+                      <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{formatCurrency(property.iptu)} mensal</td>
+                    </tr>
+                  ) : null}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-8 flex items-center justify-between text-sm text-gray-500 bg-gray-50 p-4 rounded-lg border border-gray-100">
+              <div className="flex gap-6 mx-auto">
                 <span className="flex items-center gap-2" title="Quartos">
-                   {/* Bed Icon */}
                    <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
                      <path d="M3 7h18a2 2 0 0 1 2 2v10h-2v-3H3v3H1V9a2 2 0 0 1 2-2zm2 2v3h6V9H5zm8 0v3h6V9h-6z" />
                    </svg>
                    {property.quartos} Quartos
                 </span>
                 <span className="flex items-center gap-2" title="Banheiros">
-                   {/* Shower Icon */}
                    <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8 4a4 4 0 014 4v2a2 2 0 002 2h4a2 2 0 002-2V8a4 4 0 00-4-4H8zm0 0V2m4 2V2m4 2V2M12 16v6M8 18v4M16 18v4" />
                    </svg>
@@ -164,7 +207,7 @@ export default function PropertyDetailClient({ id }: { id: string }) {
                 </span>
                 <span className="flex items-center gap-2" title="Área Total">
                    <ArrowsPointingOutIcon className="h-5 w-5 text-gray-400" />
-                   {property.tamanho} m²
+                   {formatNumber(property.tamanho || 0)} {property.unidade_medida || 'm²'}
                 </span>
               </div>
             </div>
