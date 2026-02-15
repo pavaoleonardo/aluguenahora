@@ -23,8 +23,9 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
           }
         };
         
-        status = ctx.query.status as string || 'draft';
-        console.log(`[Dashboard Filter] Filtering for user DocID: ${userDocId}, Status: ${status}`);
+        // For dashboard, we want to see everything (published or pending/drafts)
+        status = ctx.query.status as string || 'all';
+        console.log(`[Dashboard Filter] User: ${ctx.state.user.username}, Status: ${status}`);
       }
       console.log(`[Dashboard Filter] Final status: ${status}`);
 
@@ -56,11 +57,20 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
           ? [sanitizedQuery.populate, 'usuario']
           : ['usuario'];
 
-      const property = await strapi.documents('api::imovel.imovel').findOne({
+      let property = await strapi.documents('api::imovel.imovel').findOne({
         documentId: id,
         populate: populate,
         status: (ctx.query.status as any) || 'draft'
       });
+
+      if (!property && !ctx.query.status) {
+        console.log(`[findOne Fallback] Status draft not found, trying published for ID: ${id}`);
+        property = await strapi.documents('api::imovel.imovel').findOne({
+          documentId: id,
+          populate: populate,
+          status: 'published'
+        });
+      }
 
       if (!property) {
         return ctx.notFound();
