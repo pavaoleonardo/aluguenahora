@@ -89,6 +89,13 @@
         "Sitio"
       ]
     },
+    "foto_fachada": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
     "fotos": {
       "type": "media",
       "multiple": true,

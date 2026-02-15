@@ -492,6 +492,7 @@ export interface ApiImovelImovel extends Struct.CollectionTypeSchema {
       ['rascunho', 'pendente', 'publicado']
     >;
     finalidade: Schema.Attribute.Enumeration<['aluguel', 'venda']>;
+    foto_fachada: Schema.Attribute.Media<'images'>;
     fotos: Schema.Attribute.Media<'images', true>;
     iptu: Schema.Attribute.Decimal;
     latitude: Schema.Attribute.Decimal;
@@ -536,8 +537,6 @@ export interface ApiImovelImovel extends Struct.CollectionTypeSchema {
       ]
     >;
     titulo: Schema.Attribute.String & Schema.Attribute.Required;
-    unidade_medida: Schema.Attribute.Enumeration<['m\u00B2']> &
-      Schema.Attribute.DefaultTo<'m\u00B2'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
