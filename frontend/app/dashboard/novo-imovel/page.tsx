@@ -102,6 +102,15 @@ export default function NewPropertyPage() {
     setFotos(files)
   }
 
+  const setAsMain = (index: number) => {
+    setFotos(prev => {
+      const newFotos = [...prev]
+      const [item] = newFotos.splice(index, 1)
+      newFotos.unshift(item)
+      return newFotos
+    })
+  }
+
   useEffect(() => {
     if (fotos.length === 0) {
       setPreviewUrls([])
@@ -163,7 +172,7 @@ export default function NewPropertyPage() {
             cidade: formData.cidade,
             finalidade: formData.finalidade,
             tipo: formData.tipo,
-            tamanho: Number(formData.tamanho.replace(',', '.')),
+            tamanho: Math.round(Number(formData.tamanho.replace(/[^\d]/g, ''))),
             unidade_medida: formData.unidade_medida,
             estatus: 'pendente',
             endereco: formData.endereco || null,
@@ -408,12 +417,25 @@ export default function NewPropertyPage() {
                     {previewUrls.length > 0 ? (
                       <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
                         {previewUrls.map((url, idx) => (
-                          <div key={url} className="relative aspect-[4/3] overflow-hidden rounded-md border border-gray-200">
+                          <div key={url} className={`relative aspect-[4/3] overflow-hidden rounded-md border-2 ${idx === 0 ? 'border-primary' : 'border-gray-200'}`}>
                             <img
                               src={url}
                               alt={`Prévia ${idx + 1}`}
                               className="h-full w-full object-cover"
                             />
+                            {idx === 0 ? (
+                                <div className="absolute top-0 left-0 bg-primary text-white text-[10px] px-2 py-0.5 font-bold uppercase rounded-br-md">
+                                    Fachada
+                                </div>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={() => setAsMain(idx)}
+                                    className="absolute bottom-1 right-1 bg-black/60 text-white text-[10px] px-2 py-1 rounded hover:bg-primary transition-colors"
+                                >
+                                    Usar como Fachada
+                                </button>
+                            )}
                           </div>
                         ))}
                       </div>
