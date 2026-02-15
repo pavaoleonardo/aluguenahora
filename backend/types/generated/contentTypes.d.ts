@@ -482,6 +482,7 @@ export interface ApiImovelImovel extends Struct.CollectionTypeSchema {
       Schema.Attribute.CustomField<'global::bairro-regiao'>;
     banheiros: Schema.Attribute.Integer;
     cidade: Schema.Attribute.String;
+    condominio: Schema.Attribute.Decimal;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -492,6 +493,7 @@ export interface ApiImovelImovel extends Struct.CollectionTypeSchema {
     >;
     finalidade: Schema.Attribute.Enumeration<['aluguel', 'venda']>;
     fotos: Schema.Attribute.Media<'images', true>;
+    iptu: Schema.Attribute.Decimal;
     latitude: Schema.Attribute.Decimal;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -503,7 +505,7 @@ export interface ApiImovelImovel extends Struct.CollectionTypeSchema {
     preco: Schema.Attribute.Decimal;
     publishedAt: Schema.Attribute.DateTime;
     quartos: Schema.Attribute.Integer;
-    tamanho: Schema.Attribute.Integer;
+    tamanho: Schema.Attribute.Decimal;
     tipo: Schema.Attribute.Enumeration<
       [
         'Apart Hotel / Flat / Loft',
@@ -534,6 +536,8 @@ export interface ApiImovelImovel extends Struct.CollectionTypeSchema {
       ]
     >;
     titulo: Schema.Attribute.String & Schema.Attribute.Required;
+    unidade_medida: Schema.Attribute.Enumeration<['m\u00B2', 'cm']> &
+      Schema.Attribute.DefaultTo<'m\u00B2'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

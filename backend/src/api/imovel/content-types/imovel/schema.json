@@ -19,7 +19,21 @@
       "type": "blocks"
     },
     "tamanho": {
-      "type": "integer"
+      "type": "decimal"
+    },
+    "unidade_medida": {
+      "type": "enumeration",
+      "enum": [
+        "m²",
+        "cm"
+      ],
+      "default": "m²"
+    },
+    "condominio": {
+      "type": "decimal"
+    },
+    "iptu": {
+      "type": "decimal"
     },
     "quartos": {
       "type": "integer"
