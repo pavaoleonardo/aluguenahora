@@ -113,7 +113,7 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                    <div className="absolute left-0 top-0 bg-black/60 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white rounded-br-md">
+                    <div className="absolute right-0 top-0 bg-black/60 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white rounded-bl-md">
                       Fachada frontal
                     </div>
                   </>

@@ -62,7 +62,7 @@ export default function PropertyGallery({ fotos = [], titulo, finalidadeLabel }:
               priority
             />
             {activeIndex === 0 && (
-              <div className="absolute left-0 top-0 bg-black/60 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white rounded-br-md z-10">
+              <div className="absolute right-0 top-0 bg-black/60 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white rounded-bl-md z-10">
                 Fachada frontal
               </div>
             )}
