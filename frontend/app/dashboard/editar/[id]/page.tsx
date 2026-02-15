@@ -91,7 +91,7 @@ export default function EditPropertyPage() {
           cidade: item.cidade || 'Campo Grande',
           finalidade: item.finalidade || '',
           tipo: item.tipo || '',
-          tamanho: item.tamanho != null ? String(Math.round(item.tamanho)) : '',
+          tamanho: item.tamanho != null ? String(item.tamanho).replace('.', ',') : '',
           unidade_medida: item.unidade_medida || 'm²',
         })
       })
@@ -172,7 +172,7 @@ export default function EditPropertyPage() {
             cidade: formData.cidade,
             finalidade: formData.finalidade,
             tipo: formData.tipo,
-            tamanho: Math.round(Number(formData.tamanho.replace(/[^\d]/g, ''))),
+            tamanho: Number(formData.tamanho.replace(',', '.')),
             unidade_medida: formData.unidade_medida,
             estatus: 'pendente',
           },

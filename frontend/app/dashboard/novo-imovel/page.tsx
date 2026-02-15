@@ -172,7 +172,7 @@ export default function NewPropertyPage() {
             cidade: formData.cidade,
             finalidade: formData.finalidade,
             tipo: formData.tipo,
-            tamanho: Math.round(Number(formData.tamanho.replace(/[^\d]/g, ''))),
+            tamanho: Number(formData.tamanho.replace(',', '.')),
             unidade_medida: formData.unidade_medida,
             estatus: 'pendente',
             endereco: formData.endereco || null,
