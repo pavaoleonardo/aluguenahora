@@ -47,14 +47,18 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
     const { id } = ctx.params;
     
     try {
-      const sanitizedQuery = await this.sanitizeQuery(ctx);
+      const sanitizedQuery: any = await this.sanitizeQuery(ctx);
       
-      // Strapi 5: For private dashboard views, we allow draft/pending status if owner.
-      // But findOne is shared with public view.
-      // Strategy: Fetch the document first to check owner.
+      // Merge system-required populate (usuario) with frontend requested populate (fotos, etc)
+      const populate = Array.isArray(sanitizedQuery.populate) 
+        ? [...new Set([...sanitizedQuery.populate, 'usuario'])]
+        : sanitizedQuery.populate 
+          ? [sanitizedQuery.populate, 'usuario']
+          : ['usuario'];
+
       const property = await strapi.documents('api::imovel.imovel').findOne({
         documentId: id,
-        populate: ['usuario']
+        populate: populate
       });
 
       if (!property) {
