@@ -106,17 +106,12 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
             >
               <div className="relative w-full overflow-hidden rounded-xl bg-gray-200 aspect-[16/9]">
                 {property.fotos && property.fotos[0]?.url ? (
-                  <>
-                    <Image
-                      src={property.fotos[0]?.url}
-                      alt={property.titulo}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute right-0 top-0 bg-black/60 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white rounded-bl-md">
-                      Fachada frontal
-                    </div>
-                  </>
+                  <Image
+                    src={property.fotos[0]?.url}
+                    alt={property.titulo}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
                 ) : (
                   <div className="flex h-full items-center justify-center text-gray-400">
                     Sem Foto
