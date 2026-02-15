@@ -58,15 +58,22 @@ export default function EditPropertyPage() {
 
     if (!id) return
 
-    fetch(`${API_BASE_URL}/api/imoveis/${id}?populate=*&status=draft`, {
+    const url = `${API_BASE_URL}/api/imoveis/${id}?populate=*&status=draft`;
+    console.log('Fetching property for edit:', url);
+
+    fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
       .then(res => res.json())
       .then(data => {
+        console.log('Edit Page Response:', data);
         const item = data.data
-        if (!item) throw new Error('Imóvel não encontrado')
+        if (!item) {
+          console.error('Property body data missing:', data);
+          throw new Error('Imóvel não encontrado');
+        }
         const bairroValue: BairroValue = item.bairro ?? ''
         
         // Handle legacy bairro object or string

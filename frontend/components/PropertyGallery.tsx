@@ -77,7 +77,7 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
               priority
             />
             {activeIndex === 0 && (
-              <div className="absolute right-0 top-0 bg-black/60 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white rounded-bl-md z-10">
+              <div className="absolute left-0 top-0 bg-black/60 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white rounded-br-md z-10">
                 Fachada frontal
               </div>
             )}
@@ -87,8 +87,8 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
         )}
 
         {total > 0 ? (
-          <span className="absolute left-3 top-3 rounded-sm bg-black/70 px-2.5 py-1 text-xs font-semibold text-white">
-            {activeIndex + 1}/{total}
+          <span className="absolute right-0 top-0 rounded-bl-md bg-black/60 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white z-10">
+            {activeIndex + 1} / {total}
           </span>
         ) : null}
         {items.length > 1 ? (
