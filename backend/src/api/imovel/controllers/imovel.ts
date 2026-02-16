@@ -1,5 +1,5 @@
 /**
- * imovel controller - BUILD TRIGGER v3
+ * imovel controller - BUILD TRIGGER v4
  */
 
 import { factories } from '@strapi/strapi';
@@ -19,14 +19,14 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
         sanitizedQuery.filters = {
           ...(sanitizedQuery.filters || {}),
           $or: [
-            { usuario: { documentId: userDocId } },
-            { usuario: { id: userId } }
+            { usuario: { documentId: { $eq: userDocId } } },
+            { usuario: { id: { $eq: userId } } }
           ]
         };
         
         // For dashboard, we want to see everything
         status = (ctx.query.status as string) || 'all';
-        console.log(`[Dashboard Filter] User: ${ctx.state.user.username} (DocID: ${userDocId}, ID: ${userId}), Status: ${status}`);
+        console.log(`[Dashboard Filter] User: ${ctx.state.user.username} Status: ${status}`);
       }
 
       const results = await strapi.documents('api::imovel.imovel').findMany({
@@ -51,21 +51,25 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
     try {
       const sanitizedQuery: any = await this.sanitizeQuery(ctx);
       
-      // Determine populate carefully
-      let populate: any;
-      const qPopulate = sanitizedQuery.populate;
+      // Simplified and robust populate logic to avoid "Invalid populate parameter" error
+      let populate: any = sanitizedQuery.populate;
       
-      if (qPopulate === '*' || (Array.isArray(qPopulate) && qPopulate.includes('*'))) {
-        populate = '*';
-      } else if (Array.isArray(qPopulate)) {
-        populate = [...new Set([...qPopulate, 'usuario'])];
-      } else if (qPopulate) {
-        populate = [qPopulate, 'usuario'];
-      } else {
+      if (!populate) {
         populate = ['usuario', 'fotos', 'foto_fachada'];
+      } else if (populate === '*') {
+        populate = '*';
+      } else if (Array.isArray(populate)) {
+        if (!populate.includes('usuario')) {
+          populate.push('usuario');
+        }
+      } else if (typeof populate === 'string') {
+        populate = [populate, 'usuario'];
+      } else if (typeof populate === 'object') {
+        // If it's already an object, just ensure usuario is included
+        populate = { ...populate, usuario: true };
       }
 
-      console.log(`[findOne] ID: ${id}, Status: ${requestedStatus || 'draft (default)'}, Populate:`, populate);
+      console.log(`[findOne] ID: ${id}, Status: ${requestedStatus || 'draft (default)'}`);
 
       // Try as draft first
       let property = await strapi.documents('api::imovel.imovel').findOne({
