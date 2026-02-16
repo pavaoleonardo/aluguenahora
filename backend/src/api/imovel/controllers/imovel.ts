@@ -90,13 +90,14 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
       }
 
       // Owner check
-      const isOwner = ctx.state.user && property.usuario && (
-        (property.usuario as any).documentId === ctx.state.user.documentId || 
-        (property.usuario as any).id === ctx.state.user.id
+      const propertyAny = property as any;
+      const isOwner = ctx.state.user && propertyAny.usuario && (
+        (propertyAny.usuario as any).documentId === ctx.state.user.documentId || 
+        (propertyAny.usuario as any).id === ctx.state.user.id
       );
       
       // If not owner and not published, deny
-      if (!isOwner && property.estatus !== 'publicado') {
+      if (!isOwner && propertyAny.estatus !== 'publicado') {
         console.warn(`[findOne] Unauthorized: ${id} by ${ctx.state.user?.username || 'Guest'}`);
         return ctx.unauthorized('Você não tem permissão para visualizar este imóvel.');
       }
@@ -120,9 +121,10 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
 
       if (!property) return ctx.notFound();
 
-      const isOwner = ctx.state.user && property.usuario && (
-        (property.usuario as any).documentId === ctx.state.user.documentId || 
-        (property.usuario as any).id === ctx.state.user.id
+      const propertyAny = property as any;
+      const isOwner = ctx.state.user && propertyAny.usuario && (
+        (propertyAny.usuario as any).documentId === ctx.state.user.documentId || 
+        (propertyAny.usuario as any).id === ctx.state.user.id
       );
       
       if (!isOwner) return ctx.unauthorized('Você só pode editar seus próprios imóveis.');
