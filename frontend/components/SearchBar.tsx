@@ -109,7 +109,8 @@ export default function SearchBar() {
                 >
                 <option value="">Todos os Imóveis</option>
                 <optgroup label="Residencial">
-                    <option value="Apartamento">Apartamento</option>
+                    <option value="Apartamento">Apartamento / Condomínio</option>
+                    <option value="Apto. Cobertura / Duplex">Cobertura / Duplex</option>
                     <option value="Casa-Térrea">Casa</option>
                     <option value="Sobrado">Sobrado</option>
                     <option value="Kitnet">Kitnet</option>
@@ -117,14 +118,20 @@ export default function SearchBar() {
                     <option value="Apart Hotel / Flat / Loft">Flat / Loft</option>
                 </optgroup>
                 <optgroup label="Comercial">
-                    <option value="Sala / Salão / Loja">Sala Comercial</option>
-                    <option value="Galpão / Depósito">Galpão</option>
+                    <option value="Sala / Salão / Loja">Sala / Salão / Loja</option>
+                    <option value="Galpão / Depósito">Galpão / Depósito</option>
                     <option value="Imóvel Comercial">Prédio / Comercial</option>
+                    <option value="Casa Comercial">Casa Comercial</option>
+                </optgroup>
+                <optgroup label="Terrenos">
+                    <option value="Terreno">Terreno / Lote</option>
+                    <option value="Terreno-Condomínio">Terreno em Condomínio</option>
+                    <option value="Área">Área / Gleba</option>
                 </optgroup>
                 <optgroup label="Rural">
-                    <option value="Chácara">Chácara</option>
-                    <option value="Fazenda">Fazenda</option>
-                    <option value="Sitio">Sítio</option>
+                    <option value="Rural-Group">Chácara / Sítio / Fazenda</option>
+                    <option value="Pesqueiro">Pesqueiro</option>
+                    <option value="Haras">Haras</option>
                 </optgroup>
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">

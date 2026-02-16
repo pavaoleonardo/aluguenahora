@@ -59,11 +59,39 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
 
     if (tipo) {
       if (tipo === 'Casa-Térrea') {
-        // Broaden "Casa" search to include both "Casa-Térrea" and "Sobrado"
+        // Broaden "Casa" search to include all residential house types
         andFilters.push({
           $or: [
             { tipo: { $eq: 'Casa-Térrea' } },
-            { tipo: { $eq: 'Sobrado' } }
+            { tipo: { $eq: 'Casa-Térrea-Condomínio' } },
+            { tipo: { $eq: 'Sobrado' } },
+            { tipo: { $eq: 'Sobrado-Condomínio' } },
+            { tipo: { $eq: 'Casa de Vila' } }
+          ]
+        })
+      } else if (tipo === 'Apartamento') {
+         // Broaden "Apartamento" to include flats/lofts if users search generally
+         andFilters.push({
+          $or: [
+            { tipo: { $eq: 'Apartamento' } },
+            { tipo: { $eq: 'Apart Hotel / Flat / Loft' } },
+            { tipo: { $eq: 'Apto. Cobertura / Duplex' } }
+          ]
+        })
+      } else if (tipo === 'Rural-Group') {
+        // Rural grouping
+        andFilters.push({
+          $or: [
+            { tipo: { $eq: 'Chácara' } },
+            { tipo: { $eq: 'Sitio' } },
+            { tipo: { $eq: 'Fazenda' } }
+          ]
+        })
+      } else if (tipo === 'Terreno') {
+        andFilters.push({
+          $or: [
+            { tipo: { $eq: 'Terreno' } },
+            { tipo: { $eq: 'Terreno-Condomínio' } }
           ]
         })
       } else {
@@ -90,8 +118,7 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
           if (key === '$or') {
             (value as any[]).forEach((orCond, orIdx) => {
               Object.entries(orCond).forEach(([orKey, orValue]) => {
-                if (typeof orValue === 'object') {
-                   // For nested operators like { tipo: { $eq: '...' } }
+                if (typeof orValue === 'object' && orValue !== null) {
                    Object.entries(orValue as any).forEach(([opKey, opValue]) => {
                      params[`filters[$and][${index}][$or][${orIdx}][${orKey}][${opKey}]`] = opValue
                    })
