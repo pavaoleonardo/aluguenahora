@@ -46,8 +46,8 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
     if (bairro) {
       filters.push({
         $or: [
-          { bairro: { bairro: { $containsi: bairro } } },
-          { bairro: { $containsi: bairro } }
+          { bairro: { $containsi: bairro } },
+          { bairro: { bairro: { $containsi: bairro } } }
         ]
       })
     }
@@ -58,9 +58,14 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
           $or: [
             { tipo: { $eq: 'Casa-Térrea' } },
             { tipo: { $eq: 'Casa-Térrea-Condomínio' } },
-            { tipo: { $eq: 'Sobrado' } },
-            { tipo: { $eq: 'Sobrado-Condomínio' } },
             { tipo: { $eq: 'Casa de Vila' } }
+          ]
+        })
+      } else if (tipo === 'Sobrado') {
+        filters.push({
+          $or: [
+            { tipo: { $eq: 'Sobrado' } },
+            { tipo: { $eq: 'Sobrado-Condomínio' } }
           ]
         })
       } else if (tipo === 'Apartamento') {
@@ -68,7 +73,9 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
           $or: [
             { tipo: { $eq: 'Apartamento' } },
             { tipo: { $eq: 'Apart Hotel / Flat / Loft' } },
-            { tipo: { $eq: 'Apto. Cobertura / Duplex' } }
+            { tipo: { $eq: 'Apto. Cobertura / Duplex' } },
+            { tipo: { $eq: 'Studio' } },
+            { tipo: { $eq: 'Kitnet' } }
           ]
         })
       } else if (tipo === 'Rural-Group') {
@@ -76,14 +83,18 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
           $or: [
             { tipo: { $eq: 'Chácara' } },
             { tipo: { $eq: 'Sitio' } },
-            { tipo: { $eq: 'Fazenda' } }
+            { tipo: { $eq: 'Fazenda' } },
+            { tipo: { $eq: 'Haras' } },
+            { tipo: { $eq: 'Pesqueiro' } }
           ]
         })
       } else if (tipo === 'Terreno') {
         filters.push({
           $or: [
             { tipo: { $eq: 'Terreno' } },
-            { tipo: { $eq: 'Terreno-Condomínio' } }
+            { tipo: { $eq: 'Terreno-Condomínio' } },
+            { tipo: { $eq: 'Área' } },
+            { tipo: { $eq: 'Área / Gleba' } }
           ]
         })
       } else {
@@ -114,6 +125,8 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
       params['pagination[limit]'] = limit
     }
 
+    console.log('[PropertyGrid] Filters array:', filters)
+    
     // Recursively build the filter params to correctly handle Strapi's [key][op] format
     const buildDeepFilter = (prefix: string, obj: any) => {
       if (typeof obj !== 'object' || obj === null) {

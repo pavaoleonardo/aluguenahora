@@ -8,6 +8,7 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
   async find(ctx) {
     try {
       const sanitizedQuery: any = await this.sanitizeQuery(ctx);
+      console.log('[Backend find] Query filters:', JSON.stringify(sanitizedQuery.filters, null, 2));
       
       let status = 'published';
 
