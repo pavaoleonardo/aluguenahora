@@ -34,33 +34,27 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    const params: any = {
-      populate: '*',
-      sort: 'createdAt:desc',
-      'filters[publishedAt][$notNull]': true,
-    }
+    const filters: any[] = [
+      { publishedAt: { $notNull: true } }
+    ]
 
     // Add filters from search params
     const bairro = searchParams.get('bairro')
     const tipo = searchParams.get('tipo')
     const finalidade = searchParams.get('finalidade')
 
-    const andFilters: any[] = []
-
     if (bairro) {
-      // Search in both object structure and simple string structure, case-insensitive
-      andFilters.push({
+      filters.push({
         $or: [
-          { 'bairro][bairro][$containsi]': bairro },
-          { 'bairro][$containsi]': bairro }
+          { bairro: { bairro: { $containsi: bairro } } },
+          { bairro: { $containsi: bairro } }
         ]
       })
     }
 
     if (tipo) {
       if (tipo === 'Casa-Térrea') {
-        // Broaden "Casa" search to include all residential house types
-        andFilters.push({
+        filters.push({
           $or: [
             { tipo: { $eq: 'Casa-Térrea' } },
             { tipo: { $eq: 'Casa-Térrea-Condomínio' } },
@@ -70,8 +64,7 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
           ]
         })
       } else if (tipo === 'Apartamento') {
-         // Broaden "Apartamento" to include flats/lofts if users search generally
-         andFilters.push({
+        filters.push({
           $or: [
             { tipo: { $eq: 'Apartamento' } },
             { tipo: { $eq: 'Apart Hotel / Flat / Loft' } },
@@ -79,8 +72,7 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
           ]
         })
       } else if (tipo === 'Rural-Group') {
-        // Rural grouping
-        andFilters.push({
+        filters.push({
           $or: [
             { tipo: { $eq: 'Chácara' } },
             { tipo: { $eq: 'Sitio' } },
@@ -88,57 +80,57 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
           ]
         })
       } else if (tipo === 'Terreno') {
-        andFilters.push({
+        filters.push({
           $or: [
             { tipo: { $eq: 'Terreno' } },
             { tipo: { $eq: 'Terreno-Condomínio' } }
           ]
         })
       } else {
-        andFilters.push({ tipo: { $eq: tipo } })
+        filters.push({ tipo: { $eq: tipo } })
       }
     }
 
     if (finalidade) {
       if (finalidade === 'aluguel') {
-        andFilters.push({
+        filters.push({
           $or: [
             { finalidade: { $eq: 'aluguel' } },
             { finalidade: { $null: true } }
           ]
         })
       } else {
-        andFilters.push({ finalidade: { $eq: finalidade } })
+        filters.push({ finalidade: { $eq: finalidade } })
       }
     }
 
-    if (andFilters.length > 0) {
-      andFilters.forEach((filter, index) => {
-        Object.entries(filter).forEach(([key, value]) => {
-          if (key === '$or') {
-            (value as any[]).forEach((orCond, orIdx) => {
-              Object.entries(orCond).forEach(([orKey, orValue]) => {
-                if (typeof orValue === 'object' && orValue !== null) {
-                   Object.entries(orValue as any).forEach(([opKey, opValue]) => {
-                     params[`filters[$and][${index}][$or][${orIdx}][${orKey}][${opKey}]`] = opValue
-                   })
-                } else {
-                   params[`filters[$and][${index}][$or][${orIdx}][${orKey}]`] = orValue
-                }
-              })
-            })
-          } else {
-            Object.entries(value as any).forEach(([opKey, opValue]) => {
-              params[`filters[$and][${index}][${key}][${opKey}]`] = opValue
-            })
-          }
-        })
-      })
+    // Build the final params object using Strapi's bracket notation
+    const params: any = {
+      populate: '*',
+      sort: 'createdAt:desc',
     }
 
     if (limit) {
       params['pagination[limit]'] = limit
     }
+
+    // Recursively build the filter params to correctly handle Strapi's [key][op] format
+    const buildDeepFilter = (prefix: string, obj: any) => {
+      if (typeof obj !== 'object' || obj === null) {
+        params[prefix] = obj
+        return
+      }
+      Object.entries(obj).forEach(([key, value]) => {
+        const newPrefix = `${prefix}[${key}]`
+        buildDeepFilter(newPrefix, value)
+      })
+    }
+
+    filters.forEach((filter, index) => {
+      buildDeepFilter(`filters[$and][${index}]`, filter)
+    })
+
+    console.log('[PropertyGrid] Fetching with params:', params)
 
     api
       .get('/api/imoveis', { params, timeout: 8000 })
