@@ -45,24 +45,68 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
     const tipo = searchParams.get('tipo')
     const finalidade = searchParams.get('finalidade')
 
+    const andFilters: any[] = []
+
     if (bairro) {
       // Search in both object structure and simple string structure, case-insensitive
-      params['filters[$or][0][bairro][bairro][$containsi]'] = bairro
-      params['filters[$or][1][bairro][$containsi]'] = bairro
+      andFilters.push({
+        $or: [
+          { 'bairro][bairro][$containsi]': bairro },
+          { 'bairro][$containsi]': bairro }
+        ]
+      })
     }
+
     if (tipo) {
-      params['filters[tipo][$eq]'] = tipo
+      if (tipo === 'Casa-Térrea') {
+        // Broaden "Casa" search to include both "Casa-Térrea" and "Sobrado"
+        andFilters.push({
+          $or: [
+            { tipo: { $eq: 'Casa-Térrea' } },
+            { tipo: { $eq: 'Sobrado' } }
+          ]
+        })
+      } else {
+        andFilters.push({ tipo: { $eq: tipo } })
+      }
     }
-    // Only filter by finalidade if it's explicitly set and we have data for it.
-    // If it's 'aluguel', we might want to also show items where finalidade is null 
-    // to avoid hiding legacy data that is theoretically for rent.
+
     if (finalidade) {
       if (finalidade === 'aluguel') {
-        params['filters[$or][0][finalidade][$eq]'] = 'aluguel'
-        params['filters[$or][1][finalidade][$null]'] = true
+        andFilters.push({
+          $or: [
+            { finalidade: { $eq: 'aluguel' } },
+            { finalidade: { $null: true } }
+          ]
+        })
       } else {
-        params['filters[finalidade][$eq]'] = finalidade
+        andFilters.push({ finalidade: { $eq: finalidade } })
       }
+    }
+
+    if (andFilters.length > 0) {
+      andFilters.forEach((filter, index) => {
+        Object.entries(filter).forEach(([key, value]) => {
+          if (key === '$or') {
+            (value as any[]).forEach((orCond, orIdx) => {
+              Object.entries(orCond).forEach(([orKey, orValue]) => {
+                if (typeof orValue === 'object') {
+                   // For nested operators like { tipo: { $eq: '...' } }
+                   Object.entries(orValue as any).forEach(([opKey, opValue]) => {
+                     params[`filters[$and][${index}][$or][${orIdx}][${orKey}][${opKey}]`] = opValue
+                   })
+                } else {
+                   params[`filters[$and][${index}][$or][${orIdx}][${orKey}]`] = orValue
+                }
+              })
+            })
+          } else {
+            Object.entries(value as any).forEach(([opKey, opValue]) => {
+              params[`filters[$and][${index}][${key}][${opKey}]`] = opValue
+            })
+          }
+        })
+      })
     }
 
     if (limit) {
