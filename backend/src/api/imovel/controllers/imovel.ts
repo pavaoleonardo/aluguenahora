@@ -1,5 +1,5 @@
 /**
- * imovel controller - BUILD TRIGGER v2
+ * imovel controller - BUILD TRIGGER v3
  */
 
 import { factories } from '@strapi/strapi';
@@ -7,34 +7,34 @@ import { factories } from '@strapi/strapi';
 export default factories.createCoreController('api::imovel.imovel', ({ strapi }) => ({
   async find(ctx) {
     try {
-      const sanitizedQuery = await this.sanitizeQuery(ctx);
+      const sanitizedQuery: any = await this.sanitizeQuery(ctx);
       
       let status = 'published';
 
       if (ctx.state.user && ctx.query.myProperties === 'true') {
         const userDocId = ctx.state.user.documentId;
+        const userId = ctx.state.user.id;
         
+        // Robust filter for owner
         sanitizedQuery.filters = {
-          ...(sanitizedQuery.filters as any || {}),
-          usuario: {
-            documentId: {
-              $eq: userDocId
-            }
-          }
+          ...(sanitizedQuery.filters || {}),
+          $or: [
+            { usuario: { documentId: userDocId } },
+            { usuario: { id: userId } }
+          ]
         };
         
-        // For dashboard, we want to see everything (published or pending/drafts)
-        status = ctx.query.status as string || 'all';
-        console.log(`[Dashboard Filter] User: ${ctx.state.user.username}, Status: ${status}`);
+        // For dashboard, we want to see everything
+        status = (ctx.query.status as string) || 'all';
+        console.log(`[Dashboard Filter] User: ${ctx.state.user.username} (DocID: ${userDocId}, ID: ${userId}), Status: ${status}`);
       }
-      console.log(`[Dashboard Filter] Final status: ${status}`);
 
       const results = await strapi.documents('api::imovel.imovel').findMany({
         ...sanitizedQuery,
         status: status as any,
       });
 
-      console.log(`[Dashboard Filter] Found ${results?.length || 0} properties`);
+      console.log(`[Dashboard Filter] Results: ${results?.length || 0}`);
       
       const sanitizedResults = await this.sanitizeOutput(results, ctx);
       return this.transformResponse(sanitizedResults);
@@ -46,25 +46,37 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
 
   async findOne(ctx) {
     const { id } = ctx.params;
+    const requestedStatus = ctx.query.status as string;
     
     try {
       const sanitizedQuery: any = await this.sanitizeQuery(ctx);
       
-      // Merge system-required populate (usuario) with frontend requested populate (fotos, etc)
-      const populate = Array.isArray(sanitizedQuery.populate) 
-        ? [...new Set([...sanitizedQuery.populate, 'usuario'])]
-        : sanitizedQuery.populate 
-          ? [sanitizedQuery.populate, 'usuario']
-          : ['usuario'];
+      // Determine populate carefully
+      let populate: any;
+      const qPopulate = sanitizedQuery.populate;
+      
+      if (qPopulate === '*' || (Array.isArray(qPopulate) && qPopulate.includes('*'))) {
+        populate = '*';
+      } else if (Array.isArray(qPopulate)) {
+        populate = [...new Set([...qPopulate, 'usuario'])];
+      } else if (qPopulate) {
+        populate = [qPopulate, 'usuario'];
+      } else {
+        populate = ['usuario', 'fotos', 'foto_fachada'];
+      }
 
+      console.log(`[findOne] ID: ${id}, Status: ${requestedStatus || 'draft (default)'}, Populate:`, populate);
+
+      // Try as draft first
       let property = await strapi.documents('api::imovel.imovel').findOne({
         documentId: id,
         populate: populate,
-        status: (ctx.query.status as any) || 'draft'
+        status: (requestedStatus as any) || 'draft'
       });
 
-      if (!property && !ctx.query.status) {
-        console.log(`[findOne Fallback] Status draft not found, trying published for ID: ${id}`);
+      // Fallback to published if not found as draft and no status was explicitly requested
+      if (!property && !requestedStatus) {
+        console.log(`[findOne Fallback] Not found as draft, trying published for ID: ${id}`);
         property = await strapi.documents('api::imovel.imovel').findOne({
           documentId: id,
           populate: populate,
@@ -73,10 +85,11 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
       }
 
       if (!property) {
+        console.warn(`[findOne] Not found: ${id}`);
         return ctx.notFound();
       }
 
-      // owner check
+      // Owner check
       const isOwner = ctx.state.user && property.usuario && (
         (property.usuario as any).documentId === ctx.state.user.documentId || 
         (property.usuario as any).id === ctx.state.user.id
@@ -84,13 +97,14 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
       
       // If not owner and not published, deny
       if (!isOwner && property.estatus !== 'publicado') {
-        return ctx.unauthorized('Você não tem permissão para visualizar este imóvel em rascunho.');
+        console.warn(`[findOne] Unauthorized: ${id} by ${ctx.state.user?.username || 'Guest'}`);
+        return ctx.unauthorized('Você não tem permissão para visualizar este imóvel.');
       }
 
       const sanitizedResult = await this.sanitizeOutput(property, ctx);
       return this.transformResponse(sanitizedResult);
     } catch (err: any) {
-      console.error('Custom findOne error', err);
+      console.error('Custom findOne error:', err);
       ctx.badRequest('Erro ao buscar detalhes do imóvel: ' + err.message);
     }
   },
@@ -99,27 +113,20 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
     const { id } = ctx.params;
     
     try {
-      // 1. Find the property to check ownership
       const property = await strapi.documents('api::imovel.imovel').findOne({
         documentId: id,
         populate: ['usuario']
       });
 
-      if (!property) {
-        return ctx.notFound();
-      }
+      if (!property) return ctx.notFound();
 
       const isOwner = ctx.state.user && property.usuario && (
         (property.usuario as any).documentId === ctx.state.user.documentId || 
         (property.usuario as any).id === ctx.state.user.id
       );
       
-      if (!isOwner) {
-        return ctx.unauthorized('Você só pode editar seus próprios imóveis.');
-      }
+      if (!isOwner) return ctx.unauthorized('Você só pode editar seus próprios imóveis.');
 
-      // 2. Perform the update
-      // Prevent user from changing the owner
       if (ctx.request.body.data) {
         delete ctx.request.body.data.usuario;
       }
@@ -138,42 +145,29 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
   },
 
   async create(ctx) {
-    console.log('[Create Imovel] Received request');
-    
     try {
       if (!ctx.request.body || !ctx.request.body.data) {
-        console.error('[Create Imovel] Missing body or data');
-        return ctx.badRequest('Dados do imóvel não encontrados no corpo da requisição.');
+        return ctx.badRequest('Dados do imóvel não encontrados.');
       }
 
-      // 1. Sanitize the user input (removes forbidden fields)
       const sanitizedInput = await this.sanitizeInput(ctx.request.body.data, ctx);
-      
-      // 2. Add system-controlled fields (owner and status)
       const ownerId = ctx.state.user.documentId || ctx.state.user.id;
       
       const propertyData = {
         ...(sanitizedInput as any),
         usuario: ownerId,
-        estatus: 'pendente' // All new properties from the site start as pending
+        estatus: 'pendente'
       };
 
-      console.log(`[Create Imovel] Creating property for user: ${ctx.state.user.username} (ownerId: ${ownerId})`);
-
-      // 3. Save to database using Strapi 5 Document Service
       const result = await strapi.documents('api::imovel.imovel').create({
         data: propertyData,
       });
 
-      console.log(`[Create Imovel] Successfully created property: ${result.documentId}`);
-
-      // 4. Sanitize and return response
       const sanitizedResult = await this.sanitizeOutput(result, ctx);
       return this.transformResponse(sanitizedResult);
     } catch (err: any) {
       console.error('[Create Imovel] ERROR:', err);
-      // Detailed error for debugging, though we might want to mask this in pure production
-      ctx.badRequest('Erro ao processar criação de imóvel: ' + (err.message || 'Erro interno'));
+      ctx.badRequest('Erro ao criar imóvel: ' + err.message);
     }
   },
 }));
