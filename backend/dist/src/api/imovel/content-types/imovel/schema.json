@@ -108,6 +108,9 @@
             "type": "relation",
             "relation": "manyToOne",
             "target": "plugin::users-permissions.user"
+        },
+        "caracteristicas": {
+            "type": "json"
         }
     }
 }

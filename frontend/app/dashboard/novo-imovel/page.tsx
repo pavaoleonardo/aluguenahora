@@ -6,6 +6,25 @@ import { todosBairros } from '@/lib/bairrosCampoGrande'
 import { API_BASE_URL } from '@/lib/apiBase'
 import { formatCurrency, parseCurrency } from '@/lib/format'
 
+const LISTA_CARACTERISTICAS = [
+  "Água", "Asfalto", "Calçada", "Elevador", "Esgoto", "Muro", "Piso tátil", 
+  "Rampa de acessibilidade", "Rede elétrica", "WC adaptado", "Academia", 
+  "Adega", "Alarme", "Algibre", "Aquecedor solar", "Área de lazer", 
+  "Área de serviço", "Árvores frutíferas", "Automação residencial", 
+  "Brinquedoteca", "Caixa de água", "Câmeras de segurança", "Campo de futebol", 
+  "Canil", "Cerca elétrica", "Churrasqueira", "Closet", "Conveniência autônoma", 
+  "Copa", "Cozinha", "Cozinha americana", "Cozinha Industrial", "Cozinha planejada", 
+  "Deck", "Depósito", "Despensa", "Edícula", "Energia solar fotovoltaica", 
+  "Escritório", "Estacionamento para visitas", "Gazebo", "Gradil", "Guarita", 
+  "Hall de entrada", "Hidromassagem", "Home theater", "Interfone", "Jardim", 
+  "Lago", "Lareira", "Lavabo", "Lavanderia", "Mezanino", "Pé direito duplo", 
+  "Piscina", "Piscina aquecida", "Piscina coberta", "Piscina infantil", 
+  "Play-ground", "Poço artesiano", "Portão elétrico", "Portaria", 
+  "Porteiro eletrônico", "Quadra de areia", "Quarto empregada", "Quiosque", 
+  "Recepção", "Redário", "Represa", "Salão de Festas", "Salão de Jogos", 
+  "Sauna", "Terraço", "WC de serviço"
+];
+
 export default function NewPropertyPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
@@ -25,6 +44,7 @@ export default function NewPropertyPage() {
     tipo: '',
     tamanho: '',
     endereco: '',
+    caracteristicas: [] as string[],
   })
   const [geocoding, setGeocoding] = useState(false)
   const [showBairroSuggestions, setShowBairroSuggestions] = useState(false)
@@ -70,6 +90,17 @@ export default function NewPropertyPage() {
     const { name, value } = e.target
     const formatted = formatCurrency(value)
     setFormData(prev => ({ ...prev, [name]: formatted }))
+  }
+
+  const handleCharacteristicToggle = (char: string) => {
+    setFormData(prev => {
+      const current = prev.caracteristicas;
+      if (current.includes(char)) {
+        return { ...prev, caracteristicas: current.filter(c => c !== char) };
+      } else {
+        return { ...prev, caracteristicas: [...current, char] };
+      }
+    });
   }
 
   const handleBairroChange = (val: string) => {
@@ -184,6 +215,7 @@ export default function NewPropertyPage() {
             latitude: latitude,
             longitude: longitude,
             fotos: uploadedFotoIds,
+            caracteristicas: formData.caracteristicas,
           },
         }),
       })
@@ -368,6 +400,28 @@ export default function NewPropertyPage() {
                 <div>
                     <label className="block text-sm font-medium leading-6 text-gray-900">Metragem (m²)</label>
                     <input type="text" name="tamanho" value={formData.tamanho} onChange={handleChange} placeholder="0,00" className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
+                </div>
+
+                {/* Characteristics Section */}
+                <div className="sm:col-span-2 mt-4">
+                  <label className="block text-lg font-bold text-gray-900 mb-4 border-b pb-2">Características</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-y-3 gap-x-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    {LISTA_CARACTERISTICAS.map((item) => (
+                      <label key={item} className="relative flex items-center group cursor-pointer">
+                        <div className="flex h-6 items-center">
+                          <input
+                            type="checkbox"
+                            checked={formData.caracteristicas.includes(item)}
+                            onChange={() => handleCharacteristicToggle(item)}
+                            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer transition-colors"
+                          />
+                        </div>
+                        <div className="ml-3 text-sm leading-6">
+                          <span className="text-gray-700 group-hover:text-primary transition-colors">{item}</span>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="sm:col-span-2">

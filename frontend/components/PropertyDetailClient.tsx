@@ -40,6 +40,7 @@ type ImovelDetail = {
   iptu?: number
   foto_fachada?: any
   unidade_medida?: string
+  caracteristicas?: string[]
 }
 
 export default function PropertyDetailClient({ id }: { id: string }) {
@@ -131,7 +132,7 @@ export default function PropertyDetailClient({ id }: { id: string }) {
         <div className="lg:grid lg:grid-cols-2 lg:gap-x-8">
           <PropertyGallery
             fotos={property.fotos}
-            foto_fachada={property.foto_fachada}
+            foto_fachada={property.foto_fachada || (property.fotos && property.fotos[0])}
             titulo={property.titulo}
             finalidadeLabel={finalidadeLabel}
           />
@@ -213,6 +214,23 @@ export default function PropertyDetailClient({ id }: { id: string }) {
             ) : null}
 
             <div className="mt-6 space-y-6 text-base text-gray-700">{renderDescription()}</div>
+
+            {/* Characteristics Section */}
+            {property.caracteristicas && property.caracteristicas.length > 0 && (
+              <div className="mt-10 border-t border-gray-100 pt-8">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">Características do Imóvel</h3>
+                <div className="grid grid-cols-2 gap-y-2 gap-x-4">
+                  {property.caracteristicas.map((item) => (
+                    <div key={item} className="flex items-center gap-2 text-sm text-gray-600">
+                      <svg className="h-4 w-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="mt-10 flex gap-4">
               <button className="flex-1 rounded-md bg-primary px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
