@@ -2,35 +2,51 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
 import { todosBairros } from '@/lib/bairrosCampoGrande'
 import { API_BASE_URL } from '@/lib/apiBase'
 import { formatCurrency, parseCurrency } from '@/lib/format'
 
-type BairroValue = { regiao: string; bairro: string } | string | null
+const LISTA_CARACTERISTICAS = [
+  "Água", "Asfalto", "Calçada", "Elevador", "Esgoto", "Muro", "Piso tátil", 
+  "Rampa de acessibilidade", "Rede elétrica", "WC adaptado", "Academia", 
+  "Adega", "Alarme", "Algibre", "Aquecedor solar", "Área de lazer", 
+  "Área de serviço", "Árvores frutíferas", "Automação residencial", 
+  "Brinquedoteca", "Caixa de água", "Câmeras de segurança", "Campo de futebol", 
+  "Canil", "Cerca elétrica", "Churrasqueira", "Closet", "Conveniência autônoma", 
+  "Copa", "Cozinha", "Cozinha americana", "Cozinha Industrial", "Cozinha planejada", 
+  "Deck", "Depósito", "Despensa", "Edícula", "Energia solar fotovoltaica", 
+  "Escritório", "Estacionamento para visitas", "Gazebo", "Gradil", "Guarita", 
+  "Hall de entrada", "Hidromassagem", "Home theater", "Interfone", "Jardim", 
+  "Lago", "Lareira", "Lavabo", "Lavanderia", "Mezanino", "Pé direito duplo", 
+  "Piscina", "Piscina aquecida", "Piscina coberta", "Piscina infantil", 
+  "Play-ground", "Poço artesiano", "Portão elétrico", "Portaria", 
+  "Porteiro eletrônico", "Quadra de areia", "Quarto empregada", "Quiosque", 
+  "Recepção", "Redário", "Represa", "Salão de Festas", "Salão de Jogos", 
+  "Sauna", "Terraço", "WC de serviço"
+];
 
-type ImovelForm = {
-  titulo: string
-  descricao: string
-  preco: string
-  condominio: string
-  iptu: string
-  quartos: string
-  banheiros: string
-  bairro: string
-  regiao: string
-  cidade: string
-  finalidade: string
-  tipo: string
-  tamanho: string
+type ExistingFoto = {
+  id: number
+  url: string
 }
 
 export default function EditPropertyPage() {
   const router = useRouter()
   const params = useParams()
   const id = params?.id as string
+  const { user, token, loading: authLoading } = useAuth()
+  
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [formData, setFormData] = useState<ImovelForm>({
+  const [geocoding, setGeocoding] = useState(false)
+  
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [newFotos, setNewFotos] = useState<File[]>([])
+  const [previewUrls, setPreviewUrls] = useState<string[]>([])
+  const [existingFotos, setExistingFotos] = useState<ExistingFoto[]>([])
+  
+  const [formData, setFormData] = useState({
     titulo: '',
     descricao: '',
     preco: '',
@@ -39,77 +55,104 @@ export default function EditPropertyPage() {
     quartos: '',
     banheiros: '',
     bairro: '',
-    regiao: '',
     cidade: 'Campo Grande',
-    finalidade: '',
+    finalidade: 'aluguel',
     tipo: '',
     tamanho: '',
+    area_total: '',
+    endereco: '',
+    caracteristicas: [] as string[],
   })
+
   const [showBairroSuggestions, setShowBairroSuggestions] = useState(false)
   const [bairroSuggestions, setBairroSuggestions] = useState<string[]>([])
   const bairroRef = useRef<HTMLDivElement>(null)
 
+  // Geocode address using OpenStreetMap Nominatim API (free)
+  const geocodeAddress = async (address: string): Promise<{ lat: number; lon: number } | null> => {
+    if (!address.trim()) return null
+    const addressVariations = [
+      `${address}, ${formData.bairro}, ${formData.cidade}, MS, Brasil`,
+      `${address}, ${formData.cidade}, MS, Brasil`,
+    ].filter(v => v.length > 0);
+
+    for (const fullAddress of addressVariations) {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}&limit=1`,
+          { headers: { 'User-Agent': 'AlugueNaHora-App/1.0 (pavaoleonardo@gmail.com)' } }
+        )
+        const data = await response.json()
+        if (data && data.length > 0) {
+          return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) }
+        }
+      } catch (error) {
+        console.error('Geocoding error variation:', fullAddress, error)
+      }
+    }
+    return null
+  }
+
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (!token) {
+    if (authLoading) return
+    if (!token || !user) {
       router.push('/login')
       return
     }
 
     if (!id) return
 
-    const url = `${API_BASE_URL}/api/imoveis/${id}?populate=*&status=draft`;
-    console.log('Fetching property for edit:', url);
-
-    fetch(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then(res => res.json())
-      .then(data => {
-        console.log('Edit Page Response:', data);
+    const fetchProperty = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/imoveis/${id}?populate=*&status=draft`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        const data = await res.json()
         const item = data.data
-        if (!item) {
-          console.error('Property body data missing:', data);
-          throw new Error('Imóvel não encontrado');
-        }
-        const bairroValue: BairroValue = item.bairro ?? ''
-        
-        // Handle legacy bairro object or string
-        const bairro = typeof bairroValue === 'string' 
-          ? bairroValue 
-          : (bairroValue?.bairro || '')
+        if (!item) throw new Error('Imóvel não encontrado')
+
+        // Parse description
+        const descText = Array.isArray(item.descricao)
+          ? item.descricao.map((b: any) => b?.children?.map((c: any) => c.text).join('')).join('\n\n')
+          : item.descricao || ''
+
+        // Format bairro
+        const bairro = typeof item.bairro === 'string' ? item.bairro : (item.bairro?.bairro || '')
 
         setFormData({
           titulo: item.titulo || '',
-          descricao: Array.isArray(item.descricao)
-            ? item.descricao.map((b: any) => b?.children?.map((c: any) => c.text).join('')).join('\n\n')
-            : item.descricao || '',
+          descricao: descText,
           preco: item.preco != null ? formatCurrency(item.preco) : '',
           condominio: item.condominio != null ? formatCurrency(item.condominio) : '',
           iptu: item.iptu != null ? formatCurrency(item.iptu) : '',
           quartos: item.quartos != null ? String(item.quartos) : '',
           banheiros: item.banheiros != null ? String(item.banheiros) : '',
           bairro,
-          regiao: '',
           cidade: item.cidade || 'Campo Grande',
-          finalidade: item.finalidade || '',
+          finalidade: item.finalidade || 'aluguel',
           tipo: item.tipo || '',
           tamanho: item.tamanho != null ? String(item.tamanho).replace('.', ',') : '',
+          area_total: item.area_total != null ? String(item.area_total).replace('.', ',') : '',
+          endereco: item.endereco || '',
+          caracteristicas: Array.isArray(item.caracteristicas) ? item.caracteristicas : [],
         })
-      })
-      .catch((err) => {
+
+        if (item.fotos) {
+          setExistingFotos(item.fotos.map((f: any) => ({ id: f.id, url: f.url })))
+        }
+      } catch (err) {
         console.error('Error loading property:', err)
         alert('Erro ao carregar imóvel.')
         router.push('/dashboard')
-      })
-      .finally(() => setLoading(false))
-  }, [id, router])
+      } finally {
+        setLoading(false)
+      }
+    }
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
+    fetchProperty()
+  }, [id, router, authLoading, token, user])
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
   }
@@ -120,38 +163,86 @@ export default function EditPropertyPage() {
     setFormData(prev => ({ ...prev, [name]: formatted }))
   }
 
+  const handleCharacteristicToggle = (char: string) => {
+    setFormData(prev => {
+      const current = prev.caracteristicas;
+      if (current.includes(char)) {
+        return { ...prev, caracteristicas: current.filter(c => c !== char) };
+      } else {
+        return { ...prev, caracteristicas: [...current, char] };
+      }
+    });
+  }
+
   const handleBairroChange = (val: string) => {
     setFormData({ ...formData, bairro: val })
     if (val.length > 0) {
-      const filtered = todosBairros.filter(b => 
-        b.toLowerCase().includes(val.toLowerCase())
-      ).slice(0, 5)
+      const filtered = todosBairros.filter(b => b.toLowerCase().includes(val.toLowerCase())).slice(0, 5)
       setBairroSuggestions(filtered)
       setShowBairroSuggestions(true)
     } else {
-      setBairroSuggestions(todosBairros) // Show all
+      setBairroSuggestions(todosBairros)
       setShowBairroSuggestions(true)
     }
   }
 
+  const handleFotosChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    setNewFotos(prev => [...prev, ...files])
+  }
+
+  const removeExistingFoto = (id: number) => {
+    setExistingFotos(prev => prev.filter(f => f.id !== id))
+  }
+
+  const removeNewFoto = (idx: number) => {
+    setNewFotos(prev => prev.filter((_, i) => i !== idx))
+  }
+
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (bairroRef.current && !bairroRef.current.contains(event.target as Node)) {
-        setShowBairroSuggestions(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    const urls = newFotos.map((file) => URL.createObjectURL(file))
+    setPreviewUrls(urls)
+    return () => urls.forEach((url) => URL.revokeObjectURL(url))
+  }, [newFotos])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
+    setGeocoding(true)
 
     try {
-      const token = localStorage.getItem('token')
-      if (!token) throw new Error('Not authenticated')
+      // 1. Geocode
+      let latitude: number | null = null
+      let longitude: number | null = null
+      if (formData.endereco) {
+        const coords = await geocodeAddress(formData.endereco)
+        if (coords) {
+          latitude = coords.lat
+          longitude = coords.lon
+        }
+      }
+      setGeocoding(false)
 
+      // 2. Upload New Fotos
+      const newlyUploadedIds: number[] = []
+      if (newFotos.length > 0) {
+        const uploadForm = new FormData()
+        newFotos.forEach((file) => uploadForm.append('files', file))
+        const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: uploadForm,
+        })
+        const uploadData = await uploadRes.json()
+        if (Array.isArray(uploadData)) {
+          uploadData.forEach(f => newlyUploadedIds.push(f.id))
+        }
+      }
+
+      // 3. Final Foto List
+      const finalFotoIds = [...existingFotos.map(f => f.id), ...newlyUploadedIds]
+
+      // 4. Update Property
       const res = await fetch(`${API_BASE_URL}/api/imoveis/${id}`, {
         method: 'PUT',
         headers: {
@@ -177,7 +268,13 @@ export default function EditPropertyPage() {
             finalidade: formData.finalidade,
             tipo: formData.tipo,
             tamanho: Number(formData.tamanho.replace(',', '.')),
-            estatus: 'pendente',
+            area_total: Number(formData.area_total.replace(',', '.')),
+            endereco: formData.endereco || null,
+            latitude: latitude || undefined,
+            longitude: longitude || undefined,
+            fotos: finalFotoIds,
+            caracteristicas: formData.caracteristicas,
+            estatus: 'pendente', // Reset for admin approval
           },
         }),
       })
@@ -187,115 +284,52 @@ export default function EditPropertyPage() {
         throw new Error(err.error?.message || 'Erro ao atualizar imóvel')
       }
 
-      alert('Imóvel atualizado. Aguardando aprovação.')
+      alert('Imóvel atualizado! Aguardando aprovação administrativa.')
       router.push('/dashboard')
     } catch (error: any) {
       console.error('Update error:', error)
-      let message = error.message
-      if (message === 'Failed to fetch') {
-        message = 'Não foi possível conectar ao servidor. Verifique sua conexão ou se o servidor está online. (Se estiver usando o Render gratuito, o servidor pode estar "acordando")'
-      }
-      alert(message)
+      alert(error.message)
     } finally {
       setSaving(false)
     }
   }
 
-  if (loading) return <div className="p-8 text-center">Carregando imóvel...</div>
+  if (loading) return <div className="p-8 text-center text-gray-500 animate-pulse">Carregando dados do imóvel...</div>
 
   return (
     <div className="bg-white px-6 py-12 lg:px-8">
       <div className="mx-auto max-w-2xl">
-        <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl text-center mb-8">
-          Editar Imóvel
-        </h2>
-
+        <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl text-center mb-8">Editar Imóvel</h2>
+        
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium leading-6 text-gray-900">Título do Anúncio</label>
-              <input
-                type="text"
-                name="titulo"
-                required
-                value={formData.titulo}
-                onChange={handleChange}
-                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-              />
+              <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Título do Anúncio</label>
+              <input type="text" name="titulo" required value={formData.titulo} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
             </div>
-
+            
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium leading-6 text-gray-900">Descrição</label>
-              <textarea
-                name="descricao"
-                rows={3}
-                value={formData.descricao}
-                onChange={handleChange}
-                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-              />
+              <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Descrição do Imóvel</label>
+              <textarea name="descricao" rows={4} value={formData.descricao} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
             </div>
 
             <div>
-              <label className="block text-sm font-medium leading-6 text-gray-900">Preço do Aluguel (R$)</label>
-              <input
-                type="text"
-                name="preco"
-                required
-                value={formData.preco}
-                onChange={handlePriceChange}
-                placeholder="R$ 0,00"
-                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-              />
+              <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">VALOR (R$)</label>
+              <input type="text" name="preco" required value={formData.preco} onChange={handlePriceChange} placeholder="R$ 0,00" className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
             </div>
 
             <div>
-              <label className="block text-sm font-medium leading-6 text-gray-900">Finalidade</label>
-              <select
-                name="finalidade"
-                required
-                value={formData.finalidade}
-                onChange={handleChange}
-                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 cursor-default pointer-events-none bg-gray-50"
-              >
+              <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Finalidade</label>
+              <select name="finalidade" required value={formData.finalidade} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm bg-gray-50 border-gray-200">
                 <option value="aluguel">Aluguel</option>
                 <option value="venda">Venda</option>
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium leading-6 text-gray-900">Condomínio (Mensal)</label>
-              <input
-                type="text"
-                name="condominio"
-                value={formData.condominio}
-                onChange={handlePriceChange}
-                placeholder="R$ 0,00"
-                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium leading-6 text-gray-900">IPTU (Mensal)</label>
-              <input
-                type="text"
-                name="iptu"
-                value={formData.iptu}
-                onChange={handlePriceChange}
-                placeholder="R$ 0,00"
-                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-              />
-            </div>
-
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium leading-6 text-gray-900">Tipo do imóvel</label>
-              <select
-                name="tipo"
-                required
-                value={formData.tipo}
-                onChange={handleChange}
-                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-              >
-                <option value="">Quais imóveis você procura?</option>
+              <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Tipo do imóvel</label>
+              <select name="tipo" required value={formData.tipo} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm">
+                <option value="">TODOS OS IMÓVEIS</option>
                 <optgroup label="--- RESIDENCIAL ---">
                   <option value="Apart Hotel / Flat / Loft">Apart Hotel / Flat / Loft</option>
                   <option value="Apartamento">Apartamento</option>
@@ -330,92 +364,98 @@ export default function EditPropertyPage() {
               </select>
             </div>
 
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium leading-6 text-gray-900">Cidade</label>
-              <input
-                type="text"
-                name="cidade"
-                value={formData.cidade}
-                readOnly
-                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-200 bg-gray-50 sm:text-sm sm:leading-6"
-              />
-            </div>
-
             <div className="sm:col-span-2 relative" ref={bairroRef}>
-              <label className="block text-sm font-medium leading-6 text-gray-900">Bairro</label>
-              <input
-                type="text"
-                name="bairro"
-                required
-                placeholder="Comece a digitar o bairro..."
-                value={formData.bairro}
-                onChange={(e) => handleBairroChange(e.target.value)}
-                onFocus={() => {
-                  if (formData.bairro.length === 0) {
-                    setBairroSuggestions(todosBairros);
-                  }
-                  setShowBairroSuggestions(true);
-                }}
-                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-              />
+              <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Bairro</label>
+              <input type="text" name="bairro" required value={formData.bairro} onChange={(e) => handleBairroChange(e.target.value)} onFocus={() => setShowBairroSuggestions(true)} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
               {showBairroSuggestions && bairroSuggestions.length > 0 && (
                 <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg border border-gray-200 py-1 max-h-48 overflow-y-auto">
-                  {bairroSuggestions.map((suggestion: string) => (
-                    <button
-                      key={suggestion}
-                      type="button"
-                      onClick={() => { setFormData({...formData, bairro: suggestion}); setShowBairroSuggestions(false); }}
-                      className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-primary hover:text-white transition-colors"
-                    >
-                      {suggestion}
-                    </button>
+                  {bairroSuggestions.map((s) => (
+                    <button key={s} type="button" onClick={() => { setFormData({...formData, bairro: s}); setShowBairroSuggestions(false); }} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-primary hover:text-white">{s}</button>
                   ))}
                 </div>
               )}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium leading-6 text-gray-900">Quartos</label>
-              <input
-                type="number"
-                name="quartos"
-                value={formData.quartos}
-                onChange={handleChange}
-                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-              />
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Endereço Completo</label>
+              <input type="text" name="endereco" value={formData.endereco} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
             </div>
 
             <div>
-              <label className="block text-sm font-medium leading-6 text-gray-900">Banheiros</label>
-              <input
-                type="number"
-                name="banheiros"
-                value={formData.banheiros}
-                onChange={handleChange}
-                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-              />
+              <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">ÁREA CONSTRUÍDA (m²)</label>
+              <input type="text" name="tamanho" value={formData.tamanho} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
             </div>
 
             <div>
-              <label className="block text-sm font-medium leading-6 text-gray-900">Metragem (m²)</label>
-              <input
-                type="text"
-                name="tamanho"
-                value={formData.tamanho}
-                onChange={handleChange}
-                placeholder="0,00"
-                className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-              />
+              <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">ÁREA TOTAL (m²)</label>
+              <input type="text" name="area_total" value={formData.area_total} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
+            </div>
+
+            {/* Characteristics Grid */}
+            <div className="sm:col-span-2 mt-4">
+              <label className="block text-lg font-bold text-gray-900 mb-4 border-b pb-2 uppercase">Características</label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-3 gap-x-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar border p-4 rounded-lg bg-gray-50/30">
+                {LISTA_CARACTERISTICAS.map((item) => (
+                  <label key={item} className="relative flex items-center group cursor-pointer">
+                    <input type="checkbox" checked={formData.caracteristicas.includes(item)} onChange={() => handleCharacteristicToggle(item)} className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer" />
+                    <span className="ml-3 text-xs text-gray-700 font-medium group-hover:text-primary">{item}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Photos Section */}
+            <div className="sm:col-span-2 bg-gray-50/50 p-6 rounded-xl border-2 border-dashed border-gray-200">
+              <label className="block text-sm font-bold text-gray-900 uppercase mb-4">Gerenciar Fotos</label>
+              
+              {/* Existing Photos */}
+              {existingFotos.length > 0 && (
+                <div className="mb-6">
+                  <h4 className="text-xs font-bold text-gray-500 uppercase mb-3">Fotos Atuais</h4>
+                  <div className="grid grid-cols-3 gap-4">
+                    {existingFotos.map((foto) => (
+                      <div key={foto.id} className="relative aspect-square rounded-lg overflow-hidden border bg-white group">
+                        <img src={foto.url} className="h-full w-full object-cover" />
+                        <button type="button" onClick={() => removeExistingFoto(foto.id)} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* New Photos Preview */}
+              {newFotos.length > 0 && (
+                <div className="mb-6">
+                  <h4 className="text-xs font-bold text-gray-500 uppercase mb-3">Novas Fotos</h4>
+                  <div className="grid grid-cols-3 gap-4">
+                    {previewUrls.map((url, idx) => (
+                      <div key={url} className="relative aspect-square rounded-lg overflow-hidden border bg-white group">
+                        <img src={url} className="h-full w-full object-cover border-2 border-primary" />
+                        <button type="button" onClick={() => removeNewFoto(idx)} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex flex-col items-center">
+                <button type="button" onClick={() => fileInputRef.current?.click()} className="rounded-md bg-white px-8 py-3 text-sm font-bold text-primary shadow-sm ring-1 ring-inset ring-primary hover:bg-white/80 transition-all uppercase">
+                  ENVIAR FOTOS
+                </button>
+                <input type="file" ref={fileInputRef} multiple accept="image/*" onChange={handleFotosChange} className="hidden" />
+                <p className="mt-2 text-[10px] text-gray-500">As fotos passarão pela aprovação do administrador</p>
+              </div>
             </div>
           </div>
 
-          <div className="flex justify-end pt-4">
-            <button
-              type="submit"
-              disabled={saving}
-              className="rounded-md bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-            >
-              {saving ? 'Salvando...' : 'Salvar alterações'}
+          <div className="flex justify-end pt-8 gap-4">
+            <button type="button" onClick={() => router.push('/dashboard')} className="rounded-md bg-white px-6 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">Cancelar</button>
+            <button type="submit" disabled={saving} className="rounded-md bg-primary px-8 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50">
+              {saving ? (geocoding ? 'Localizando...' : 'Salvando...') : 'Salvar e Enviar para Aprovação'}
             </button>
           </div>
         </form>

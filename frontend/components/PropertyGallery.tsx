@@ -38,8 +38,8 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
     if (mainPhoto?.url) {
       const url = mainPhoto.url
       const thumb = mainPhoto.formats?.thumbnail?.url || url
-      const large = mainPhoto.formats?.medium?.url || mainPhoto.formats?.small?.url || url
-      allItems.push({ url: large || url, thumb: thumb || url, label: 'Fachada frontal' })
+      // Use the direct URL which is the full size image to avoid pixelation
+      allItems.push({ url: url, thumb: thumb || url, label: 'Fachada frontal' })
     }
 
     // Add remaining photos
@@ -50,9 +50,8 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
         // Skip if this is the same as the main photo to avoid duplication
         if (!url || url === mainPhoto?.url) return null
         const thumb = foto?.formats?.thumbnail?.url || url
-        const large = foto?.formats?.medium?.url || foto?.formats?.small?.url || url
-        const label = foto?.caption || foto?.alternativeText || foto?.name || ''
-        return { url: large || url, thumb: thumb || url, label }
+        // Prioritize full size URL
+        return { url: url, thumb: thumb || url, label: foto?.caption || foto?.alternativeText || foto?.name || '' }
       })
       .filter(Boolean) as { url: string; thumb: string; label: string }[]
 
