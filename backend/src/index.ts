@@ -1,5 +1,10 @@
 import type { Core } from '@strapi/strapi';
 import axios from 'axios';
+import sharp from 'sharp';
+
+// Optimize sharp for low memory environments
+sharp.concurrency(1);
+sharp.cache(false);
 
 // Geocode function
 const geocodeAddress = async (endereco: string, bairro: any, cidade: string): Promise<{ latitude: number; longitude: number } | null> => {
