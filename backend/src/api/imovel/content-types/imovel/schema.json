@@ -37,7 +37,8 @@
       "type": "integer"
     },
     "bairro": {
-      "type": "string"
+      "type": "customField",
+      "customField": "global::bairro-regiao"
     },
     "cidade": {
       "type": "string"
