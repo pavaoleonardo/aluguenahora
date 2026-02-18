@@ -37,8 +37,7 @@
       "type": "integer"
     },
     "bairro": {
-      "type": "customField",
-      "customField": "global::bairro-regiao"
+      "type": "string"
     },
     "cidade": {
       "type": "string"
@@ -100,12 +99,7 @@
       ]
     },
     "estatus": {
-      "type": "enumeration",
-      "enum": [
-        "rascunho",
-        "pendente",
-        "publicado"
-      ]
+      "type": "string"
     },
     "usuario": {
       "type": "relation",

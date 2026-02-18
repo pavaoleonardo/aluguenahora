@@ -46,8 +46,6 @@ const geocodeAddress = async (endereco, bairro, cidade) => {
         catch (error) {
             console.error(`[Geocoding] Error with variation "${fullAddress}": ${error.message}`);
         }
-        // Wait a bit between attempts to respect rate limits if needed, 
-        // though here we only have 3 variations max.
     }
     return null;
 };
@@ -58,39 +56,30 @@ exports.default = {
             name: 'bairro-regiao',
             type: 'json',
         });
-        // Register document service middleware for geocoding
+        // Temporarily disabled geocoding middleware to save memory and avoid crashes on update
+        /*
         strapi.documents.use(async (context, next) => {
-            // Only process imovel content type
-            if (context.uid !== 'api::imovel.imovel') {
-                return next();
+          if (context.uid !== 'api::imovel.imovel') return next();
+          if (context.action !== 'create' && context.action !== 'update') return next();
+    
+          const params = context.params as any;
+          const data = params?.data;
+    
+          if (data?.endereco) {
+            const hasCoords = data.latitude && data.longitude &&
+                             Math.abs(data.latitude) > 0 && Math.abs(data.longitude) > 0;
+    
+            if (!hasCoords) {
+              const coords = await geocodeAddress(data.endereco, data.bairro, data.cidade);
+              if (coords) {
+                data.latitude = coords.latitude;
+                data.longitude = coords.longitude;
+              }
             }
-            // Only process create and update actions
-            if (context.action !== 'create' && context.action !== 'update') {
-                return next();
-            }
-            const params = context.params;
-            const data = params === null || params === void 0 ? void 0 : params.data;
-            // Check if we have an address
-            if (data === null || data === void 0 ? void 0 : data.endereco) {
-                // Only geocode if coordinates are missing or zero
-                // This allows manual override if the user manually enters coords
-                const hasCoords = data.latitude && data.longitude &&
-                    Math.abs(data.latitude) > 0 && Math.abs(data.longitude) > 0;
-                if (!hasCoords) {
-                    console.log(`[Middleware] Geocoding for address: ${data.endereco}`);
-                    const coords = await geocodeAddress(data.endereco, data.bairro, data.cidade);
-                    if (coords) {
-                        data.latitude = coords.latitude;
-                        data.longitude = coords.longitude;
-                        console.log(`[Middleware] Coordinates automatically set: ${coords.latitude}, ${coords.longitude}`);
-                    }
-                    else {
-                        console.log(`[Middleware] Could not geocode address: ${data.endereco}`);
-                    }
-                }
-            }
-            return next();
+          }
+          return next();
         });
+        */
     },
     bootstrap({ strapi }) {
         // Seed news logic
@@ -120,13 +109,10 @@ exports.default = {
                     }
                 ];
                 for (const item of newsToSeed) {
-                    // Check if it already exists by title
                     const existing = await strapi.db.query('api::noticia.noticia').findOne({
                         where: { titulo: item.titulo }
                     });
                     if (!existing) {
-                        console.log(`[Bootstrap] Seeding news: ${item.titulo}`);
-                        // Use Document Service for Strapi 5
                         await strapi.documents('api::noticia.noticia').create({
                             data: item,
                             status: 'published'
