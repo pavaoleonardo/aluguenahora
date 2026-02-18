@@ -10,7 +10,6 @@ import { useAuth } from '@/context/AuthContext'
 const navigation = [
   { name: 'Home', href: '/' },
   { name: 'Buscar Imóveis', href: '/imoveis' },
-  { name: 'Anunciar Imóveis', href: '/dashboard/novo-imovel' },
   { name: 'Sobre', href: '/sobre' },
 ]
 
@@ -52,6 +51,11 @@ export default function Navbar() {
               {item.name}
             </Link>
           ))}
+          {user && (
+            <Link href="/dashboard/novo-imovel" className="text-base font-semibold text-gray-900 hover:text-primary transition-colors">
+              Anunciar Imóveis
+            </Link>
+          )}
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end gap-x-6 items-center">
           {!loading && (
@@ -116,6 +120,15 @@ export default function Navbar() {
                     {item.name}
                   </Link>
                 ))}
+                {user && (
+                  <Link
+                    href="/dashboard/novo-imovel"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
+                  >
+                    Anunciar Imóveis
+                  </Link>
+                )}
               </div>
               <div className="py-6 space-y-4">
                 {!loading && (

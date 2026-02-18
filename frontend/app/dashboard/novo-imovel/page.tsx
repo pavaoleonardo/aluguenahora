@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
 import { todosBairros } from '@/lib/bairrosCampoGrande'
 import { API_BASE_URL } from '@/lib/apiBase'
 import { formatCurrency, parseCurrency } from '@/lib/format'
@@ -27,6 +28,7 @@ const LISTA_CARACTERISTICAS = [
 
 export default function NewPropertyPage() {
   const router = useRouter()
+  const { user, token, loading: authLoading } = useAuth()
   const [loading, setLoading] = useState(false)
   const [fotos, setFotos] = useState<File[]>([])
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
@@ -143,6 +145,14 @@ export default function NewPropertyPage() {
       urls.forEach((url) => URL.revokeObjectURL(url))
     }
   }, [fotos])
+
+  useEffect(() => {
+    if (authLoading) return
+
+    if (!token || !user) {
+      router.push('/login?redirect=/dashboard/novo-imovel')
+    }
+  }, [authLoading, token, user, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
