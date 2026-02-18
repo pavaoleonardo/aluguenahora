@@ -11,8 +11,6 @@ export default function NewPropertyPage() {
   const [loading, setLoading] = useState(false)
   const [fotos, setFotos] = useState<File[]>([])
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
-  const [fotoFachada, setFotoFachada] = useState<File | null>(null)
-  const [previewFachada, setPreviewFachada] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     titulo: '',
     descricao: '',
@@ -103,14 +101,6 @@ export default function NewPropertyPage() {
     setFotos(files)
   }
 
-  const handleFachadaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setFotoFachada(file)
-      setPreviewFachada(URL.createObjectURL(file))
-    }
-  }
-
   useEffect(() => {
     if (fotos.length === 0) {
       setPreviewUrls([])
@@ -147,23 +137,7 @@ export default function NewPropertyPage() {
       }
       setGeocoding(false)
 
-      // 1. Upload Fachada
-      let uploadedFachadaId = null
-      if (fotoFachada) {
-        const fachadaFormData = new FormData()
-        fachadaFormData.append('files', fotoFachada)
-        const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-          body: fachadaFormData,
-        })
-        const uploadData = await uploadRes.json()
-        if (uploadData && uploadData[0]) {
-          uploadedFachadaId = uploadData[0].id
-        }
-      }
-
-      // 2. Upload Outras Fotos
+      // 1. Upload Fotos
       const uploadedFotoIds: any[] = []
       if (fotos.length > 0) {
         const uploadForm = new FormData()
@@ -209,7 +183,6 @@ export default function NewPropertyPage() {
             endereco: formData.endereco || null,
             latitude: latitude,
             longitude: longitude,
-            foto_fachada: uploadedFachadaId,
             fotos: uploadedFotoIds,
           },
         }),
@@ -398,35 +371,14 @@ export default function NewPropertyPage() {
                 </div>
 
                 <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Foto da Fachada (Principal)</label>
-                    <input
-                      type="file"
-                      name="fotoFachada"
-                      accept="image/*"
-                      onChange={handleFachadaChange}
-                      className="mt-2 block w-full text-sm text-gray-900 file:mr-4 file:rounded-md file:border-0 file:bg-gray-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-gray-700 hover:file:bg-gray-200"
-                    />
-                    {previewFachada && (
-                      <div className="mt-3 relative aspect-[4/3] w-48 overflow-hidden rounded-md border-2 border-primary">
-                        <img
-                          src={previewFachada}
-                          alt="Prévia da Fachada"
-                          className="h-full w-full object-cover"
-                        />
-                        <div className="absolute top-0 left-0 bg-primary text-white text-[10px] px-2 py-0.5 font-bold uppercase rounded-br-md">
-                            Fachada
-                        </div>
-                      </div>
-                    )}
-                </div>
-
-                <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Outras Fotos (Opcional)</label>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Fotos do Imóvel</label>
+                    <p className="mt-1 text-xs text-gray-500 mb-2">Dica: A primeira foto selecionada será usada como a principal (fachada) nos resultados de busca.</p>
                     <input
                       type="file"
                       name="fotos"
                       accept="image/*"
                       multiple
+                      required
                       onChange={handleFotosChange}
                       className="mt-2 block w-full text-sm text-gray-900 file:mr-4 file:rounded-md file:border-0 file:bg-gray-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-gray-700 hover:file:bg-gray-200"
                     />
@@ -444,6 +396,11 @@ export default function NewPropertyPage() {
                               alt={`Prévia ${idx + 1}`}
                               className="h-full w-full object-cover"
                             />
+                            {idx === 0 && (
+                                <div className="absolute top-0 left-0 bg-primary text-white text-[10px] px-2 py-0.5 font-bold uppercase rounded-br-md">
+                                    Principal
+                                </div>
+                            )}
                           </div>
                         ))}
                       </div>

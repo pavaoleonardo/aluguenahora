@@ -26,20 +26,29 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
   const items = useMemo(() => {
     const allItems = []
 
-    // Add fachada first if exists
-    if (foto_fachada?.url) {
-      const url = foto_fachada.url
-      const thumb = foto_fachada.formats?.thumbnail?.url || url
-      const large = foto_fachada.formats?.medium?.url || foto_fachada.formats?.small?.url || url
+    // If fachada exists, it's the first. If not, the first of 'fotos' is the main one.
+    let mainPhoto = foto_fachada
+    let galleryStartIdx = 0
+
+    if (!mainPhoto?.url && fotos.length > 0) {
+      mainPhoto = fotos[0]
+      galleryStartIdx = 1
+    }
+
+    if (mainPhoto?.url) {
+      const url = mainPhoto.url
+      const thumb = mainPhoto.formats?.thumbnail?.url || url
+      const large = mainPhoto.formats?.medium?.url || mainPhoto.formats?.small?.url || url
       allItems.push({ url: large || url, thumb: thumb || url, label: 'Fachada frontal' })
     }
 
-    // Add other photos
+    // Add remaining photos
     const otherPhotos = (fotos || [])
+      .slice(galleryStartIdx)
       .map((foto) => {
         const url = foto?.url
-        // Skip if this is the same as the fachada to avoid duplication
-        if (!url || url === foto_fachada?.url) return null
+        // Skip if this is the same as the main photo to avoid duplication
+        if (!url || url === mainPhoto?.url) return null
         const thumb = foto?.formats?.thumbnail?.url || url
         const large = foto?.formats?.medium?.url || foto?.formats?.small?.url || url
         const label = foto?.caption || foto?.alternativeText || foto?.name || ''

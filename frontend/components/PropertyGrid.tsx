@@ -182,7 +182,7 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
               className="group flex flex-col items-start justify-between hover:shadow-lg transition-shadow rounded-2xl p-4 bg-white border border-gray-100"
             >
               <div className="relative w-full overflow-hidden rounded-xl bg-gray-200 aspect-[16/9]">
-                {property.foto_fachada?.url || (property.fotos && property.fotos[0]?.url) ? (
+                {(property.foto_fachada?.url || (property.fotos && property.fotos[0]?.url)) ? (
                   <Image
                     src={property.foto_fachada?.url || property.fotos[0]?.url}
                     alt={property.titulo}
