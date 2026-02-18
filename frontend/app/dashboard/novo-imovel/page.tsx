@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext'
 import { todosBairros } from '@/lib/bairrosCampoGrande'
 import { API_BASE_URL } from '@/lib/apiBase'
 import { formatCurrency, parseCurrency } from '@/lib/format'
+import { compressImages } from '@/lib/image'
 
 const LISTA_CARACTERISTICAS = [
   "Água", "Asfalto", "Calçada", "Elevador", "Esgoto", "Muro", "Piso tátil", 
@@ -51,6 +52,7 @@ export default function NewPropertyPage() {
     caracteristicas: [] as string[],
   })
   const [geocoding, setGeocoding] = useState(false)
+  const [compressing, setCompressing] = useState(false)
   const [showBairroSuggestions, setShowBairroSuggestions] = useState(false)
   const [bairroSuggestions, setBairroSuggestions] = useState<string[]>([])
   const bairroRef = useRef<HTMLDivElement>(null)
@@ -180,11 +182,19 @@ export default function NewPropertyPage() {
       }
       setGeocoding(false)
 
-      // 1. Upload Fotos
-      const uploadedFotoIds: any[] = []
+      // 1. Compress Fotos (especially useful for heavy mobile photos)
+      let filesToUpload = fotos
       if (fotos.length > 0) {
+        setCompressing(true)
+        filesToUpload = await compressImages(fotos)
+        setCompressing(false)
+      }
+
+      // 2. Upload Fotos
+      const uploadedFotoIds: any[] = []
+      if (filesToUpload.length > 0) {
         const uploadForm = new FormData()
-        fotos.forEach((file) => uploadForm.append('files', file))
+        filesToUpload.forEach((file) => uploadForm.append('files', file))
         const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
@@ -497,7 +507,11 @@ export default function NewPropertyPage() {
                   disabled={loading}
                   className="rounded-md bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                 >
-                  {loading ? (geocoding ? 'Localizando endereço...' : 'Enviando...') : 'Enviar para Aprovação'}
+                  {loading ? (
+                    geocoding ? 'Localizando endereço...' : 
+                    compressing ? 'Otimizando fotos...' : 
+                    'Enviando...'
+                  ) : 'Enviar para Aprovação'}
                 </button>
             </div>
          </form>

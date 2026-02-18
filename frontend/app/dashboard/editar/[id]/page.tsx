@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext'
 import { todosBairros } from '@/lib/bairrosCampoGrande'
 import { API_BASE_URL } from '@/lib/apiBase'
 import { formatCurrency, parseCurrency } from '@/lib/format'
+import { compressImages } from '@/lib/image'
 
 const LISTA_CARACTERISTICAS = [
   "Água", "Asfalto", "Calçada", "Elevador", "Esgoto", "Muro", "Piso tátil", 
@@ -40,6 +41,7 @@ export default function EditPropertyPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [geocoding, setGeocoding] = useState(false)
+  const [compressing, setCompressing] = useState(false)
   
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [newFotos, setNewFotos] = useState<File[]>([])
@@ -223,11 +225,19 @@ export default function EditPropertyPage() {
       }
       setGeocoding(false)
 
-      // 2. Upload New Fotos
-      const newlyUploadedIds: number[] = []
+      // 2. Compress New Fotos
+      let filesToUpload = newFotos
       if (newFotos.length > 0) {
+        setCompressing(true)
+        filesToUpload = await compressImages(newFotos)
+        setCompressing(false)
+      }
+
+      // 3. Upload New Fotos
+      const newlyUploadedIds: number[] = []
+      if (filesToUpload.length > 0) {
         const uploadForm = new FormData()
-        newFotos.forEach((file) => uploadForm.append('files', file))
+        filesToUpload.forEach((file) => uploadForm.append('files', file))
         const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
@@ -455,7 +465,11 @@ export default function EditPropertyPage() {
           <div className="flex justify-end pt-8 gap-4">
             <button type="button" onClick={() => router.push('/dashboard')} className="rounded-md bg-white px-6 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">Cancelar</button>
             <button type="submit" disabled={saving} className="rounded-md bg-primary px-8 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50">
-              {saving ? (geocoding ? 'Localizando...' : 'Salvando...') : 'Salvar e Enviar para Aprovação'}
+              {saving ? (
+                geocoding ? 'Localizando...' : 
+                compressing ? 'Otimizando fotos...' : 
+                'Salvando...'
+              ) : 'Salvar e Enviar para Aprovação'}
             </button>
           </div>
         </form>
