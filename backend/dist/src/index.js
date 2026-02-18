@@ -4,6 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
+const sharp_1 = __importDefault(require("sharp"));
+// Optimize sharp for low memory environments
+sharp_1.default.concurrency(1);
+sharp_1.default.cache(false);
 // Geocode function
 const geocodeAddress = async (endereco, bairro, cidade) => {
     if (!endereco || !endereco.trim())
