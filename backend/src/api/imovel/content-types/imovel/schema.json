@@ -21,6 +21,9 @@
     "tamanho": {
       "type": "decimal"
     },
+    "area_total": {
+      "type": "decimal"
+    },
     "condominio": {
       "type": "decimal"
     },

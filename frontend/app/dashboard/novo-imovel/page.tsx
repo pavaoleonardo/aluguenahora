@@ -30,6 +30,7 @@ export default function NewPropertyPage() {
   const router = useRouter()
   const { user, token, loading: authLoading } = useAuth()
   const [loading, setLoading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [fotos, setFotos] = useState<File[]>([])
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
   const [formData, setFormData] = useState({
@@ -45,6 +46,7 @@ export default function NewPropertyPage() {
     finalidade: 'aluguel',
     tipo: '',
     tamanho: '',
+    area_total: '',
     endereco: '',
     caracteristicas: [] as string[],
   })
@@ -220,6 +222,7 @@ export default function NewPropertyPage() {
             finalidade: formData.finalidade,
             tipo: formData.tipo,
             tamanho: Number(formData.tamanho.replace(',', '.')),
+            area_total: Number(formData.area_total.replace(',', '.')),
             estatus: 'pendente',
             endereco: formData.endereco || null,
             latitude: latitude,
@@ -263,12 +266,12 @@ export default function NewPropertyPage() {
                 </div>
                 
                 <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Descrição</label>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Descrição do Imóvel</label>
                     <textarea name="descricao" rows={3} value={formData.descricao} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Preço do Aluguel (R$)</label>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">VALOR (R$)</label>
                     <input type="text" name="preco" required value={formData.preco} onChange={handlePriceChange} placeholder="R$ 0,00" className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
                 </div>
 
@@ -305,7 +308,7 @@ export default function NewPropertyPage() {
                       onChange={handleChange}
                       className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                     >
-                      <option value="">Quais imóveis você procura?</option>
+                      <option value="">TODOS OS IMÓVEIS</option>
                       <optgroup label="--- RESIDENCIAL ---">
                         <option value="Apart Hotel / Flat / Loft">Apart Hotel / Flat / Loft</option>
                         <option value="Apartamento">Apartamento</option>
@@ -408,8 +411,13 @@ export default function NewPropertyPage() {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Metragem (m²)</label>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">ÁREA CONSTRUÍDA / ÚTIL (m²)</label>
                     <input type="text" name="tamanho" value={formData.tamanho} onChange={handleChange} placeholder="0,00" className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">ÁREA TOTAL (m²)</label>
+                    <input type="text" name="area_total" value={formData.area_total} onChange={handleChange} placeholder="0,00" className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
                 </div>
 
                 {/* Characteristics Section */}
@@ -436,16 +444,27 @@ export default function NewPropertyPage() {
 
                 <div className="sm:col-span-2">
                     <label className="block text-sm font-medium leading-6 text-gray-900">Fotos do Imóvel</label>
-                    <p className="mt-1 text-xs text-gray-500 mb-2">Dica: A primeira foto selecionada será usada como a principal (fachada) nos resultados de busca.</p>
-                    <input
-                      type="file"
-                      name="fotos"
-                      accept="image/*"
-                      multiple
-                      required
-                      onChange={handleFotosChange}
-                      className="mt-2 block w-full text-sm text-gray-900 file:mr-4 file:rounded-md file:border-0 file:bg-gray-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-gray-700 hover:file:bg-gray-200"
-                    />
+                    <p className="mt-1 text-xs text-gray-500 mb-4">Dica: A primeira foto selecionada será usada como a principal (fachada) nos resultados de busca.</p>
+                    
+                    <div className="flex flex-col items-start gap-4">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="rounded-md bg-white px-6 py-2.5 text-sm font-bold text-primary shadow-sm ring-1 ring-inset ring-primary hover:bg-gray-50 transition-all uppercase"
+                      >
+                        ENVIAR FOTOS
+                      </button>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        name="fotos"
+                        accept="image/*"
+                        multiple
+                        required
+                        onChange={handleFotosChange}
+                        className="hidden"
+                      />
+                    </div>
                     {fotos.length > 0 ? (
                       <p className="mt-2 text-xs text-gray-500">
                         {fotos.length} foto(s) selecionada(s)

@@ -25,6 +25,7 @@ type ImovelDetail = {
   titulo: string
   descricao?: any
   tamanho?: number
+  area_total?: number
   quartos?: number
   banheiros?: number
   bairro?: BairroValue
@@ -169,9 +170,13 @@ export default function PropertyDetailClient({ id }: { id: string }) {
                       <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{property.endereco}</td>
                     </tr>
                   )}
+                   <tr>
+                    <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">ÁREA CONSTRUÍDA / ÚTIL (m²)</td>
+                    <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{formatNumber(property.tamanho || 0)}</td>
+                  </tr>
                   <tr>
-                    <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">Área útil</td>
-                    <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{formatNumber(property.tamanho || 0)} {property.unidade_medida || 'm²'}</td>
+                    <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">ÁREA TOTAL (m²)</td>
+                    <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{formatNumber(property.area_total || 0)}</td>
                   </tr>
                   {property.condominio ? (
                     <tr>
@@ -205,7 +210,7 @@ export default function PropertyDetailClient({ id }: { id: string }) {
                 </span>
                 <span className="flex items-center gap-2" title="Área Total">
                    <ArrowsPointingOutIcon className="h-5 w-5 text-gray-400" />
-                   {formatNumber(property.tamanho || 0)} {property.unidade_medida || 'm²'}
+                   {formatNumber(property.area_total || 0)} m²
                 </span>
               </div>
             </div>
