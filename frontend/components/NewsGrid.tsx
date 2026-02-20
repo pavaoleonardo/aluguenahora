@@ -11,6 +11,15 @@ export default function NewsGrid() {
   const [news, setNews] = useState<NoticiaData[]>([])
   const [loading, setLoading] = useState(true)
 
+  const isSafeExternalLink = (value: string) => {
+    try {
+      const url = new URL(value)
+      return url.protocol === 'http:' || url.protocol === 'https:'
+    } catch {
+      return false
+    }
+  }
+
   useEffect(() => {
     api.get('/api/noticias', { 
       params: { 
@@ -71,10 +80,14 @@ export default function NewsGrid() {
     <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-12 lg:mx-0 lg:max-w-none lg:grid-cols-3">
       {news.map((item) => {
         const imageUrl = getImageUrl(item.imagem?.url);
+        const safeExternalLink = item.link && isSafeExternalLink(item.link) ? item.link : null;
+        const href = safeExternalLink || `/noticias/${item.documentId}`;
         return (
           <Link 
             key={item.id}
-            href={item.link || `/noticias/${item.documentId}`} 
+            href={href}
+            target={safeExternalLink ? '_blank' : undefined}
+            rel={safeExternalLink ? 'noopener noreferrer' : undefined}
             className="flex flex-col items-start justify-between bg-white p-6 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 group"
           >
             <div className="relative w-full">
