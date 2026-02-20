@@ -27,6 +27,8 @@ const LISTA_CARACTERISTICAS = [
   "Sauna", "Terraço", "WC de serviço"
 ];
 
+const MAX_FOTOS_POR_IMOVEL = 8;
+
 type ExistingFoto = {
   id: number
   url: string
@@ -190,7 +192,18 @@ export default function EditPropertyPage() {
 
   const handleFotosChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
-    setNewFotos(prev => [...prev, ...files])
+    const availableSlots = MAX_FOTOS_POR_IMOVEL - existingFotos.length - newFotos.length
+
+    if (availableSlots <= 0) {
+      alert(`Limite de ${MAX_FOTOS_POR_IMOVEL} fotos por imóvel atingido.`)
+      return
+    }
+
+    if (files.length > availableSlots) {
+      alert(`Você só pode adicionar mais ${availableSlots} foto(s) neste imóvel.`)
+    }
+
+    setNewFotos(prev => [...prev, ...files.slice(0, availableSlots)])
   }
 
   const removeExistingFoto = (id: number) => {
@@ -236,16 +249,25 @@ export default function EditPropertyPage() {
       // 3. Upload New Fotos
       const newlyUploadedIds: number[] = []
       if (filesToUpload.length > 0) {
-        const uploadForm = new FormData()
-        filesToUpload.forEach((file) => uploadForm.append('files', file))
-        const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-          body: uploadForm,
-        })
-        const uploadData = await uploadRes.json()
-        if (Array.isArray(uploadData)) {
-          uploadData.forEach(f => newlyUploadedIds.push(f.id))
+        // Upload serially to avoid memory spikes on free-tier instances.
+        for (const file of filesToUpload) {
+          const uploadForm = new FormData()
+          uploadForm.append('files', file)
+
+          const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` },
+            body: uploadForm,
+          })
+          const uploadData = await uploadRes.json()
+
+          if (!uploadRes.ok) {
+            throw new Error(uploadData?.error?.message || 'Erro ao enviar foto')
+          }
+
+          if (Array.isArray(uploadData) && uploadData[0]?.id) {
+            newlyUploadedIds.push(uploadData[0].id)
+          }
         }
       }
 

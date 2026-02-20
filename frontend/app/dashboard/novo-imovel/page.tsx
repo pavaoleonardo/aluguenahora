@@ -27,6 +27,8 @@ const LISTA_CARACTERISTICAS = [
   "Sauna", "Terraço", "WC de serviço"
 ];
 
+const MAX_FOTOS_POR_IMOVEL = 8;
+
 export default function NewPropertyPage() {
   const router = useRouter()
   const { user, token, loading: authLoading } = useAuth()
@@ -135,7 +137,10 @@ export default function NewPropertyPage() {
 
   const handleFotosChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
-    setFotos(files)
+    if (files.length > MAX_FOTOS_POR_IMOVEL) {
+      alert(`Você pode enviar no máximo ${MAX_FOTOS_POR_IMOVEL} fotos por imóvel.`)
+    }
+    setFotos(files.slice(0, MAX_FOTOS_POR_IMOVEL))
   }
 
   useEffect(() => {
@@ -167,8 +172,6 @@ export default function NewPropertyPage() {
       const token = localStorage.getItem('token')
       const userStr = localStorage.getItem('user')
       if (!token || !userStr) throw new Error('Not authenticated')
-      
-      const user = JSON.parse(userStr)
 
       // Geocode the address to get coordinates
       let latitude: number | null = null
@@ -191,18 +194,27 @@ export default function NewPropertyPage() {
       }
 
       // 2. Upload Fotos
-      const uploadedFotoIds: any[] = []
+      const uploadedFotoIds: number[] = []
       if (filesToUpload.length > 0) {
-        const uploadForm = new FormData()
-        filesToUpload.forEach((file) => uploadForm.append('files', file))
-        const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-          body: uploadForm,
-        })
-        const uploadData = await uploadRes.json()
-        if (Array.isArray(uploadData)) {
-          uploadData.forEach(f => uploadedFotoIds.push(f.id))
+        // Upload serially to avoid high memory peaks on free-tier backend instances.
+        for (const file of filesToUpload) {
+          const uploadForm = new FormData()
+          uploadForm.append('files', file)
+
+          const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` },
+            body: uploadForm,
+          })
+
+          const uploadData = await uploadRes.json()
+          if (!uploadRes.ok) {
+            throw new Error(uploadData?.error?.message || 'Erro ao enviar foto')
+          }
+
+          if (Array.isArray(uploadData) && uploadData[0]?.id) {
+            uploadedFotoIds.push(uploadData[0].id)
+          }
         }
       }
 

@@ -21,6 +21,9 @@ export async function compressImage(file: File) {
 }
 
 export async function compressImages(files: File[]) {
-  const compressionPromises = files.map(file => compressImage(file));
-  return Promise.all(compressionPromises);
+  const compressed: File[] = [];
+  for (const file of files) {
+    compressed.push(await compressImage(file));
+  }
+  return compressed;
 }
