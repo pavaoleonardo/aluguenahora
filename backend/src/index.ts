@@ -133,5 +133,36 @@ export default {
     };
 
     seedNews();
+
+    // ----------------------------------------------------
+    // HOTFIX: Relink broken properties to admin user
+    // ----------------------------------------------------
+    const fixUnlinkedProperties = async () => {
+      try {
+        const users = await strapi.db.query('plugin::users-permissions.user').findMany();
+        if (users.length === 0) return;
+        
+        const adminUser = users[0]; // Gets the first user (usually the creator/admin)
+        
+        const unlinkedProperties = await strapi.db.query('api::imovel.imovel').findMany({
+          where: { usuario: null }
+        });
+
+        if (unlinkedProperties.length > 0) {
+          console.log(`[HOTFIX] Linking ${unlinkedProperties.length} orphaned properties to user ID ${adminUser.id}`);
+          for (const p of unlinkedProperties) {
+            await strapi.db.query('api::imovel.imovel').update({
+              where: { id: p.id },
+              data: { usuario: adminUser.id }
+            });
+          }
+          console.log('[HOTFIX] Orphaned properties successfully linked.');
+        }
+      } catch (error) {
+         console.error('[HOTFIX] Error linking properties:', error);
+      }
+    };
+
+    fixUnlinkedProperties();
   },
 };
