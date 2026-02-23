@@ -51,7 +51,8 @@
       "enum": [
         "aluguel",
         "venda"
-      ]
+      ],
+      "required": true
     },
     "endereco": {
       "type": "string"
@@ -90,7 +91,8 @@
         "Haras",
         "Pesqueiro",
         "Sitio"
-      ]
+      ],
+      "required": true
     },
     "fotos": {
       "type": "media",

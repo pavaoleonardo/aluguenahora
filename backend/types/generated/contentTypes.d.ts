@@ -490,7 +490,8 @@ export interface ApiImovelImovel extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     descricao: Schema.Attribute.Blocks;
     endereco: Schema.Attribute.String;
-    finalidade: Schema.Attribute.Enumeration<['aluguel', 'venda']>;
+    finalidade: Schema.Attribute.Enumeration<['aluguel', 'venda']> &
+      Schema.Attribute.Required;
     fotos: Schema.Attribute.Media<'images', true>;
     iptu: Schema.Attribute.Decimal;
     latitude: Schema.Attribute.Decimal;
@@ -533,7 +534,8 @@ export interface ApiImovelImovel extends Struct.CollectionTypeSchema {
         'Pesqueiro',
         'Sitio',
       ]
-    >;
+    > &
+      Schema.Attribute.Required;
     titulo: Schema.Attribute.String & Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
