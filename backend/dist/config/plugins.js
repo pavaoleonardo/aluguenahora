@@ -12,11 +12,8 @@ exports.default = ({ env }) => ({
             },
             actionOptions: {
                 upload: {},
-                uploadStream: {},
                 delete: {},
             },
-            // Disable responsive dimensions to save memory during upload processing
-            breakpoints: {},
         },
     },
 });

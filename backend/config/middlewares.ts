@@ -25,8 +25,8 @@ export default ({ env }) => {
     'https://*.trycloudflare.com',
   ];
 
-  const baseOrigins = configuredOrigins.length > 0 ? configuredOrigins : isProd ? [] : devOrigins;
-  const allowedOrigins = frontendUrl ? [...new Set([...baseOrigins, frontendUrl])] : baseOrigins;
+  const baseOrigins = configuredOrigins.length > 0 ? configuredOrigins : isProd ? ['https://aluguenahora.vercel.app'] : devOrigins;
+  const allowedOrigins = frontendUrl ? [...new Set([...baseOrigins, frontendUrl, 'https://aluguenahora.vercel.app'])] : [...new Set([...baseOrigins, 'https://aluguenahora.vercel.app'])];
 
   return [
     'strapi::logger',
@@ -37,8 +37,11 @@ export default ({ env }) => {
         contentSecurityPolicy: {
           useDefaults: true,
           directives: {
-            'img-src': ["'self'", 'data:', 'blob:', 'https://res.cloudinary.com'],
-            'media-src': ["'self'", 'data:', 'blob:', 'https://res.cloudinary.com'],
+            'connect-src': ["'self'", 'https:'],
+            'img-src': ["'self'", 'data:', 'blob:', 'res.cloudinary.com', 'market-assets.strapiapp.com'],
+            'media-src': ["'self'", 'data:', 'blob:', 'res.cloudinary.com', 'market-assets.strapiapp.com'],
+            'script-src': ["'self'", "'unsafe-inline'"],
+            'frame-src': ["'self'"],
           },
         },
       },
@@ -50,7 +53,9 @@ export default ({ env }) => {
           const requestOrigin = ctx.request.header.origin;
 
           if (!requestOrigin) return false;
-          if (allowedOrigins.some((pattern) => matchOrigin(requestOrigin, pattern))) {
+          // Normalize origin for comparison
+          const normalizedOrigin = requestOrigin.toLowerCase();
+          if (allowedOrigins.some((pattern) => matchOrigin(normalizedOrigin, pattern.toLowerCase()))) {
             return requestOrigin;
           }
           return false;

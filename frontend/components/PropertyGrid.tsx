@@ -146,7 +146,7 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
     console.log('[PropertyGrid] Fetching with params:', params)
 
     api
-      .get('/api/imoveis', { params, timeout: 8000 })
+      .get('/api/imoveis', { params, timeout: 20000 })
       .then((res) => setProperties(res.data.data || []))
       .catch((error) => {
         console.error('Error fetching properties:', error)
