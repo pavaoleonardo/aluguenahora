@@ -64,9 +64,9 @@ export default ({ env }) => {
     {
       name: 'strapi::body',
       config: {
-        formLimit: env('BODY_FORM_LIMIT', '10mb'),
-        jsonLimit: env('BODY_JSON_LIMIT', '2mb'),
-        textLimit: env('BODY_TEXT_LIMIT', '2mb'),
+        formLimit: env('BODY_FORM_LIMIT', '5mb'),
+        jsonLimit: env('BODY_JSON_LIMIT', '1mb'),
+        textLimit: env('BODY_TEXT_LIMIT', '1mb'),
         formidable: {
           maxFileSize: env.int('UPLOAD_MAX_FILE_SIZE', 5 * 1024 * 1024),
           multiples: true,

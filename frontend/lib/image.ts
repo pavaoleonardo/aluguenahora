@@ -2,9 +2,10 @@ import imageCompression from 'browser-image-compression';
 
 export async function compressImage(file: File) {
   const options = {
-    maxSizeMB: 1, // Max size 1MB
-    maxWidthOrHeight: 1920, // Max dimension 1920px
-    useWebWorker: true,
+    maxSizeMB: 0.5, // Max 500KB — sufficient for web display, reduces server memory pressure
+    maxWidthOrHeight: 1600, // Max dimension 1600px — ideal for property listings
+    useWebWorker: true, // Safe on desktop browsers
+    initialQuality: 0.7, // Start with 70% JPEG quality for faster compression
   };
   
   try {
@@ -16,7 +17,10 @@ export async function compressImage(file: File) {
     });
   } catch (error) {
     console.error('Erro na compressão:', error);
-    return file; // Fallback para o arquivo original em caso de erro
+    if (file.size > 4.5 * 1024 * 1024) {
+      throw new Error(`Não foi possível comprimir a imagem ${file.name} e ela é muito grande (${(file.size/1024/1024).toFixed(1)}MB). Limite: 4.5MB.`);
+    }
+    return file; // Fallback para o arquivo original em caso de erro, desde que pequeno
   }
 }
 
