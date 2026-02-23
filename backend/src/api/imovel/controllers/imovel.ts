@@ -135,21 +135,18 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
         return ctx.badRequest('Dados inválidos para atualização.');
       }
 
+      // Enforce stripped fields for security
       const sanitizedInput = await this.sanitizeInput(ctx.request.body.data, ctx);
       const safeData = sanitizePropertyInput(sanitizedInput);
+      ctx.request.body.data = safeData;
 
-      const result = await strapi.documents('api::imovel.imovel').update({
-        documentId: id,
-        data: {
-          ...(safeData as any),
-        },
-      });
+      // Delegate to default which handles media mappings properly
+      const result = await super.update(ctx);
 
-      const sanitizedResult = await this.sanitizeOutput(result, ctx);
-      return this.transformResponse(sanitizedResult);
+      return result;
     } catch (err: any) {
       console.error('Custom update error', err);
-      ctx.badRequest('Erro ao atualizar imóvel.');
+      return ctx.badRequest(err.message || 'Erro ao atualizar imóvel.');
     }
   },
 
@@ -159,24 +156,28 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
         return ctx.badRequest('Dados do imóvel não encontrados.');
       }
 
+      // Sanitize input to prevent injection of estatus, usuario, etc
       const sanitizedInput = await this.sanitizeInput(ctx.request.body.data, ctx);
-      const ownerId = ctx.state.user.documentId || ctx.state.user.id;
       const safeData = sanitizePropertyInput(sanitizedInput);
+      ctx.request.body.data = safeData;
+
+      // Create using default core logic (handles drafts, data normalization)
+      const result = await super.create(ctx);
       
-      const propertyData = {
-        ...(safeData as any),
-        usuario: ownerId
-      };
+      // Force assign the current user as the owner, bypassing any RBAC missing permissions
+      if (ctx.state.user && result?.data?.documentId) {
+        await strapi.documents('api::imovel.imovel').update({
+          documentId: result.data.documentId,
+          data: {
+            usuario: ctx.state.user.documentId || ctx.state.user.id
+          }
+        });
+      }
 
-      const result = await strapi.documents('api::imovel.imovel').create({
-        data: propertyData,
-      });
-
-      const sanitizedResult = await this.sanitizeOutput(result, ctx);
-      return this.transformResponse(sanitizedResult);
+      return result;
     } catch (err: any) {
       console.error('[Create Imovel] ERROR:', err);
-      ctx.badRequest('Erro ao criar imóvel.');
+      return ctx.badRequest(err.message || 'Erro ao criar imóvel.');
     }
   },
 }));
