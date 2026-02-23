@@ -41,27 +41,27 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
           orConditions.push({ usuario: { id: { $eq: userId } } });
         }
 
-        ctx.query.filters = {
-          ...(typeof ctx.query.filters === 'object' && ctx.query.filters !== null ? ctx.query.filters : {}),
-          $or: orConditions.length > 0 ? orConditions : [{ id: -1 }] // Fallback
+        const userFilter = {
+          $or: orConditions.length > 0 ? orConditions : [{ id: -1 }]
         };
 
-        const sanitizedQuery: any = await this.sanitizeQuery(ctx);
-        const populate = sanitizedQuery.populate || ['usuario', 'fotos', 'foto_fachada'];
-        
-        // Fetch both drafts and published
+        // Document API does NOT support populate='*'. Convert to explicit fields.
+        const DEFAULT_POPULATE = ['usuario', 'fotos', 'foto_fachada'] as any;
+
+        // Fetch both drafts and published using Document API
         const drafts = await strapi.documents('api::imovel.imovel').findMany({
-          filters: sanitizedQuery.filters,
-          populate: populate,
+          filters: userFilter,
+          populate: DEFAULT_POPULATE,
           status: 'draft' as any
         }) as any[];
 
         const published = await strapi.documents('api::imovel.imovel').findMany({
-          filters: sanitizedQuery.filters,
-          populate: populate,
+          filters: userFilter,
+          populate: DEFAULT_POPULATE,
           status: 'published' as any
         }) as any[];
 
+        // Merge: prefer draft data but preserve publishedAt from published version
         const mergedMap = new Map();
         
         for (const p of published) {
@@ -70,8 +70,6 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
         
         for (const d of drafts) {
           if (mergedMap.has(d.documentId)) {
-            // Document is published, keep the underlying data from the draft (latest edits), 
-            // but preserve the publishedAt state to indicate it's live
             const p = mergedMap.get(d.documentId);
             mergedMap.set(d.documentId, { ...d, publishedAt: p.publishedAt });
           } else {
@@ -87,7 +85,7 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
       return await super.find(ctx);
     } catch (err: any) {
       console.error('[Custom Find Error]', err.message, err.stack);
-      ctx.badRequest(err.message || 'Erro ao buscar imóveis.');
+      return ctx.badRequest(err.message || 'Erro ao buscar imóveis.');
     }
   },
 
