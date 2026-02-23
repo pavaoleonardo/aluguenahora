@@ -107,7 +107,8 @@
         "recusado",
         "publicado"
       ],
-      "default": "pendente"
+      "default": "pendente",
+      "required": true
     },
     "usuario": {
       "type": "relation",
