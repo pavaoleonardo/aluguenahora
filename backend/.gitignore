@@ -129,8 +129,6 @@ exports
 .strapi-cloud.json
 
 # Build artifacts
-dist/
-build/
 .cache/
 .tmp/
 node_modules/
