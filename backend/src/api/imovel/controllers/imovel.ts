@@ -150,6 +150,48 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
     }
   },
 
+  async fix(ctx) {
+    try {
+      const users = await strapi.db.query('plugin::users-permissions.user').findMany();
+      if (users.length === 0) return ctx.send({ message: 'No users found' });
+      
+      const adminId = users[0].id; // id is a string/number
+      const adminDocId = users[0].documentId;
+      
+      const unlinked = await strapi.db.query('api::imovel.imovel').findMany({
+        where: { usuario: null }
+      });
+
+      const fixedIds = [];
+      const errs = [];
+
+      for (const p of unlinked) {
+        try {
+          // In Strapi v5, updating a relation via document API:
+          await strapi.documents('api::imovel.imovel').update({
+            documentId: p.documentId,
+            data: { 
+               // pass documentId of the related entity
+               usuario: adminDocId
+            }
+          });
+          fixedIds.push(p.id);
+        } catch(e: any) {
+          errs.push({ id: p.id, error: e.message });
+        }
+      }
+
+      return ctx.send({ 
+        fixed: fixedIds, 
+        errs,
+        unlinkedCount: unlinked.length,
+        adminDocId 
+      });
+    } catch (err: any) {
+      return ctx.badRequest(err.message);
+    }
+  },
+
   async create(ctx) {
     try {
       if (!ctx.request.body || !ctx.request.body.data) {
