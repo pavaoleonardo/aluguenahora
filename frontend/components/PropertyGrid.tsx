@@ -34,9 +34,7 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    const filters: any[] = [
-      { publishedAt: { $notNull: true } }
-    ]
+    const filters: any[] = []
 
     // Add filters from search params
     const bairro = searchParams.get('bairro')
