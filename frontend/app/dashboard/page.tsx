@@ -10,7 +10,6 @@ import { API_BASE_URL } from '@/lib/apiBase'
 interface Attributes {
   titulo: string;
   preco: number;
-  estatus: string;
   fotos: {
     data: { attributes: { url: string } }[] | null
   };
