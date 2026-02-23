@@ -43,15 +43,45 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
 
         ctx.query.filters = {
           ...(typeof ctx.query.filters === 'object' && ctx.query.filters !== null ? ctx.query.filters : {}),
-          $or: orConditions.length > 0 ? orConditions : [{ id: -1 }] // Fallback if user has no id/docId
+          $or: orConditions.length > 0 ? orConditions : [{ id: -1 }] // Fallback
         };
 
-        const requestedStatus = String(ctx.query.status || '');
-        if (requestedStatus === 'draft' || requestedStatus === 'published' || requestedStatus === 'all') {
-          ctx.query.status = requestedStatus;
-        } else {
-          ctx.query.status = 'all';
+        const sanitizedQuery: any = await this.sanitizeQuery(ctx);
+        const populate = sanitizedQuery.populate || ['usuario', 'fotos', 'foto_fachada'];
+        
+        // Fetch both drafts and published
+        const drafts = await strapi.documents('api::imovel.imovel').findMany({
+          filters: sanitizedQuery.filters,
+          populate: populate,
+          status: 'draft' as any
+        }) as any[];
+
+        const published = await strapi.documents('api::imovel.imovel').findMany({
+          filters: sanitizedQuery.filters,
+          populate: populate,
+          status: 'published' as any
+        }) as any[];
+
+        const mergedMap = new Map();
+        
+        for (const p of published) {
+          mergedMap.set(p.documentId, p);
         }
+        
+        for (const d of drafts) {
+          if (mergedMap.has(d.documentId)) {
+            // Document is published, keep the underlying data from the draft (latest edits), 
+            // but preserve the publishedAt state to indicate it's live
+            const p = mergedMap.get(d.documentId);
+            mergedMap.set(d.documentId, { ...d, publishedAt: p.publishedAt });
+          } else {
+            mergedMap.set(d.documentId, d);
+          }
+        }
+
+        const mergedResults = Array.from(mergedMap.values());
+        const sanitizedResults = await this.sanitizeOutput(mergedResults, ctx);
+        return this.transformResponse(sanitizedResults);
       }
 
       return await super.find(ctx);
