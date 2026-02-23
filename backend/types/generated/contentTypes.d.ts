@@ -478,9 +478,11 @@ export interface ApiImovelImovel extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    area_total: Schema.Attribute.Decimal;
     bairro: Schema.Attribute.JSON &
       Schema.Attribute.CustomField<'global::bairro-regiao'>;
     banheiros: Schema.Attribute.Integer;
+    caracteristicas: Schema.Attribute.JSON;
     cidade: Schema.Attribute.String;
     condominio: Schema.Attribute.Decimal;
     createdAt: Schema.Attribute.DateTime;
@@ -489,10 +491,10 @@ export interface ApiImovelImovel extends Struct.CollectionTypeSchema {
     descricao: Schema.Attribute.Blocks;
     endereco: Schema.Attribute.String;
     estatus: Schema.Attribute.Enumeration<
-      ['rascunho', 'pendente', 'publicado']
-    >;
+      ['rascunho', 'pendente', 'recusado', 'publicado']
+    > &
+      Schema.Attribute.DefaultTo<'pendente'>;
     finalidade: Schema.Attribute.Enumeration<['aluguel', 'venda']>;
-    foto_fachada: Schema.Attribute.Media<'images'>;
     fotos: Schema.Attribute.Media<'images', true>;
     iptu: Schema.Attribute.Decimal;
     latitude: Schema.Attribute.Decimal;

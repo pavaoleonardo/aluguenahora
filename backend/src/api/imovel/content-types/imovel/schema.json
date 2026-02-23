@@ -100,7 +100,14 @@
       ]
     },
     "estatus": {
-      "type": "string"
+      "type": "enumeration",
+      "enum": [
+        "rascunho",
+        "pendente",
+        "recusado",
+        "publicado"
+      ],
+      "default": "pendente"
     },
     "usuario": {
       "type": "relation",

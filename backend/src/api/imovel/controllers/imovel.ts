@@ -29,15 +29,12 @@ const sanitizePropertyInput = (input: any) => {
 export default factories.createCoreController('api::imovel.imovel', ({ strapi }) => ({
   async find(ctx) {
     try {
-      const sanitizedQuery: any = await this.sanitizeQuery(ctx);
-      let status: 'published' | 'draft' | 'all' = 'published';
-
       if (ctx.state.user && ctx.query.myProperties === 'true') {
         const userDocId = ctx.state.user.documentId;
         const userId = ctx.state.user.id;
 
-        sanitizedQuery.filters = {
-          ...(sanitizedQuery.filters || {}),
+        ctx.query.filters = {
+          ...(typeof ctx.query.filters === 'object' && ctx.query.filters !== null ? ctx.query.filters : {}),
           $or: [
             { usuario: { documentId: { $eq: userDocId } } },
             { usuario: { id: { $eq: userId } } }
@@ -46,22 +43,16 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
 
         const requestedStatus = String(ctx.query.status || '');
         if (requestedStatus === 'draft' || requestedStatus === 'published' || requestedStatus === 'all') {
-          status = requestedStatus;
+          ctx.query.status = requestedStatus;
         } else {
-          status = 'all';
+          ctx.query.status = 'all';
         }
       }
 
-      const results = await strapi.documents('api::imovel.imovel').findMany({
-        ...sanitizedQuery,
-        status: status as any,
-      });
-
-      const sanitizedResults = await this.sanitizeOutput(results, ctx);
-      return this.transformResponse(sanitizedResults);
+      return await super.find(ctx);
     } catch (err: any) {
-      console.error('[Custom Find Error]', err);
-      ctx.badRequest('Erro ao buscar imóveis.');
+      console.error('[Custom Find Error]', err.message, err.stack);
+      ctx.badRequest(err.message || 'Erro ao buscar imóveis.');
     }
   },
 
