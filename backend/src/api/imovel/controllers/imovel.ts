@@ -33,12 +33,17 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
         const userDocId = ctx.state.user.documentId;
         const userId = ctx.state.user.id;
 
+        const orConditions: any[] = [];
+        if (userDocId) {
+          orConditions.push({ usuario: { documentId: { $eq: userDocId } } });
+        }
+        if (userId) {
+          orConditions.push({ usuario: { id: { $eq: userId } } });
+        }
+
         ctx.query.filters = {
           ...(typeof ctx.query.filters === 'object' && ctx.query.filters !== null ? ctx.query.filters : {}),
-          $or: [
-            { usuario: { documentId: { $eq: userDocId } } },
-            { usuario: { id: { $eq: userId } } }
-          ]
+          $or: orConditions.length > 0 ? orConditions : [{ id: -1 }] // Fallback if user has no id/docId
         };
 
         const requestedStatus = String(ctx.query.status || '');
