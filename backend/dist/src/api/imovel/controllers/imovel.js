@@ -121,43 +121,50 @@ exports.default = strapi_1.factories.createCoreController('api::imovel.imovel', 
             if (!((_a = ctx.request.body) === null || _a === void 0 ? void 0 : _a.data)) {
                 return ctx.badRequest('Dados inválidos para atualização.');
             }
+            // Enforce stripped fields for security
             const sanitizedInput = await this.sanitizeInput(ctx.request.body.data, ctx);
             const safeData = sanitizePropertyInput(sanitizedInput);
-            const result = await strapi.documents('api::imovel.imovel').update({
-                documentId: id,
-                data: {
-                    ...safeData,
-                },
-            });
-            const sanitizedResult = await this.sanitizeOutput(result, ctx);
-            return this.transformResponse(sanitizedResult);
+            ctx.request.body.data = safeData;
+            // Delegate to default which handles media mappings properly
+            const result = await super.update(ctx);
+            return result;
         }
         catch (err) {
             console.error('Custom update error', err);
-            ctx.badRequest('Erro ao atualizar imóvel.');
+            return ctx.badRequest(err.message || 'Erro ao atualizar imóvel.');
         }
     },
     async create(ctx) {
+        var _a;
         try {
             if (!ctx.request.body || !ctx.request.body.data) {
                 return ctx.badRequest('Dados do imóvel não encontrados.');
             }
+            // Sanitize input to prevent injection of estatus, usuario, etc
             const sanitizedInput = await this.sanitizeInput(ctx.request.body.data, ctx);
-            const ownerId = ctx.state.user.documentId || ctx.state.user.id;
             const safeData = sanitizePropertyInput(sanitizedInput);
-            const propertyData = {
-                ...safeData,
-                usuario: ownerId
-            };
-            const result = await strapi.documents('api::imovel.imovel').create({
-                data: propertyData,
-            });
-            const sanitizedResult = await this.sanitizeOutput(result, ctx);
-            return this.transformResponse(sanitizedResult);
+            ctx.request.body.data = safeData;
+            // Create using default core logic (handles drafts, data normalization)
+            const result = await super.create(ctx);
+            // Force assign the current user as the owner using DB layer!
+            if (ctx.state.user && ((_a = result === null || result === void 0 ? void 0 : result.data) === null || _a === void 0 ? void 0 : _a.documentId)) {
+                await strapi.db.query('api::imovel.imovel').update({
+                    where: { documentId: result.data.documentId },
+                    data: {
+                        usuario: ctx.state.user.id // DB layer uses numeric ID always
+                    }
+                });
+                // Also fetch and append it manually to result so the UI gets it instantly
+                result.data.usuario = {
+                    id: ctx.state.user.id,
+                    documentId: ctx.state.user.documentId
+                };
+            }
+            return result;
         }
         catch (err) {
             console.error('[Create Imovel] ERROR:', err);
-            ctx.badRequest('Erro ao criar imóvel.');
+            return ctx.badRequest(err.message || 'Erro ao criar imóvel.');
         }
     },
 }));

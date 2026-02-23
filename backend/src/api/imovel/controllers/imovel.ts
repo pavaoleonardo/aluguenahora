@@ -206,12 +206,12 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
       // Create using default core logic (handles drafts, data normalization)
       const result = await super.create(ctx);
       
-      // Force assign the current user as the owner using DB layer!
+      // Force assign the current user as the owner using Document API
       if (ctx.state.user && result?.data?.documentId) {
-        await strapi.db.query('api::imovel.imovel').update({
-          where: { documentId: result.data.documentId },
+        await strapi.documents('api::imovel.imovel').update({
+          documentId: result.data.documentId,
           data: {
-            usuario: ctx.state.user.id // DB layer uses numeric ID always
+            usuario: ctx.state.user.documentId || ctx.state.user.id
           }
         });
         

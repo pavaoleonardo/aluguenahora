@@ -151,9 +151,9 @@ export default {
         if (unlinkedProperties.length > 0) {
           console.log(`[HOTFIX] Linking ${unlinkedProperties.length} orphaned properties to user ID ${adminUser.id}`);
           for (const p of unlinkedProperties) {
-            await strapi.db.query('api::imovel.imovel').update({
-              where: { id: p.id },
-              data: { usuario: adminUser.id }
+            await strapi.documents('api::imovel.imovel').update({
+              documentId: p.documentId,
+              data: { usuario: adminUser.documentId || adminUser.id }
             });
           }
           console.log('[HOTFIX] Orphaned properties successfully linked.');
