@@ -1,28 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const parseOrigins = (value) => value
-    .split(',')
-    .map((entry) => entry.trim())
-    .filter(Boolean);
-const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-const matchOrigin = (origin, pattern) => {
-    if (!pattern.includes('*')) {
-        return origin === pattern;
-    }
-    const regex = new RegExp(`^${escapeRegex(pattern).replace(/\\\*/g, '.*')}$`);
-    return regex.test(origin);
-};
 exports.default = ({ env }) => {
     const isProd = env('NODE_ENV', 'development') === 'production';
-    const configuredOrigins = parseOrigins(env('CORS_ORIGIN', ''));
-    const frontendUrl = env('FRONTEND_URL', '').trim();
-    const devOrigins = [
+    const backendUrl = env('RENDER_EXTERNAL_URL', 'https://aluguenahora.onrender.com');
+    const frontendUrls = [
         'http://localhost:3000',
         'http://127.0.0.1:3000',
-        'https://*.trycloudflare.com',
+        'https://aluguenahora.vercel.app',
+        'https://www.aluguenahora.vercel.app',
+        backendUrl
     ];
-    const baseOrigins = configuredOrigins.length > 0 ? configuredOrigins : isProd ? ['https://aluguenahora.vercel.app'] : devOrigins;
-    const allowedOrigins = frontendUrl ? [...new Set([...baseOrigins, frontendUrl, 'https://aluguenahora.vercel.app'])] : [...new Set([...baseOrigins, 'https://aluguenahora.vercel.app'])];
     return [
         'strapi::logger',
         'strapi::errors',
@@ -44,19 +31,9 @@ exports.default = ({ env }) => {
         {
             name: 'strapi::cors',
             config: {
-                origin: (ctx) => {
-                    const requestOrigin = ctx.request.header.origin;
-                    if (!requestOrigin)
-                        return false;
-                    // Normalize origin for comparison
-                    const normalizedOrigin = requestOrigin.toLowerCase();
-                    if (allowedOrigins.some((pattern) => matchOrigin(normalizedOrigin, pattern.toLowerCase()))) {
-                        return requestOrigin;
-                    }
-                    return false;
-                },
+                origin: frontendUrls,
                 headers: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
-                methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+                methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
             },
         },
         'strapi::poweredBy',
