@@ -3,7 +3,7 @@ export default {
     {
       method: 'GET',
       path: '/imoveis/fix',
-      handler: 'imovel.fix',
+      handler: 'api::imovel.imovel.fix',
       config: {
         auth: false,
       },
