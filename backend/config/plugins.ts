@@ -10,11 +10,8 @@ export default ({ env }: { env: any }) => ({
       },
       actionOptions: {
         upload: {},
-        uploadStream: {},
         delete: {},
       },
-      // Disable responsive dimensions to save memory during upload processing
-      breakpoints: {},
     },
   },
 });
