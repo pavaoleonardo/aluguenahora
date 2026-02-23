@@ -66,6 +66,7 @@ export default ({ env }) => {
     },
     'strapi::poweredBy',
     'strapi::query',
+    'strapi::compression',
     {
       name: 'strapi::body',
       config: {
