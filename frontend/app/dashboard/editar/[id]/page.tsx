@@ -306,7 +306,6 @@ export default function EditPropertyPage() {
             longitude: longitude || undefined,
             fotos: finalFotoIds,
             caracteristicas: formData.caracteristicas,
-            estatus: 'pendente', // Reset for admin approval
           },
         }),
       })

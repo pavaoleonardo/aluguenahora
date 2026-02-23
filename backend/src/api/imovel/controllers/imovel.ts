@@ -142,7 +142,6 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
         documentId: id,
         data: {
           ...(safeData as any),
-          estatus: 'pendente',
         },
       });
 
@@ -166,8 +165,7 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
       
       const propertyData = {
         ...(safeData as any),
-        usuario: ownerId,
-        estatus: 'pendente'
+        usuario: ownerId
       };
 
       const result = await strapi.documents('api::imovel.imovel').create({

@@ -127,7 +127,6 @@ exports.default = strapi_1.factories.createCoreController('api::imovel.imovel', 
                 documentId: id,
                 data: {
                     ...safeData,
-                    estatus: 'pendente',
                 },
             });
             const sanitizedResult = await this.sanitizeOutput(result, ctx);
@@ -148,8 +147,7 @@ exports.default = strapi_1.factories.createCoreController('api::imovel.imovel', 
             const safeData = sanitizePropertyInput(sanitizedInput);
             const propertyData = {
                 ...safeData,
-                usuario: ownerId,
-                estatus: 'pendente'
+                usuario: ownerId
             };
             const result = await strapi.documents('api::imovel.imovel').create({
                 data: propertyData,

@@ -99,17 +99,6 @@
         "images"
       ]
     },
-    "estatus": {
-      "type": "enumeration",
-      "enum": [
-        "rascunho",
-        "pendente",
-        "recusado",
-        "publicado"
-      ],
-      "default": "pendente",
-      "required": true
-    },
     "usuario": {
       "type": "relation",
       "relation": "manyToOne",

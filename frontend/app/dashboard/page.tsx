@@ -24,7 +24,7 @@ interface Imovel {
   titulo: string;
   bairro?: string | { bairro: string; regiao?: string };
   preco: number;
-  estatus: string; // rascunho, pendente, publicado
+  publishedAt?: string | null;
   finalidade?: string;
   tipo?: string;
   fotos: any[];
@@ -114,11 +114,10 @@ export default function DashboardPage() {
                                 )}
                                 <div className="absolute top-2 right-2">
                                      <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${
-                                         property.estatus === 'publicado' ? 'bg-green-50 text-green-700 ring-green-600/20' : 
-                                         property.estatus === 'pendente' ? 'bg-yellow-50 text-yellow-800 ring-yellow-600/20' :
-                                         'bg-gray-50 text-gray-600 ring-gray-500/10'
+                                         property.publishedAt ? 'bg-green-50 text-green-700 ring-green-600/20' : 
+                                         'bg-yellow-50 text-yellow-800 ring-yellow-600/20'
                                      }`}>
-                                         {property.estatus ? property.estatus.charAt(0).toUpperCase() + property.estatus.slice(1) : 'Rascunho'}
+                                         {property.publishedAt ? 'Publicado' : 'Rascunho'}
                                      </span>
                                 </div>
                              </div>
@@ -133,9 +132,9 @@ export default function DashboardPage() {
                                  {property.tipo ? (
                                    <p className="mt-1 text-sm text-gray-500">{property.tipo}</p>
                                  ) : null}
-                                 {property.estatus !== 'publicado' ? (
+                                 {!property.publishedAt ? (
                                    <p className="mt-2 text-xs font-semibold text-yellow-700">
-                                     Aguardando aprovação do admin
+                                     Aguardando aprovação
                                    </p>
                                  ) : null}
                                  <div className="mt-4">

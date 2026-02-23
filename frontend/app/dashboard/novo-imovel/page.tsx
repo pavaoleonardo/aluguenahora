@@ -245,7 +245,6 @@ export default function NewPropertyPage() {
             tipo: formData.tipo,
             tamanho: Number(formData.tamanho.replace(',', '.')),
             area_total: Number(formData.area_total.replace(',', '.')),
-            estatus: 'pendente',
             endereco: formData.endereco || null,
             latitude: latitude,
             longitude: longitude,

@@ -490,11 +490,6 @@ export interface ApiImovelImovel extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     descricao: Schema.Attribute.Blocks;
     endereco: Schema.Attribute.String;
-    estatus: Schema.Attribute.Enumeration<
-      ['rascunho', 'pendente', 'recusado', 'publicado']
-    > &
-      Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<'pendente'>;
     finalidade: Schema.Attribute.Enumeration<['aluguel', 'venda']>;
     fotos: Schema.Attribute.Media<'images', true>;
     iptu: Schema.Attribute.Decimal;
