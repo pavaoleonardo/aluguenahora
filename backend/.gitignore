@@ -127,3 +127,10 @@ license.txt
 exports
 .strapi-updater.json
 .strapi-cloud.json
+
+# Build artifacts
+dist/
+build/
+.cache/
+.tmp/
+node_modules/
