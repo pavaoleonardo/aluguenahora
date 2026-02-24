@@ -45,19 +45,63 @@ export default function DashboardPage() {
       return
     }
 
-    // Simplified fetch: backend automatically filters by the authenticated user when ?myProperties=true is passed
-    fetch(`${API_BASE_URL}/api/imoveis?populate=*&myProperties=true`, {
-      headers: {
-        Authorization: `Bearer ${token}`
+    const fetchMyProperties = async () => {
+      try {
+        // ---- PRIMARY: try myProperties=true (custom backend controller) ----
+        let myProps: Imovel[] = []
+        let usedFallback = false
+
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/imoveis?populate=*&myProperties=true`, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+
+          if (res.ok) {
+            const data = await res.json()
+            myProps = data?.data || []
+          } else {
+            usedFallback = true
+          }
+        } catch {
+          usedFallback = true
+        }
+
+        // ---- FALLBACK: fetch all published and filter client-side ----
+        if (usedFallback || myProps.length === 0) {
+          try {
+            const res = await fetch(`${API_BASE_URL}/api/imoveis?populate=*&pagination[pageSize]=100`, {
+              headers: { Authorization: `Bearer ${token}` }
+            })
+
+            if (res.ok) {
+              const data = await res.json()
+              const all: Imovel[] = data?.data || []
+
+              // Filter by current user
+              const mine = all.filter((item: any) => {
+                const owner = item.usuario
+                if (!owner) return false
+                return owner.id === user.id || owner.documentId === (user as any).documentId
+              })
+
+              if (mine.length > 0) {
+                myProps = mine
+              }
+            }
+          } catch (fallbackErr) {
+            console.error('Fallback fetch also failed:', fallbackErr)
+          }
+        }
+
+        setProperties(myProps)
+      } catch (err) {
+        console.error('Error fetching properties:', err)
+      } finally {
+        setLoading(false)
       }
-    })
-    .then(res => res.json())
-    .then(data => {
-      // Handle Strapi response
-      setProperties(data.data || [])
-    })
-    .catch(err => console.error(err))
-    .finally(() => setLoading(false))
+    }
+
+    fetchMyProperties()
 
   }, [authLoading, token, user, router])
 
