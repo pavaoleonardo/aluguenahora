@@ -41,45 +41,47 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
           orConditions.push({ usuario: { id: { $eq: userId } } });
         }
 
-        const userFilter = {
+        const userFilters = {
+          ...(typeof ctx.query.filters === 'object' && ctx.query.filters !== null ? ctx.query.filters : {}),
           $or: orConditions.length > 0 ? orConditions : [{ id: -1 }]
         };
 
-        // Document API does NOT support populate='*'. Convert to explicit fields.
-        const DEFAULT_POPULATE = ['usuario', 'fotos', 'foto_fachada'] as any;
+        // Remove custom param so Strapi core doesn't choke on it
+        delete ctx.query.myProperties;
 
-        // Fetch both drafts and published using Document API
-        const drafts = await strapi.documents('api::imovel.imovel').findMany({
-          filters: userFilter,
-          populate: DEFAULT_POPULATE,
-          status: 'draft' as any
-        }) as any[];
+        // Save original query state
+        const originalFilters = ctx.query.filters;
+        const originalStatus = ctx.query.status;
 
-        const published = await strapi.documents('api::imovel.imovel').findMany({
-          filters: userFilter,
-          populate: DEFAULT_POPULATE,
-          status: 'published' as any
-        }) as any[];
+        // === Fetch DRAFTS (all docs have a draft in Strapi v5) ===
+        ctx.query.filters = userFilters;
+        ctx.query.status = 'draft';
+        const draftResult = await super.find(ctx);
+        const drafts: any[] = draftResult?.data || [];
 
-        // Merge: prefer draft data but preserve publishedAt from published version
-        const mergedMap = new Map();
-        
-        for (const p of published) {
-          mergedMap.set(p.documentId, p);
-        }
-        
-        for (const d of drafts) {
-          if (mergedMap.has(d.documentId)) {
-            const p = mergedMap.get(d.documentId);
-            mergedMap.set(d.documentId, { ...d, publishedAt: p.publishedAt });
-          } else {
-            mergedMap.set(d.documentId, d);
+        // === Fetch PUBLISHED ===
+        ctx.query.filters = userFilters;
+        ctx.query.status = 'published';
+        const pubResult = await super.find(ctx);
+        const published: any[] = pubResult?.data || [];
+
+        // Restore query
+        ctx.query.filters = originalFilters;
+        ctx.query.status = originalStatus;
+
+        // Merge: all docs appear via drafts, published tells us which are live
+        const publishedDocIds = new Set(published.map((p: any) => p.documentId));
+
+        const merged = drafts.map((d: any) => {
+          if (publishedDocIds.has(d.documentId)) {
+            // Find the published version to get its publishedAt
+            const pub = published.find((p: any) => p.documentId === d.documentId);
+            return { ...d, publishedAt: pub?.publishedAt || new Date().toISOString() };
           }
-        }
+          return { ...d, publishedAt: null };
+        });
 
-        const mergedResults = Array.from(mergedMap.values());
-        const sanitizedResults = await this.sanitizeOutput(mergedResults, ctx);
-        return this.transformResponse(sanitizedResults);
+        return { data: merged, meta: draftResult?.meta || {} };
       }
 
       return await super.find(ctx);
