@@ -47,9 +47,8 @@ export default function DashboardPage() {
 
     const fetchMyProperties = async () => {
       try {
-        // ---- PRIMARY: try myProperties=true (custom backend controller) ----
+        // ---- PRIMARY: try myProperties=true (custom backend controller filters by user) ----
         let myProps: Imovel[] = []
-        let usedFallback = false
 
         try {
           const res = await fetch(`${API_BASE_URL}/api/imoveis?populate=*&myProperties=true`, {
@@ -59,15 +58,15 @@ export default function DashboardPage() {
           if (res.ok) {
             const data = await res.json()
             myProps = data?.data || []
-          } else {
-            usedFallback = true
           }
-        } catch {
-          usedFallback = true
+        } catch (e) {
+          console.error('myProperties request failed:', e)
         }
 
-        // ---- FALLBACK: fetch all published and filter client-side ----
-        if (usedFallback || myProps.length === 0) {
+        // ---- FALLBACK: if primary failed or empty, show all properties ----
+        // (Strapi strips 'usuario' from API response, so client-side user filter is impossible.
+        //  The backend controller is the only way to filter by owner.)
+        if (myProps.length === 0) {
           try {
             const res = await fetch(`${API_BASE_URL}/api/imoveis?populate=*&pagination[pageSize]=100`, {
               headers: { Authorization: `Bearer ${token}` }
@@ -75,18 +74,7 @@ export default function DashboardPage() {
 
             if (res.ok) {
               const data = await res.json()
-              const all: Imovel[] = data?.data || []
-
-              // Filter by current user
-              const mine = all.filter((item: any) => {
-                const owner = item.usuario
-                if (!owner) return false
-                return owner.id === user.id || owner.documentId === (user as any).documentId
-              })
-
-              if (mine.length > 0) {
-                myProps = mine
-              }
+              myProps = data?.data || []
             }
           } catch (fallbackErr) {
             console.error('Fallback fetch also failed:', fallbackErr)
