@@ -170,37 +170,50 @@ exports.default = strapi_1.factories.createCoreController('api::imovel.imovel', 
     async fix(ctx) {
         try {
             const users = await strapi.db.query('plugin::users-permissions.user').findMany();
-            if (users.length === 0)
-                return ctx.send({ message: 'No users found' });
-            const adminId = users[0].id; // id is a string/number
-            const adminDocId = users[0].documentId;
-            const unlinked = await strapi.db.query('api::imovel.imovel').findMany({
-                where: { usuario: null }
-            });
-            const fixedIds = [];
-            const errs = [];
-            for (const p of unlinked) {
-                try {
-                    // In Strapi v5, updating a relation via document API:
-                    await strapi.documents('api::imovel.imovel').update({
-                        documentId: p.documentId,
-                        data: {
-                            // pass documentId of the related entity
-                            usuario: adminDocId
-                        }
-                    });
-                    fixedIds.push(p.id);
+            // List all users
+            const userList = users.map((u) => ({
+                id: u.id,
+                documentId: u.documentId,
+                username: u.username,
+                email: u.email,
+            }));
+            // If action=reassign, reassign specific properties to a user
+            const action = ctx.query.action;
+            const targetUserDocId = ctx.query.targetUser;
+            const propertyDocIds = ctx.query.properties; // comma-separated
+            if (action === 'reassign' && targetUserDocId && propertyDocIds) {
+                const docIdList = propertyDocIds.split(',');
+                const results = [];
+                const errs = [];
+                for (const docId of docIdList) {
+                    try {
+                        await strapi.documents('api::imovel.imovel').update({
+                            documentId: docId.trim(),
+                            data: { usuario: targetUserDocId }
+                        });
+                        results.push({ docId: docId.trim(), status: 'reassigned' });
+                    }
+                    catch (e) {
+                        errs.push({ docId: docId.trim(), error: e.message });
+                    }
                 }
-                catch (e) {
-                    errs.push({ id: p.id, error: e.message });
-                }
+                return ctx.send({ action: 'reassign', results, errs, targetUserDocId });
             }
-            return ctx.send({
-                fixed: fixedIds,
-                errs,
-                unlinkedCount: unlinked.length,
-                adminDocId
+            // Default: list users and all properties with their owners
+            const allProperties = await strapi.db.query('api::imovel.imovel').findMany({
+                populate: ['usuario'],
             });
+            const propertyList = allProperties.map((p) => {
+                var _a, _b;
+                return ({
+                    id: p.id,
+                    documentId: p.documentId,
+                    titulo: p.titulo,
+                    ownerUserId: ((_a = p.usuario) === null || _a === void 0 ? void 0 : _a.id) || null,
+                    ownerUsername: ((_b = p.usuario) === null || _b === void 0 ? void 0 : _b.username) || 'NONE',
+                });
+            });
+            return ctx.send({ users: userList, properties: propertyList });
         }
         catch (err) {
             return ctx.badRequest(err.message);

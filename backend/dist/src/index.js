@@ -125,38 +125,5 @@ exports.default = {
             }
         };
         seedNews();
-        // ----------------------------------------------------
-        // HOTFIX: Relink ALL properties to Leonardo
-        // ----------------------------------------------------
-        const fixUnlinkedProperties = async () => {
-            try {
-                const users = await strapi.db.query('plugin::users-permissions.user').findMany({
-                    where: {
-                        $or: [
-                            { username: { $containsi: 'Leonardo' } },
-                            { email: { $containsi: 'pavaoleonardo' } }
-                        ]
-                    }
-                });
-                if (users.length === 0)
-                    return;
-                const leonardo = users[0]; // Gets Leonardo
-                const allProperties = await strapi.db.query('api::imovel.imovel').findMany();
-                if (allProperties.length > 0) {
-                    console.log(`[HOTFIX] Linking ALL ${allProperties.length} properties to user ID ${leonardo.id} (Leonardo)`);
-                    for (const p of allProperties) {
-                        await strapi.documents('api::imovel.imovel').update({
-                            documentId: p.documentId,
-                            data: { usuario: leonardo.documentId || leonardo.id }
-                        });
-                    }
-                    console.log('[HOTFIX] Properties successfully linked to Leonardo.');
-                }
-            }
-            catch (error) {
-                console.error('[HOTFIX] Error linking properties:', error);
-            }
-        };
-        fixUnlinkedProperties();
     },
 };

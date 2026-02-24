@@ -165,6 +165,13 @@ export default function NewPropertyPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Manual validation for photos (hidden file input can't use 'required' on mobile)
+    if (fotos.length === 0) {
+      alert('Por favor, selecione pelo menos uma foto do imóvel.')
+      return
+    }
+
     setLoading(true)
     setGeocoding(true)
 
@@ -481,7 +488,6 @@ export default function NewPropertyPage() {
                         name="fotos"
                         accept="image/*"
                         multiple
-                        required
                         onChange={handleFotosChange}
                         className="hidden"
                       />
