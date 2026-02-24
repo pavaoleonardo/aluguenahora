@@ -33,8 +33,9 @@ export default function NewPropertyPage() {
   const router = useRouter()
   const { user, token, loading: authLoading } = useAuth()
   const [loading, setLoading] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const fileInputId = 'foto-upload-input'
   const [fotos, setFotos] = useState<File[]>([])
+  const [errors, setErrors] = useState<string[]>([])
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
   const [formData, setFormData] = useState({
     titulo: '',
@@ -166,11 +167,21 @@ export default function NewPropertyPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Manual validation for photos (hidden file input can't use 'required' on mobile)
-    if (fotos.length === 0) {
-      alert('Por favor, selecione pelo menos uma foto do imóvel.')
+    // Full manual validation (HTML5 validation is unreliable on mobile browsers)
+    const validationErrors: string[] = []
+    if (!formData.titulo.trim()) validationErrors.push('Título do anúncio é obrigatório.')
+    if (!formData.preco.trim()) validationErrors.push('Valor (R$) é obrigatório.')
+    if (!formData.tipo) validationErrors.push('Tipo do imóvel é obrigatório.')
+    if (!formData.bairro.trim()) validationErrors.push('Bairro é obrigatório.')
+    if (fotos.length === 0) validationErrors.push('Selecione pelo menos uma foto do imóvel.')
+
+    if (validationErrors.length > 0) {
+      setErrors(validationErrors)
+      alert(validationErrors.join('\n'))
+      window.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
+    setErrors([])
 
     setLoading(true)
     setGeocoding(true)
@@ -286,11 +297,19 @@ export default function NewPropertyPage() {
        <div className="mx-auto max-w-2xl">
          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl text-center mb-8">Anunciar Imóvel</h2>
          
-         <form onSubmit={handleSubmit} className="space-y-6">
+         {errors.length > 0 && (
+           <div className="mb-6 rounded-md bg-red-50 p-4 border border-red-200">
+             <h3 className="text-sm font-bold text-red-800 mb-2">Por favor corrija os seguintes erros:</h3>
+             <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
+               {errors.map((err, i) => <li key={i}>{err}</li>)}
+             </ul>
+           </div>
+         )}
+         <form onSubmit={handleSubmit} noValidate className="space-y-6">
             <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2">
                 <div className="sm:col-span-2">
                     <label className="block text-sm font-medium leading-6 text-gray-900">Título do Anúncio</label>
-                    <input type="text" name="titulo" required value={formData.titulo} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
+                    <input type="text" name="titulo" value={formData.titulo} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
                 </div>
                 
                 <div className="sm:col-span-2">
@@ -300,17 +319,16 @@ export default function NewPropertyPage() {
 
                 <div>
                     <label className="block text-sm font-medium leading-6 text-gray-900">VALOR (R$)</label>
-                    <input type="text" name="preco" required value={formData.preco} onChange={handlePriceChange} placeholder="R$ 0,00" className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
+                    <input type="text" name="preco" value={formData.preco} onChange={handlePriceChange} placeholder="R$ 0,00" inputMode="decimal" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
                 </div>
 
                 <div>
                     <label className="block text-sm font-medium leading-6 text-gray-900">Finalidade</label>
                     <select
                       name="finalidade"
-                      required
                       value={formData.finalidade}
                       onChange={handleChange}
-                      className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 cursor-default pointer-events-none bg-gray-50"
+                      className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm bg-gray-50"
                     >
                       <option value="aluguel">Aluguel</option>
                       <option value="venda">Venda</option>
@@ -331,12 +349,11 @@ export default function NewPropertyPage() {
                     <label className="block text-sm font-medium leading-6 text-gray-900">Tipo do imóvel</label>
                     <select
                       name="tipo"
-                      required
                       value={formData.tipo}
                       onChange={handleChange}
-                      className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                      className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm"
                     >
-                      <option value="">TODOS OS IMÓVEIS</option>
+                      <option value="">Selecione o tipo...</option>
                       <optgroup label="--- RESIDENCIAL ---">
                         <option value="Apart Hotel / Flat / Loft">Apart Hotel / Flat / Loft</option>
                         <option value="Apartamento">Apartamento</option>
@@ -387,7 +404,6 @@ export default function NewPropertyPage() {
                     <input
                       type="text"
                       name="bairro"
-                      required
                       placeholder="Comece a digitar o bairro..."
                       value={formData.bairro}
                       onChange={(e) => handleBairroChange(e.target.value)}
@@ -475,21 +491,21 @@ export default function NewPropertyPage() {
                     <p className="mt-1 text-xs text-gray-500 mb-4">Dica: A primeira foto selecionada será usada como a principal (fachada) nos resultados de busca.</p>
                     
                     <div className="flex flex-col items-start gap-4">
-                      <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        className="rounded-md bg-white px-6 py-2.5 text-sm font-bold text-primary shadow-sm ring-1 ring-inset ring-primary hover:bg-gray-50 transition-all uppercase"
+                      <label
+                        htmlFor={fileInputId}
+                        className="rounded-md bg-white px-6 py-3 text-base font-bold text-primary shadow-sm ring-1 ring-inset ring-primary hover:bg-gray-50 active:bg-gray-100 transition-all uppercase cursor-pointer select-none touch-manipulation"
                       >
-                        ENVIAR FOTOS
-                      </button>
+                        📷 SELECIONAR FOTOS
+                      </label>
                       <input
                         type="file"
-                        ref={fileInputRef}
+                        id={fileInputId}
                         name="fotos"
                         accept="image/*"
                         multiple
+                        capture={undefined}
                         onChange={handleFotosChange}
-                        className="hidden"
+                        className="sr-only"
                       />
                     </div>
                     {fotos.length > 0 ? (
@@ -518,17 +534,17 @@ export default function NewPropertyPage() {
                 </div>
             </div>
 
-            <div className="flex justify-end pt-4">
+            <div className="pt-6">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="rounded-md bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  className="w-full rounded-md bg-primary px-6 py-4 text-base font-bold text-white shadow-sm hover:bg-primary-hover active:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 touch-manipulation"
                 >
                   {loading ? (
-                    geocoding ? 'Localizando endereço...' : 
-                    compressing ? 'Otimizando fotos...' : 
-                    'Enviando...'
-                  ) : 'Enviar para Aprovação'}
+                    geocoding ? '📍 Localizando endereço...' : 
+                    compressing ? '🔄 Otimizando fotos...' : 
+                    '⏳ Enviando...'
+                  ) : '✅ Enviar para Aprovação'}
                 </button>
             </div>
          </form>
