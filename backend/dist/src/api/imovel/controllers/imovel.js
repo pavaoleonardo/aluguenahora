@@ -24,48 +24,48 @@ exports.default = strapi_1.factories.createCoreController('api::imovel.imovel', 
     async find(ctx) {
         try {
             if (ctx.state.user && ctx.query.myProperties === 'true') {
-                const userDocId = ctx.state.user.documentId;
-                const userId = ctx.state.user.id;
-                const orConditions = [];
-                if (userDocId) {
-                    orConditions.push({ usuario: { documentId: { $eq: userDocId } } });
-                }
-                if (userId) {
-                    orConditions.push({ usuario: { id: { $eq: userId } } });
-                }
-                const userFilters = {
-                    ...(typeof ctx.query.filters === 'object' && ctx.query.filters !== null ? ctx.query.filters : {}),
-                    $or: orConditions.length > 0 ? orConditions : [{ id: -1 }]
-                };
                 // Remove custom param so Strapi core doesn't choke on it
                 delete ctx.query.myProperties;
-                // Save original query state
-                const originalFilters = ctx.query.filters;
-                const originalStatus = ctx.query.status;
-                // === Fetch DRAFTS (all docs have a draft in Strapi v5) ===
-                ctx.query.filters = userFilters;
-                ctx.query.status = 'draft';
-                const draftResult = await super.find(ctx);
-                const drafts = (draftResult === null || draftResult === void 0 ? void 0 : draftResult.data) || [];
-                // === Fetch PUBLISHED ===
-                ctx.query.filters = userFilters;
+                // Step 1: Use low-level DB query to find property IDs owned by this user
+                // (super.find blocks filtering by 'usuario' relation for security)
+                const userId = ctx.state.user.id;
+                const userProperties = await strapi.db.query('api::imovel.imovel').findMany({
+                    where: { usuario: userId },
+                    select: ['id', 'documentId'],
+                });
+                if (!userProperties || userProperties.length === 0) {
+                    return { data: [], meta: { pagination: { page: 1, pageSize: 25, pageCount: 0, total: 0 } } };
+                }
+                const docIds = userProperties.map((p) => p.documentId);
+                // Step 2: Fetch full data using super.find() with documentId filter (allowed!)
+                ctx.query.filters = {
+                    documentId: { $in: docIds }
+                };
+                // Fetch published version
                 ctx.query.status = 'published';
                 const pubResult = await super.find(ctx);
                 const published = (pubResult === null || pubResult === void 0 ? void 0 : pubResult.data) || [];
-                // Restore query
-                ctx.query.filters = originalFilters;
-                ctx.query.status = originalStatus;
-                // Merge: all docs appear via drafts, published tells us which are live
                 const publishedDocIds = new Set(published.map((p) => p.documentId));
+                // Fetch draft version
+                ctx.query.filters = { documentId: { $in: docIds } };
+                ctx.query.status = 'draft';
+                const draftResult = await super.find(ctx);
+                const drafts = (draftResult === null || draftResult === void 0 ? void 0 : draftResult.data) || [];
+                // Merge: use draft data but mark publishedAt from published version
                 const merged = drafts.map((d) => {
                     if (publishedDocIds.has(d.documentId)) {
-                        // Find the published version to get its publishedAt
                         const pub = published.find((p) => p.documentId === d.documentId);
                         return { ...d, publishedAt: (pub === null || pub === void 0 ? void 0 : pub.publishedAt) || new Date().toISOString() };
                     }
                     return { ...d, publishedAt: null };
                 });
-                return { data: merged, meta: (draftResult === null || draftResult === void 0 ? void 0 : draftResult.meta) || {} };
+                // Add published-only entries not in drafts (edge case)
+                for (const p of published) {
+                    if (!drafts.some((d) => d.documentId === p.documentId)) {
+                        merged.push(p);
+                    }
+                }
+                return { data: merged, meta: { pagination: { page: 1, pageSize: 100, pageCount: 1, total: merged.length } } };
             }
             return await super.find(ctx);
         }
