@@ -150,11 +150,11 @@ export default function DashboardPage() {
                                            ? 'bg-blue-50 text-blue-700 ring-blue-600/20'
                                            : property.publishedAt 
                                              ? 'bg-green-50 text-green-700 ring-green-600/20' 
-                                             : 'bg-yellow-50 text-yellow-800 ring-yellow-600/20'
+                                             : 'bg-orange-50 text-orange-700 ring-orange-600/20'
                                      }`}>
                                          {(property as any)._status === 'modified' 
-                                           ? 'Modificado' 
-                                           : property.publishedAt ? 'Publicado' : 'Rascunho'}
+                                           ? '✏️ Modificado' 
+                                           : property.publishedAt ? '✅ Publicado' : '⏳ Pendente'}
                                      </span>
                                 </div>
                              </div>
