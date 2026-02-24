@@ -65,19 +65,26 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
         const draftResult = await super.find(ctx);
         const drafts: any[] = draftResult?.data || [];
 
-        // Merge: use draft data but mark publishedAt from published version
+        // Merge: use draft data but detect publish status
         const merged = drafts.map((d: any) => {
           if (publishedDocIds.has(d.documentId)) {
             const pub = published.find((p: any) => p.documentId === d.documentId);
-            return { ...d, publishedAt: pub?.publishedAt || new Date().toISOString() };
+            const draftUpdated = new Date(d.updatedAt).getTime();
+            const pubUpdated = pub ? new Date(pub.updatedAt).getTime() : 0;
+            const isModified = draftUpdated > pubUpdated;
+            return { 
+              ...d, 
+              publishedAt: pub?.publishedAt || new Date().toISOString(),
+              _status: isModified ? 'modified' : 'published'
+            };
           }
-          return { ...d, publishedAt: null };
+          return { ...d, publishedAt: null, _status: 'draft' };
         });
 
         // Add published-only entries not in drafts (edge case)
         for (const p of published) {
           if (!drafts.some((d: any) => d.documentId === p.documentId)) {
-            merged.push(p);
+            merged.push({ ...p, _status: 'published' });
           }
         }
 

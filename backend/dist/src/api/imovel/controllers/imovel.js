@@ -51,18 +51,25 @@ exports.default = strapi_1.factories.createCoreController('api::imovel.imovel', 
                 ctx.query.status = 'draft';
                 const draftResult = await super.find(ctx);
                 const drafts = (draftResult === null || draftResult === void 0 ? void 0 : draftResult.data) || [];
-                // Merge: use draft data but mark publishedAt from published version
+                // Merge: use draft data but detect publish status
                 const merged = drafts.map((d) => {
                     if (publishedDocIds.has(d.documentId)) {
                         const pub = published.find((p) => p.documentId === d.documentId);
-                        return { ...d, publishedAt: (pub === null || pub === void 0 ? void 0 : pub.publishedAt) || new Date().toISOString() };
+                        const draftUpdated = new Date(d.updatedAt).getTime();
+                        const pubUpdated = pub ? new Date(pub.updatedAt).getTime() : 0;
+                        const isModified = draftUpdated > pubUpdated;
+                        return {
+                            ...d,
+                            publishedAt: (pub === null || pub === void 0 ? void 0 : pub.publishedAt) || new Date().toISOString(),
+                            _status: isModified ? 'modified' : 'published'
+                        };
                     }
-                    return { ...d, publishedAt: null };
+                    return { ...d, publishedAt: null, _status: 'draft' };
                 });
                 // Add published-only entries not in drafts (edge case)
                 for (const p of published) {
                     if (!drafts.some((d) => d.documentId === p.documentId)) {
-                        merged.push(p);
+                        merged.push({ ...p, _status: 'published' });
                     }
                 }
                 return { data: merged, meta: { pagination: { page: 1, pageSize: 100, pageCount: 1, total: merged.length } } };

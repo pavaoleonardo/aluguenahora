@@ -28,6 +28,7 @@ interface Imovel {
   tipo?: string;
   fotos: any[];
   foto_fachada?: any;
+  _status?: 'published' | 'modified' | 'draft';
 }
 
 export default function DashboardPage() {
@@ -145,10 +146,15 @@ export default function DashboardPage() {
                                 )}
                                 <div className="absolute top-2 right-2">
                                      <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${
-                                         property.publishedAt ? 'bg-green-50 text-green-700 ring-green-600/20' : 
-                                         'bg-yellow-50 text-yellow-800 ring-yellow-600/20'
+                                         (property as any)._status === 'modified' 
+                                           ? 'bg-blue-50 text-blue-700 ring-blue-600/20'
+                                           : property.publishedAt 
+                                             ? 'bg-green-50 text-green-700 ring-green-600/20' 
+                                             : 'bg-yellow-50 text-yellow-800 ring-yellow-600/20'
                                      }`}>
-                                         {property.publishedAt ? 'Publicado' : 'Rascunho'}
+                                         {(property as any)._status === 'modified' 
+                                           ? 'Modificado' 
+                                           : property.publishedAt ? 'Publicado' : 'Rascunho'}
                                      </span>
                                 </div>
                              </div>
@@ -163,7 +169,11 @@ export default function DashboardPage() {
                                  {property.tipo ? (
                                    <p className="mt-1 text-sm text-gray-500">{property.tipo}</p>
                                  ) : null}
-                                 {!property.publishedAt ? (
+                                 {(property as any)._status === 'modified' ? (
+                                   <p className="mt-2 text-xs font-semibold text-blue-700">
+                                     Edição pendente de publicação
+                                   </p>
+                                 ) : !property.publishedAt ? (
                                    <p className="mt-2 text-xs font-semibold text-yellow-700">
                                      Aguardando aprovação
                                    </p>
