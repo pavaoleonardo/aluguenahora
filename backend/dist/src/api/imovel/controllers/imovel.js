@@ -26,26 +26,52 @@ exports.default = strapi_1.factories.createCoreController('api::imovel.imovel', 
             if (ctx.state.user && ctx.query.myProperties === 'true') {
                 const userDocId = ctx.state.user.documentId;
                 const userId = ctx.state.user.id;
-                ctx.query.filters = {
+                const orConditions = [];
+                if (userDocId) {
+                    orConditions.push({ usuario: { documentId: { $eq: userDocId } } });
+                }
+                if (userId) {
+                    orConditions.push({ usuario: { id: { $eq: userId } } });
+                }
+                const userFilters = {
                     ...(typeof ctx.query.filters === 'object' && ctx.query.filters !== null ? ctx.query.filters : {}),
-                    $or: [
-                        { usuario: { documentId: { $eq: userDocId } } },
-                        { usuario: { id: { $eq: userId } } }
-                    ]
+                    $or: orConditions.length > 0 ? orConditions : [{ id: -1 }]
                 };
-                const requestedStatus = String(ctx.query.status || '');
-                if (requestedStatus === 'draft' || requestedStatus === 'published' || requestedStatus === 'all') {
-                    ctx.query.status = requestedStatus;
-                }
-                else {
-                    ctx.query.status = 'all';
-                }
+                // Remove custom param so Strapi core doesn't choke on it
+                delete ctx.query.myProperties;
+                // Save original query state
+                const originalFilters = ctx.query.filters;
+                const originalStatus = ctx.query.status;
+                // === Fetch DRAFTS (all docs have a draft in Strapi v5) ===
+                ctx.query.filters = userFilters;
+                ctx.query.status = 'draft';
+                const draftResult = await super.find(ctx);
+                const drafts = (draftResult === null || draftResult === void 0 ? void 0 : draftResult.data) || [];
+                // === Fetch PUBLISHED ===
+                ctx.query.filters = userFilters;
+                ctx.query.status = 'published';
+                const pubResult = await super.find(ctx);
+                const published = (pubResult === null || pubResult === void 0 ? void 0 : pubResult.data) || [];
+                // Restore query
+                ctx.query.filters = originalFilters;
+                ctx.query.status = originalStatus;
+                // Merge: all docs appear via drafts, published tells us which are live
+                const publishedDocIds = new Set(published.map((p) => p.documentId));
+                const merged = drafts.map((d) => {
+                    if (publishedDocIds.has(d.documentId)) {
+                        // Find the published version to get its publishedAt
+                        const pub = published.find((p) => p.documentId === d.documentId);
+                        return { ...d, publishedAt: (pub === null || pub === void 0 ? void 0 : pub.publishedAt) || new Date().toISOString() };
+                    }
+                    return { ...d, publishedAt: null };
+                });
+                return { data: merged, meta: (draftResult === null || draftResult === void 0 ? void 0 : draftResult.meta) || {} };
             }
             return await super.find(ctx);
         }
         catch (err) {
             console.error('[Custom Find Error]', err.message, err.stack);
-            ctx.badRequest(err.message || 'Erro ao buscar imóveis.');
+            return ctx.badRequest(err.message || 'Erro ao buscar imóveis.');
         }
     },
     async findOne(ctx) {
@@ -134,6 +160,45 @@ exports.default = strapi_1.factories.createCoreController('api::imovel.imovel', 
             return ctx.badRequest(err.message || 'Erro ao atualizar imóvel.');
         }
     },
+    async fix(ctx) {
+        try {
+            const users = await strapi.db.query('plugin::users-permissions.user').findMany();
+            if (users.length === 0)
+                return ctx.send({ message: 'No users found' });
+            const adminId = users[0].id; // id is a string/number
+            const adminDocId = users[0].documentId;
+            const unlinked = await strapi.db.query('api::imovel.imovel').findMany({
+                where: { usuario: null }
+            });
+            const fixedIds = [];
+            const errs = [];
+            for (const p of unlinked) {
+                try {
+                    // In Strapi v5, updating a relation via document API:
+                    await strapi.documents('api::imovel.imovel').update({
+                        documentId: p.documentId,
+                        data: {
+                            // pass documentId of the related entity
+                            usuario: adminDocId
+                        }
+                    });
+                    fixedIds.push(p.id);
+                }
+                catch (e) {
+                    errs.push({ id: p.id, error: e.message });
+                }
+            }
+            return ctx.send({
+                fixed: fixedIds,
+                errs,
+                unlinkedCount: unlinked.length,
+                adminDocId
+            });
+        }
+        catch (err) {
+            return ctx.badRequest(err.message);
+        }
+    },
     async create(ctx) {
         var _a;
         try {
@@ -146,12 +211,12 @@ exports.default = strapi_1.factories.createCoreController('api::imovel.imovel', 
             ctx.request.body.data = safeData;
             // Create using default core logic (handles drafts, data normalization)
             const result = await super.create(ctx);
-            // Force assign the current user as the owner using DB layer!
+            // Force assign the current user as the owner using Document API
             if (ctx.state.user && ((_a = result === null || result === void 0 ? void 0 : result.data) === null || _a === void 0 ? void 0 : _a.documentId)) {
-                await strapi.db.query('api::imovel.imovel').update({
-                    where: { documentId: result.data.documentId },
+                await strapi.documents('api::imovel.imovel').update({
+                    documentId: result.data.documentId,
                     data: {
-                        usuario: ctx.state.user.id // DB layer uses numeric ID always
+                        usuario: ctx.state.user.documentId || ctx.state.user.id
                     }
                 });
                 // Also fetch and append it manually to result so the UI gets it instantly

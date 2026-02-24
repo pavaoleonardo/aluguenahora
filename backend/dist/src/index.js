@@ -126,26 +126,31 @@ exports.default = {
         };
         seedNews();
         // ----------------------------------------------------
-        // HOTFIX: Relink broken properties to admin user
+        // HOTFIX: Relink ALL properties to Leonardo
         // ----------------------------------------------------
         const fixUnlinkedProperties = async () => {
             try {
-                const users = await strapi.db.query('plugin::users-permissions.user').findMany();
+                const users = await strapi.db.query('plugin::users-permissions.user').findMany({
+                    where: {
+                        $or: [
+                            { username: { $containsi: 'Leonardo' } },
+                            { email: { $containsi: 'pavaoleonardo' } }
+                        ]
+                    }
+                });
                 if (users.length === 0)
                     return;
-                const adminUser = users[0]; // Gets the first user (usually the creator/admin)
-                const unlinkedProperties = await strapi.db.query('api::imovel.imovel').findMany({
-                    where: { usuario: null }
-                });
-                if (unlinkedProperties.length > 0) {
-                    console.log(`[HOTFIX] Linking ${unlinkedProperties.length} orphaned properties to user ID ${adminUser.id}`);
-                    for (const p of unlinkedProperties) {
-                        await strapi.db.query('api::imovel.imovel').update({
-                            where: { id: p.id },
-                            data: { usuario: adminUser.id }
+                const leonardo = users[0]; // Gets Leonardo
+                const allProperties = await strapi.db.query('api::imovel.imovel').findMany();
+                if (allProperties.length > 0) {
+                    console.log(`[HOTFIX] Linking ALL ${allProperties.length} properties to user ID ${leonardo.id} (Leonardo)`);
+                    for (const p of allProperties) {
+                        await strapi.documents('api::imovel.imovel').update({
+                            documentId: p.documentId,
+                            data: { usuario: leonardo.documentId || leonardo.id }
                         });
                     }
-                    console.log('[HOTFIX] Orphaned properties successfully linked.');
+                    console.log('[HOTFIX] Properties successfully linked to Leonardo.');
                 }
             }
             catch (error) {

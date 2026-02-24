@@ -2,6 +2,7 @@
 # exit on error
 set -o errexit
 
-npm install
-echo "Building Strapi..."
-NODE_OPTIONS=--max-old-space-size=420 npm run build
+echo "Installing dependencies..."
+npm install --production
+echo "Build complete! (Using pre-compiled dist/ from repository)"
+
