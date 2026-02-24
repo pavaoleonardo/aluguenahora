@@ -229,6 +229,9 @@ exports.default = strapi_1.factories.createCoreController('api::imovel.imovel', 
             const sanitizedInput = await this.sanitizeInput(ctx.request.body.data, ctx);
             const safeData = sanitizePropertyInput(sanitizedInput);
             ctx.request.body.data = safeData;
+            // FORCE draft status — properties MUST be approved by admin before publishing.
+            // Strapi v5 REST API publishes by default if status is not explicitly set.
+            ctx.query.status = 'draft';
             // Create using default core logic (handles drafts, data normalization)
             const result = await super.create(ctx);
             // Force assign the current user as the owner using Document API
@@ -237,7 +240,8 @@ exports.default = strapi_1.factories.createCoreController('api::imovel.imovel', 
                     documentId: result.data.documentId,
                     data: {
                         usuario: ctx.state.user.documentId || ctx.state.user.id
-                    }
+                    },
+                    status: 'draft', // ensure we update the draft version
                 });
                 // Also fetch and append it manually to result so the UI gets it instantly
                 result.data.usuario = {
