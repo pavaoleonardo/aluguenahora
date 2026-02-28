@@ -1,8 +1,33 @@
 import type { StrapiApp } from '@strapi/strapi/admin';
+import AuthLogo from './extensions/logo.png';
+import favicon from './extensions/favicon.png';
 
 export default {
   config: {
+    head: {
+      favicon,
+    },
+    auth: {
+      logo: AuthLogo,
+    },
+    menu: {
+      logo: AuthLogo,
+    },
     locales: ['en', 'pt-BR'],
+    translations: {
+      en: {
+        'Auth.form.welcome.title': 'Welcome to Alugue na Hora',
+        'Auth.form.welcome.subtitle': 'Log in to manage properties',
+        'app.components.LeftMenu.navbrand.title': 'Alugue na Hora',
+        'app.components.LeftMenu.navbrand.workplace': 'Dashboard',
+      },
+      'pt-BR': {
+        'Auth.form.welcome.title': 'Bem-vindo ao Alugue na Hora',
+        'Auth.form.welcome.subtitle': 'Faça login para gerenciar os imóveis',
+        'app.components.LeftMenu.navbrand.title': 'Alugue na Hora',
+        'app.components.LeftMenu.navbrand.workplace': 'Painel',
+      },
+    },
   },
   register(app: StrapiApp) {
     app.customFields.register({
