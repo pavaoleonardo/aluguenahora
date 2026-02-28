@@ -1,12 +1,8 @@
 export default ({ env }) => {
   const isProd = env('NODE_ENV', 'development') === 'production';
-  const backendUrl = env('RENDER_EXTERNAL_URL', 'https://aluguenahora.onrender.com');
   const frontendUrls = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
-    'https://aluguenahora.vercel.app',
-    'https://www.aluguenahora.vercel.app',
-    backendUrl
   ];
 
   return [
