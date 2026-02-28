@@ -27,7 +27,7 @@ const LISTA_CARACTERISTICAS = [
   "Sauna", "Terraço", "WC de serviço"
 ];
 
-const MAX_FOTOS_POR_IMOVEL = 8;
+const MAX_FOTOS_POR_IMOVEL = 30;
 
 export default function NewPropertyPage() {
   const router = useRouter()
@@ -214,25 +214,22 @@ export default function NewPropertyPage() {
       // 2. Upload Fotos
       const uploadedFotoIds: number[] = []
       if (filesToUpload.length > 0) {
-        // Upload serially to avoid high memory peaks on free-tier backend instances.
-        for (const file of filesToUpload) {
-          const uploadForm = new FormData()
-          uploadForm.append('files', file)
+        const uploadForm = new FormData()
+        filesToUpload.forEach(file => uploadForm.append('files', file))
 
-          const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${token}` },
-            body: uploadForm,
-          })
+        const uploadRes = await fetch(`${API_BASE_URL}/api/upload`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: uploadForm,
+        })
 
-          const uploadData = await uploadRes.json()
-          if (!uploadRes.ok) {
-            throw new Error(uploadData?.error?.message || 'Erro ao enviar foto')
-          }
+        const uploadData = await uploadRes.json()
+        if (!uploadRes.ok) {
+          throw new Error(uploadData?.error?.message || 'Erro ao enviar fotos')
+        }
 
-          if (Array.isArray(uploadData) && uploadData[0]?.id) {
-            uploadedFotoIds.push(uploadData[0].id)
-          }
+        if (Array.isArray(uploadData)) {
+          uploadData.forEach(foto => uploadedFotoIds.push(foto.id))
         }
       }
 
