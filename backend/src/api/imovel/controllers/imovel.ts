@@ -182,8 +182,18 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
       const safeData = sanitizePropertyInput(sanitizedInput);
       ctx.request.body.data = safeData;
 
-      // Delegate to default which handles media mappings properly
+      // Delegate to default which handles media mappings properly (modifies Draft)
       const result = await super.update(ctx);
+
+      // FORCE UNPUBLISH: When a user edits a property, immediately pull it down from live
+      // so the admin has to review the new photos/description and re-publish it.
+      try {
+        await strapi.documents('api::imovel.imovel').unpublish({
+          documentId: id,
+        });
+      } catch (unpublishErr) {
+        console.error('Failed to auto-unpublish property after edit:', unpublishErr);
+      }
 
       return result;
     } catch (err: any) {
