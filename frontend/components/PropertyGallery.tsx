@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import Image from 'next/image'
 
 type FotoItem = {
@@ -63,17 +63,40 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
   const active = items[activeIndex]
   const total = items.length
 
-  const goPrev = (e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
+  const goPrev = (e?: React.MouseEvent | KeyboardEvent) => {
+    if (e && 'stopPropagation' in e) e.stopPropagation();
     if (items.length === 0) return
     setActiveIndex((prev) => (prev - 1 + items.length) % items.length)
   }
 
-  const goNext = (e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
+  const goNext = (e?: React.MouseEvent | KeyboardEvent) => {
+    if (e && 'stopPropagation' in e) e.stopPropagation();
     if (items.length === 0) return
     setActiveIndex((prev) => (prev + 1) % items.length)
   }
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') {
+        goNext(e as any);
+      } else if (e.key === 'ArrowLeft') {
+        goPrev(e as any);
+      } else if (e.key === 'Escape') {
+        setIsModalOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    // Prevent scrolling behind modal
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'auto';
+    };
+  }, [isModalOpen, items.length]);
 
   return (
     <div className="flex flex-col gap-4">

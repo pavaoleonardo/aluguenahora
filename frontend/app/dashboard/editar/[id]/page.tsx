@@ -107,6 +107,13 @@ export default function EditPropertyPage() {
 
     if (!id) return
 
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setActivePhotoUrl(null);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+
     const fetchProperty = async () => {
       try {
         const res = await fetch(`${API_BASE_URL}/api/imoveis/${id}?populate=*&status=draft`, {
@@ -155,6 +162,10 @@ export default function EditPropertyPage() {
     }
 
     fetchProperty()
+
+    return () => {
+      window.removeEventListener('keydown', handleGlobalKeyDown);
+    };
   }, [id, router, authLoading, token, user])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
