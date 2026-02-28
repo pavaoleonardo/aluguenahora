@@ -49,6 +49,7 @@ export default function EditPropertyPage() {
   const [newFotos, setNewFotos] = useState<File[]>([])
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
   const [existingFotos, setExistingFotos] = useState<ExistingFoto[]>([])
+  const [activePhotoUrl, setActivePhotoUrl] = useState<string | null>(null)
   
   const [formData, setFormData] = useState({
     titulo: '',
@@ -443,9 +444,10 @@ export default function EditPropertyPage() {
                   <h4 className="text-xs font-bold text-gray-500 uppercase mb-3">Fotos Atuais</h4>
                   <div className="grid grid-cols-3 gap-4">
                     {existingFotos.map((foto) => (
-                      <div key={foto.id} className="relative aspect-square rounded-lg overflow-hidden border bg-white group">
-                        <img src={foto.url} className="h-full w-full object-cover" />
-                        <button type="button" onClick={() => removeExistingFoto(foto.id)} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div key={foto.id} className="relative aspect-square rounded-lg overflow-hidden border bg-white group cursor-pointer" onClick={() => setActivePhotoUrl(foto.url)}>
+                        <img src={foto.url} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-300" />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                        <button type="button" onClick={(e) => { e.stopPropagation(); removeExistingFoto(foto.id); }} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                       </div>
@@ -460,9 +462,10 @@ export default function EditPropertyPage() {
                   <h4 className="text-xs font-bold text-gray-500 uppercase mb-3">Novas Fotos</h4>
                   <div className="grid grid-cols-3 gap-4">
                     {previewUrls.map((url, idx) => (
-                      <div key={url} className="relative aspect-square rounded-lg overflow-hidden border bg-white group">
-                        <img src={url} className="h-full w-full object-cover border-2 border-primary" />
-                        <button type="button" onClick={() => removeNewFoto(idx)} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div key={url} className="relative aspect-square rounded-lg overflow-hidden border bg-white group cursor-pointer" onClick={() => setActivePhotoUrl(url)}>
+                        <img src={url} className="h-full w-full object-cover border-2 border-primary group-hover:scale-110 transition-transform duration-300" />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                        <button type="button" onClick={(e) => { e.stopPropagation(); removeNewFoto(idx); }} className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                       </div>
@@ -478,6 +481,18 @@ export default function EditPropertyPage() {
                 <input type="file" ref={fileInputRef} multiple accept="image/*" onChange={handleFotosChange} className="hidden" />
                 <p className="mt-2 text-[10px] text-gray-500">As fotos passarão pela aprovação do administrador</p>
               </div>
+
+              {/* Edit Page Lightbox Modal */}
+              {activePhotoUrl && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm px-4 py-8" onClick={() => setActivePhotoUrl(null)}>
+                  <button type="button" onClick={() => setActivePhotoUrl(null)} className="absolute top-6 right-6 text-white hover:text-gray-300 bg-black/50 rounded-full p-2 z-[101]">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+                  <div className="relative w-full h-full flex items-center justify-center max-w-7xl mx-auto" onClick={(e) => e.stopPropagation()}>
+                    <img src={activePhotoUrl} alt="Visualização em tamanho real" className="max-w-full max-h-full object-contain" />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
