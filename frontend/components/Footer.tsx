@@ -127,7 +127,7 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} Alugue Na Hora. Todos os direitos reservados.
           </p>
           <p className="mt-2 text-xs leading-5 text-gray-500">
-            Made with <span className="text-red-500">❤️</span> by ALL Marketing
+            Made with <span className="text-red-500">❤️</span> by ALL Agency
           </p>
         </div>
       </div>
