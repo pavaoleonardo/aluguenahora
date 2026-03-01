@@ -146,6 +146,31 @@ export default function PropertyDetailClient({ id }: { id: string }) {
               {formatCurrency(property.preco || 0)}
             </p>
 
+            <div className="mt-6 flex flex-col gap-4">
+              <div className="flex flex-wrap gap-4 items-center text-sm text-gray-500 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                <span className="flex items-center gap-2" title="Quartos">
+                   <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                     <path d="M3 7h18a2 2 0 0 1 2 2v10h-2v-3H3v3H1V9a2 2 0 0 1 2-2zm2 2v3h6V9H5zm8 0v3h6V9h-6z" />
+                   </svg>
+                   {property.quartos} Quartos
+                </span>
+                <span className="flex items-center gap-2" title="Banheiros">
+                   <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 4a4 4 0 014 4v2a2 2 0 002 2h4a2 2 0 002-2V8a4 4 0 00-4-4H8zm0 0V2m4 2V2m4 2V2M12 16v6M8 18v4M16 18v4" />
+                   </svg>
+                   {property.banheiros} Banheiros
+                </span>
+                <span className="flex items-center gap-2" title="Área Total">
+                   <ArrowsPointingOutIcon className="h-5 w-5 text-gray-400" />
+                   {formatNumber(property.area_total || 0)} m²
+                </span>
+              </div>
+            </div>
+
+            {property.tipo ? (
+              <p className="mt-3 text-sm text-gray-600">Tipo: {property.tipo}</p>
+            ) : null}
+
             <div className="mt-8 overflow-hidden rounded-lg border border-gray-200">
               <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-gray-700">Dados do Imóvel</h3>
@@ -171,7 +196,7 @@ export default function PropertyDetailClient({ id }: { id: string }) {
                     </tr>
                   )}
                    <tr>
-                    <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">ÁREA CONSTRUÍDA / ÚTIL (m²)</td>
+                    <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">ÁREA CONSTRUÍDA (m²)</td>
                     <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{formatNumber(property.tamanho || 0)}</td>
                   </tr>
                   <tr>
@@ -194,49 +219,6 @@ export default function PropertyDetailClient({ id }: { id: string }) {
               </table>
             </div>
 
-            <div className="mt-8 flex items-center justify-between text-sm text-gray-500 bg-gray-50 p-4 rounded-lg border border-gray-100">
-              <div className="flex gap-6 mx-auto">
-                <span className="flex items-center gap-2" title="Quartos">
-                   <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                     <path d="M3 7h18a2 2 0 0 1 2 2v10h-2v-3H3v3H1V9a2 2 0 0 1 2-2zm2 2v3h6V9H5zm8 0v3h6V9h-6z" />
-                   </svg>
-                   {property.quartos} Quartos
-                </span>
-                <span className="flex items-center gap-2" title="Banheiros">
-                   <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 4a4 4 0 014 4v2a2 2 0 002 2h4a2 2 0 002-2V8a4 4 0 00-4-4H8zm0 0V2m4 2V2m4 2V2M12 16v6M8 18v4M16 18v4" />
-                   </svg>
-                   {property.banheiros} Banheiros
-                </span>
-                <span className="flex items-center gap-2" title="Área Total">
-                   <ArrowsPointingOutIcon className="h-5 w-5 text-gray-400" />
-                   {formatNumber(property.area_total || 0)} m²
-                </span>
-              </div>
-            </div>
-            {property.tipo ? (
-              <p className="mt-3 text-sm text-gray-600">Tipo: {property.tipo}</p>
-            ) : null}
-
-            <div className="mt-6 space-y-6 text-base text-gray-700">{renderDescription()}</div>
-
-            {/* Characteristics Section */}
-            {property.caracteristicas && property.caracteristicas.length > 0 && (
-              <div className="mt-10 border-t border-gray-100 pt-8">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Características do Imóvel</h3>
-                <div className="grid grid-cols-2 gap-y-2 gap-x-4">
-                  {property.caracteristicas.map((item) => (
-                    <div key={item} className="flex items-center gap-2 text-sm text-gray-600">
-                      <svg className="h-4 w-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
             <div className="mt-10 flex gap-4">
               <button className="flex-1 rounded-md bg-primary px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
                 Tenho Interesse
@@ -250,6 +232,29 @@ export default function PropertyDetailClient({ id }: { id: string }) {
             </div>
           </div>
         </div>
+        
+        {/* Full-width sections below the grid */}
+        <div className="mt-16 lg:mt-24 border-t border-gray-200 pt-10">
+          <h3 className="text-2xl font-bold text-gray-900 mb-6">Descrição Completa</h3>
+          <div className="space-y-6 text-base text-gray-700">{renderDescription()}</div>
+        </div>
+
+        {/* Characteristics Section */}
+        {property.caracteristicas && property.caracteristicas.length > 0 && (
+          <div className="mt-16 lg:mt-24 border-t border-gray-200 pt-10">
+            <h3 className="text-2xl font-bold text-gray-900 mb-6">Características do Imóvel</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-4 gap-x-6">
+              {property.caracteristicas.map((item) => (
+                <div key={item} className="flex items-center gap-3 text-sm text-gray-700">
+                  <svg className="h-5 w-5 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         
         {/* Map Section */}
         {property.latitude && property.longitude && (
