@@ -174,41 +174,41 @@ export default function PropertyDetailClient({ id }: { id: string }) {
               <table className="min-w-full divide-y divide-gray-200">
                 <tbody className="divide-y divide-gray-200 bg-white">
                   <tr>
-                    <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50 w-1/3">Tipo</td>
-                    <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{property.tipo}</td>
+                    <td className="whitespace-normal break-words px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50 w-1/3">Tipo</td>
+                    <td className="whitespace-normal break-words px-4 py-2 text-sm text-gray-900">{property.tipo}</td>
                   </tr>
                   <tr>
-                    <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">Cidade/UF</td>
-                    <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{property.cidade} - MS</td>
+                    <td className="whitespace-normal break-words px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">Cidade/UF</td>
+                    <td className="whitespace-normal break-words px-4 py-2 text-sm text-gray-900">{property.cidade} - MS</td>
                   </tr>
                   <tr>
-                    <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">Bairro</td>
-                    <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{bairroLabel}</td>
+                    <td className="whitespace-normal break-words px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">Bairro</td>
+                    <td className="whitespace-normal break-words px-4 py-2 text-sm text-gray-900">{bairroLabel}</td>
                   </tr>
                   {property.endereco && (
                     <tr>
-                      <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">Endereço</td>
-                      <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{property.endereco}</td>
+                      <td className="whitespace-normal break-words px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">Endereço</td>
+                      <td className="whitespace-normal break-words px-4 py-2 text-sm text-gray-900">{property.endereco}</td>
                     </tr>
                   )}
                    <tr>
-                    <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">ÁREA CONSTRUÍDA (m²)</td>
-                    <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{formatNumber(property.tamanho || 0)}</td>
+                    <td className="whitespace-normal break-words px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">ÁREA CONSTRUÍDA (m²)</td>
+                    <td className="whitespace-normal break-words px-4 py-2 text-sm text-gray-900">{formatNumber(property.tamanho || 0)}</td>
                   </tr>
                   <tr>
-                    <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">ÁREA TOTAL (m²)</td>
-                    <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{formatNumber(property.area_total || 0)}</td>
+                    <td className="whitespace-normal break-words px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">ÁREA TOTAL (m²)</td>
+                    <td className="whitespace-normal break-words px-4 py-2 text-sm text-gray-900">{formatNumber(property.area_total || 0)}</td>
                   </tr>
                   {property.condominio ? (
                     <tr>
-                      <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">Condomínio</td>
-                      <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{formatCurrency(property.condominio)}</td>
+                      <td className="whitespace-normal break-words px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">Condomínio</td>
+                      <td className="whitespace-normal break-words px-4 py-2 text-sm text-gray-900">{formatCurrency(property.condominio)}</td>
                     </tr>
                   ) : null}
                   {property.iptu ? (
                     <tr>
-                      <td className="whitespace-nowrap px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">IPTU</td>
-                      <td className="whitespace-nowrap px-4 py-2 text-sm text-gray-900">{formatCurrency(property.iptu)} mensal</td>
+                      <td className="whitespace-normal break-words px-4 py-2 text-sm font-medium text-gray-500 bg-gray-50/50">IPTU</td>
+                      <td className="whitespace-normal break-words px-4 py-2 text-sm text-gray-900">{formatCurrency(property.iptu)} mensal</td>
                     </tr>
                   ) : null}
                 </tbody>

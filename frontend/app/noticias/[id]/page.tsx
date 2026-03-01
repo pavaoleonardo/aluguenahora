@@ -92,7 +92,7 @@ export default function NoticiaDetailPage() {
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
-        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 text-white">
+        <div className="absolute bottom-0 left-0 right-0 px-8 pt-8 pb-20 md:px-16 md:pt-16 md:pb-24 text-white">
           <div className="max-w-5xl mx-auto">
             <div className="flex flex-wrap items-center gap-4 mb-6">
                 <span className="bg-primary text-white px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/30">
