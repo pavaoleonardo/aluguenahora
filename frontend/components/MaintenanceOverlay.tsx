@@ -20,9 +20,9 @@ export default function MaintenanceOverlay() {
   // If user is logged in (you or Jackson), hide the maintenance screen!
   if (user) return null
 
-  // If user is trying to access the login or register page, let them through
+  // If user is trying to access the login page, let them through
   // so you can actually login to bypass this!
-  if (pathname.startsWith('/login') || pathname.startsWith('/register')) return null
+  if (pathname.startsWith('/login')) return null
 
   return (
     <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-slate-950 text-white p-6 backdrop-blur-md">
