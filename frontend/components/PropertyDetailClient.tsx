@@ -167,10 +167,6 @@ export default function PropertyDetailClient({ id }: { id: string }) {
               </div>
             </div>
 
-            {property.tipo ? (
-              <p className="mt-3 text-sm text-gray-600">Tipo: {property.tipo}</p>
-            ) : null}
-
             <div className="mt-8 overflow-hidden rounded-lg border border-gray-200">
               <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-gray-700">Dados do Imóvel</h3>
