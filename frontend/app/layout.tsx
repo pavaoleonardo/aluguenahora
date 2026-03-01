@@ -19,6 +19,7 @@ export const metadata: Metadata = {
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import MaintenanceOverlay from "@/components/MaintenanceOverlay";
 import { AuthProvider } from "@/context/AuthContext";
 
 export default function RootLayout({
@@ -35,6 +36,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen overflow-x-clip`}
       >
         <AuthProvider>
+          <MaintenanceOverlay />
           <Navbar />
           <main className="flex-1 w-full max-w-full overflow-x-clip">
             {children}
