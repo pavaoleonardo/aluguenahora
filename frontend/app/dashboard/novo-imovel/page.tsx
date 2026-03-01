@@ -519,11 +519,6 @@ export default function NewPropertyPage() {
                               alt={`Prévia ${idx + 1}`}
                               className="h-full w-full object-cover"
                             />
-                            {idx === 0 && (
-                                <div className="absolute top-0 left-0 bg-primary text-white text-[10px] px-2 py-0.5 font-bold uppercase rounded-br-md">
-                                    Principal
-                                </div>
-                            )}
                           </div>
                         ))}
                       </div>
