@@ -45,8 +45,7 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
       filters.push({
         $or: [
           { bairro: { $containsi: bairro } },
-          { bairro: { bairro: { $containsi: bairro } } },
-          { bairro: { regiao: { $containsi: bairro } } }
+          { titulo: { $containsi: bairro } }
         ]
       })
     }
