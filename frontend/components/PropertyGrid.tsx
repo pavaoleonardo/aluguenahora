@@ -45,7 +45,8 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
       filters.push({
         $or: [
           { bairro: { $containsi: bairro } },
-          { bairro: { bairro: { $containsi: bairro } } }
+          { bairro: { bairro: { $containsi: bairro } } },
+          { bairro: { regiao: { $containsi: bairro } } }
         ]
       })
     }
@@ -56,7 +57,8 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
           $or: [
             { tipo: { $eq: 'Casa-Térrea' } },
             { tipo: { $eq: 'Casa-Térrea-Condomínio' } },
-            { tipo: { $eq: 'Casa de Vila' } }
+            { tipo: { $eq: 'Casa de Vila' } },
+            { tipo: { $eq: 'Casa Comercial' } }
           ]
         })
       } else if (tipo === 'Sobrado') {
@@ -73,7 +75,8 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
             { tipo: { $eq: 'Apart Hotel / Flat / Loft' } },
             { tipo: { $eq: 'Apto. Cobertura / Duplex' } },
             { tipo: { $eq: 'Studio' } },
-            { tipo: { $eq: 'Kitnet' } }
+            { tipo: { $eq: 'Kitnet' } },
+            { tipo: { $containsi: 'Condomínio' } }
           ]
         })
       } else if (tipo === 'Rural-Group') {
