@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import PropertyGrid from "@/components/PropertyGrid";
 import SearchBar from "@/components/SearchBar";
 import NewsGrid from "@/components/NewsGrid";
@@ -49,10 +50,10 @@ export default async function Home() {
                     Propriedades selecionadas a dedo por nossa equipe de especialistas.
                 </p>
             </div>
-            <button className="text-primary font-semibold hover:text-primary/80 flex items-center gap-2 group transition-all">
+            <Link href="/imoveis" className="text-primary font-semibold hover:text-primary/80 flex items-center gap-2 group transition-all">
                 Ver todos os imóveis 
                 <ArrowRightIcon className="h-4 w-4 transform group-hover:translate-x-1 transition-transform" />
-            </button>
+            </Link>
         </div>
         
         <PropertyGrid limit={3} emptyMessage="Nenhum imóvel em destaque encontrado no momento." />
