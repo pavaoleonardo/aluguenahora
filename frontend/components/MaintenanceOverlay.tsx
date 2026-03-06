@@ -36,7 +36,7 @@ export default function MaintenanceOverlay() {
       <div className="relative z-10 max-w-lg w-full text-center bg-white/5 backdrop-blur-xl border border-white/10 p-10 md:p-16 rounded-[3rem] shadow-2xl">
         <div className="flex items-center justify-center mb-8">
           <Image 
-            src="/mascot-construction.png" 
+            src="/mascot-construction-branded.png" 
             alt="Em Construção" 
             width={180} 
             height={180} 
