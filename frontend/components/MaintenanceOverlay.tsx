@@ -3,6 +3,7 @@
 import { useAuth } from '@/context/AuthContext'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 
 export default function MaintenanceOverlay() {
   const { user, loading } = useAuth()
@@ -33,10 +34,15 @@ export default function MaintenanceOverlay() {
       </div>
 
       <div className="relative z-10 max-w-lg w-full text-center bg-white/5 backdrop-blur-xl border border-white/10 p-10 md:p-16 rounded-[3rem] shadow-2xl">
-        <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-white/10 mb-8 ring-4 ring-white/5 shadow-inner">
-          <svg className="w-12 h-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-          </svg>
+        <div className="flex items-center justify-center mb-8">
+          <Image 
+            src="/mascot-construction.png" 
+            alt="Em Construção" 
+            width={180} 
+            height={180} 
+            className="drop-shadow-2xl hover:scale-110 transition-transform duration-500 ease-in-out" 
+            priority
+          />
         </div>
         
         <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4 text-white">
