@@ -114,19 +114,91 @@ export default function PropertyDetailClient({ id }: { id: string }) {
         : ''
 
   const renderDescription = () => {
-    if (Array.isArray(property.descricao)) {
-      return property.descricao.map((block: any, i: number) => {
-        if (block.type === 'paragraph') {
-          return (
-            <p key={i} className="mb-4">
-              {block.children.map((c: any) => c.text).join('')}
-            </p>
-          )
-        }
-        return null
-      })
+    // If it's a simple string (fallback)
+    if (typeof property.descricao === 'string') {
+      return <div className="prose prose-blue max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap">{property.descricao}</div>
     }
-    return <p>{property.descricao}</p>
+
+    // If it's the Strapi array blocks format
+    if (Array.isArray(property.descricao)) {
+      return (
+        <div className="prose prose-blue max-w-none text-gray-700 leading-relaxed">
+          {property.descricao.map((block: any, i: number) => {
+            // Render the children text with proper formatting
+            const renderChildren = (children: any[]) => {
+              return children.map((child: any, j: number) => {
+                let text = child.text || '';
+                if (child.bold) text = <strong key={j}>{text}</strong>;
+                if (child.italic) text = <em key={j}>{text}</em>;
+                if (child.underline) text = <u key={j}>{text}</u>;
+                if (child.strikethrough) text = <del key={j}>{text}</del>;
+                if (child.code) text = <code key={j} className="bg-gray-100 rounded px-1 py-0.5 text-sm">{text}</code>;
+                
+                if (child.type === 'link') {
+                  return (
+                    <a key={j} href={child.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-hover underline">
+                      {child.children?.map((c: any) => c.text).join('')}
+                    </a>
+                  );
+                }
+                return text || <span key={j} />;
+              });
+            };
+
+            switch (block.type) {
+              case 'paragraph':
+                return <p key={i} className="mb-4 last:mb-0">{renderChildren(block.children)}</p>;
+              case 'heading': {
+                const level = Math.min(Math.max(block.level || 2, 1), 6);
+                const Tag = `h${level}` as keyof React.JSX.IntrinsicElements;
+                const hClasses = {
+                  1: "text-2xl font-bold mt-8 mb-4 text-gray-900",
+                  2: "text-xl font-bold mt-6 mb-3 text-gray-900",
+                  3: "text-lg font-bold mt-5 mb-2 text-gray-900",
+                  4: "text-base font-bold mt-4 mb-2 text-gray-900",
+                  5: "text-base font-semibold mt-4 mb-2 text-gray-900",
+                  6: "text-sm font-bold mt-4 mb-2 text-gray-900 uppercase tracking-wider"
+                }[level as 1|2|3|4|5|6] || "text-lg font-bold mt-6 mb-3 text-gray-900";
+                
+                return <Tag key={i} className={hClasses}>{renderChildren(block.children)}</Tag>;
+              }
+              case 'list':
+                const ListTag = block.format === 'ordered' ? 'ol' : 'ul';
+                const listClass = block.format === 'ordered' ? 'list-decimal pl-6 mb-6 space-y-2' : 'list-disc pl-6 mb-6 space-y-2';
+                return (
+                  <ListTag key={i} className={listClass}>
+                    {block.children.map((item: any, k: number) => (
+                      <li key={k} className="pl-1">{renderChildren(item.children)}</li>
+                    ))}
+                  </ListTag>
+                );
+              case 'quote':
+                return (
+                  <blockquote key={i} className="border-l-4 border-primary/40 bg-gray-50/50 italic pl-4 py-3 my-6 rounded-r-lg text-gray-600">
+                    {renderChildren(block.children)}
+                  </blockquote>
+                );
+              case 'code':
+                return (
+                  <pre key={i} className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto my-6 text-sm">
+                    <code>{renderChildren(block.children)}</code>
+                  </pre>
+                );
+              case 'image':
+                return (
+                  <div key={i} className="my-8 rounded-xl overflow-hidden shadow-sm border border-gray-100">
+                    <img src={block.image.url} alt={block.image.alternativeText || ''} className="w-full h-auto object-cover" />
+                  </div>
+                );
+              default:
+                return null;
+            }
+          })}
+        </div>
+      )
+    }
+    
+    return null;
   }
 
   return (
