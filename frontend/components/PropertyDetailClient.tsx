@@ -6,6 +6,7 @@ import { api } from '@/lib/api'
 import PropertyGallery from '@/components/PropertyGallery'
 import { ArrowsPointingOutIcon, MapPinIcon } from '@heroicons/react/24/outline'
 import { formatCurrency, formatNumber } from '@/lib/format'
+import { API_BASE_URL } from '@/lib/apiBase'
 import dynamic from 'next/dynamic'
 
 const PropertyMap = dynamic(() => import('@/components/PropertyMap'), {
@@ -42,6 +43,7 @@ type ImovelDetail = {
   foto_fachada?: any
   unidade_medida?: string
   caracteristicas?: string[]
+  video_url?: string
 }
 
 export default function PropertyDetailClient({ id }: { id: string }) {
@@ -234,6 +236,23 @@ export default function PropertyDetailClient({ id }: { id: string }) {
           <h3 className="text-2xl font-bold text-gray-900 mb-6">Descrição Completa</h3>
           <div className="space-y-6 text-base text-gray-700">{renderDescription()}</div>
         </div>
+
+        {/* Video Section */}
+        {property.video_url && (
+          <div className="mt-16 lg:mt-24 border-t border-gray-200 pt-10">
+            <h3 className="text-2xl font-bold text-gray-900 mb-6">Vídeo do Imóvel</h3>
+            <div className="max-w-4xl mx-auto overflow-hidden rounded-xl shadow-lg border border-gray-200 bg-black">
+              <video 
+                controls 
+                preload="none"
+                className="w-full aspect-video"
+                src={`${API_BASE_URL}${property.video_url}`}
+              >
+                Seu navegador não suporta a exibição de vídeos.
+              </video>
+            </div>
+          </div>
+        )}
 
         {/* Characteristics Section */}
         {property.caracteristicas && property.caracteristicas.length > 0 && (
