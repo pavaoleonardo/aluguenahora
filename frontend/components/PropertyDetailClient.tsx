@@ -243,7 +243,7 @@ export default function PropertyDetailClient({ id }: { id: string }) {
           <div className="mt-16 lg:mt-24 border-t border-gray-200 pt-10">
             <h3 className="text-2xl font-bold text-gray-900 mb-6">Características do Imóvel</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-4 gap-x-6">
-              {property.caracteristicas.map((item) => (
+              {[...property.caracteristicas].sort((a, b) => a.localeCompare(b, 'pt-BR')).map((item) => (
                 <div key={item} className="flex items-center gap-3 text-sm text-gray-700">
                   <svg className="h-5 w-5 text-primary flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
