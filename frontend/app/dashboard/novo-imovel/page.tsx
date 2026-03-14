@@ -525,7 +525,7 @@ export default function NewPropertyPage() {
                 {/* Characteristics Section */}
                 <div className="sm:col-span-2 mt-4">
                   <label className="block text-lg font-bold text-gray-900 mb-4 border-b pb-2">Características</label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-3">
+                  <div className="columns-1 sm:columns-2 md:columns-3 gap-x-6">
                     {LISTA_CARACTERISTICAS.map((item) => (
                       <label key={item} className="relative flex items-center group cursor-pointer break-inside-avoid mb-3">
                         <div className="flex h-6 items-center">
@@ -619,7 +619,7 @@ export default function NewPropertyPage() {
                         {formData.video_url && (
                           <div className="flex items-center gap-2 text-green-600 font-bold">
                             <span className="text-xl">✅</span>
-                            <span>Vídeo pronto!</span>
+                            <span>Vídeo enviado!</span>
                           </div>
                         )}
                       </div>

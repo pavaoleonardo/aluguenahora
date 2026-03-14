@@ -496,7 +496,7 @@ export default function EditPropertyPage() {
             {/* Characteristics Grid */}
             <div className="sm:col-span-2 mt-4">
               <label className="block text-lg font-bold text-gray-900 mb-4 border-b pb-2 uppercase">Características</label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-3 border p-4 rounded-lg bg-gray-50/30">
+              <div className="columns-1 sm:columns-2 md:columns-3 gap-x-6 border p-4 rounded-lg bg-gray-50/30">
                 {LISTA_CARACTERISTICAS.map((item) => (
                   <label key={item} className="relative flex items-center group cursor-pointer break-inside-avoid mb-3">
                     <input type="checkbox" checked={formData.caracteristicas.includes(item)} onChange={() => handleCharacteristicToggle(item)} className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer" />
