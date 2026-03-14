@@ -49,6 +49,7 @@ type ImovelDetail = {
 export default function PropertyDetailClient({ id }: { id: string }) {
   const [property, setProperty] = useState<ImovelDetail | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
 
   useEffect(() => {
     if (!id || id === 'undefined') {
@@ -113,7 +114,7 @@ export default function PropertyDetailClient({ id }: { id: string }) {
         ? 'Venda'
         : ''
 
-  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
+
 
   const renderDescription = () => {
     // If it's a simple string (fallback)
