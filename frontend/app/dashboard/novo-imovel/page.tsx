@@ -384,6 +384,16 @@ export default function NewPropertyPage() {
                 </div>
 
                 <div>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Cidade/UF</label>
+                    <input
+                      type="text"
+                      value="Campo Grande - MS"
+                      disabled
+                      className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm bg-gray-100 cursor-not-allowed"
+                    />
+                </div>
+
+                <div>
                     <label className="block text-sm font-medium leading-6 text-gray-900">Condomínio (Mensal)</label>
                     <input type="text" name="condominio" value={formData.condominio} onChange={handlePriceChange} placeholder="R$ 0,00" className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
                 </div>
