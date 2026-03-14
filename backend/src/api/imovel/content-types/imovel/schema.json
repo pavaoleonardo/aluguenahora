@@ -108,6 +108,9 @@
     },
     "caracteristicas": {
       "type": "json"
+    },
+    "video_url": {
+      "type": "string"
     }
   }
 }

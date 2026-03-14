@@ -3,6 +3,9 @@
  */
 
 import { factories } from '@strapi/strapi';
+import path from 'path';
+import fs from 'fs';
+import crypto from 'crypto';
 
 const isOwnerOfProperty = (property: any, user: any) => {
   if (!property?.usuario || !user) return false;
@@ -12,6 +15,9 @@ const isOwnerOfProperty = (property: any, user: any) => {
     property.usuario.id === user.id
   );
 };
+
+const VIDEO_MAX_SIZE = 60 * 1024 * 1024; // 60MB
+const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/quicktime', 'video/webm', 'video/ogg'];
 
 const sanitizePropertyInput = (input: any) => {
   const data = { ...(input || {}) };
@@ -297,6 +303,58 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
     } catch (err: any) {
       console.error('[Create Imovel] ERROR:', err);
       return ctx.badRequest(err.message || 'Erro ao criar imóvel.');
+    }
+  },
+
+  async uploadVideo(ctx) {
+    try {
+      if (!ctx.request.files || !ctx.request.files.video) {
+        return ctx.badRequest('Arquivo de vídeo não encontrado.');
+      }
+
+      const file = Array.isArray(ctx.request.files.video) 
+        ? ctx.request.files.video[0] 
+        : ctx.request.files.video;
+      
+      const fileAny = file as any;
+
+      // Validation
+      if (fileAny.size > VIDEO_MAX_SIZE) {
+        return ctx.badRequest('O vídeo excede o limite de 60MB.');
+      }
+
+      if (!ALLOWED_VIDEO_TYPES.includes(fileAny.type)) {
+        return ctx.badRequest('Formato de vídeo não suportado. Use MP4, MOV, WebM ou OGG.');
+      }
+
+      // Prepare local path
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'videos');
+      
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+
+      const extension = path.extname(fileAny.name || '');
+      const fileName = `${crypto.randomUUID()}${extension}`;
+      const filePath = path.join(uploadDir, fileName);
+
+      // Copy file to local storage
+      fs.copyFileSync(fileAny.path, filePath);
+      
+      // Clean up temp file
+      if (fileAny.path && fs.existsSync(fileAny.path)) {
+        try { fs.unlinkSync(fileAny.path); } catch(e) {}
+      }
+
+      // Return consistent URL path
+      return ctx.send({
+        url: `/uploads/videos/${fileName}`,
+        name: fileAny.name,
+      });
+
+    } catch (err: any) {
+      console.error('[Video Upload] ERROR:', err);
+      return ctx.badRequest('Falha ao processar o upload do vídeo.');
     }
   },
 }));

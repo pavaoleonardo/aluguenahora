@@ -55,9 +55,13 @@ export default function NewPropertyPage() {
     area_total: '',
     endereco: '',
     caracteristicas: [] as string[],
+    video_url: '',
   })
   const [geocoding, setGeocoding] = useState(false)
   const [compressing, setCompressing] = useState(false)
+  const [videoFile, setVideoFile] = useState<File | null>(null)
+  const [uploadingVideo, setUploadingVideo] = useState(false)
+  const videoInputId = 'video-upload-input'
   const [showBairroSuggestions, setShowBairroSuggestions] = useState(false)
   const [bairroSuggestions, setBairroSuggestions] = useState<string[]>([])
   const bairroRef = useRef<HTMLDivElement>(null)
@@ -144,6 +148,50 @@ export default function NewPropertyPage() {
       alert(`Você pode enviar no máximo ${MAX_FOTOS_POR_IMOVEL} fotos por imóvel.`)
     }
     setFotos(files.slice(0, MAX_FOTOS_POR_IMOVEL))
+  }
+
+  const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 60 * 1024 * 1024) {
+        alert('O vídeo deve ter no máximo 60MB.')
+        e.target.value = ''
+        return
+      }
+      setVideoFile(file)
+    }
+  }
+
+  const handleVideoUpload = async () => {
+    if (!videoFile) return
+
+    try {
+      setUploadingVideo(true)
+      const data = new FormData()
+      data.append('video', videoFile)
+
+      const response = await fetch(`${API_BASE_URL}/imoveis/upload-video`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: data
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error?.message || 'Erro no upload do vídeo')
+      }
+
+      const result = await response.json()
+      setFormData(prev => ({ ...prev, video_url: result.url }))
+      alert('Vídeo enviado com sucesso!')
+    } catch (err: any) {
+      console.error('Video upload error:', err)
+      alert(err.message || 'Erro ao enviar vídeo.')
+    } finally {
+      setUploadingVideo(false)
+    }
   }
 
   useEffect(() => {
@@ -267,6 +315,7 @@ export default function NewPropertyPage() {
             longitude: longitude,
             fotos: uploadedFotoIds,
             caracteristicas: formData.caracteristicas,
+            video_url: formData.video_url,
           },
         }),
       })
@@ -525,6 +574,52 @@ export default function NewPropertyPage() {
                         ))}
                       </div>
                     ) : null}
+
+                    {/* VIDEO UPLOAD SECTION */}
+                    <div className="mt-8 pt-8 border-t border-gray-200">
+                      <h3 className="text-lg font-bold text-gray-900 uppercase">🎥 Vídeo do Imóvel</h3>
+                      <p className="mt-1 text-xs text-gray-500 mb-4">Selecione um vídeo de até 60MB para mostrar mais detalhes do imóvel.</p>
+                      
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <label
+                          htmlFor={videoInputId}
+                          className="rounded-md bg-white px-6 py-3 text-base font-bold text-secondary shadow-sm ring-1 ring-inset ring-secondary hover:bg-gray-50 active:bg-gray-100 transition-all uppercase cursor-pointer select-none"
+                        >
+                          {videoFile ? '🔄 Trocar Vídeo' : '🎬 Selecionar Vídeo'}
+                        </label>
+                        <input
+                          type="file"
+                          id={videoInputId}
+                          accept="video/*"
+                          onChange={handleVideoChange}
+                          className="sr-only"
+                        />
+
+                        {videoFile && !formData.video_url && (
+                          <button
+                            type="button"
+                            onClick={handleVideoUpload}
+                            disabled={uploadingVideo}
+                            className="rounded-md bg-secondary px-6 py-3 text-base font-bold text-white shadow-sm hover:bg-secondary-hover transition-all uppercase disabled:opacity-50"
+                          >
+                            {uploadingVideo ? '⏳ Enviando...' : '☁️ Upload Vídeo'}
+                          </button>
+                        )}
+
+                        {formData.video_url && (
+                          <div className="flex items-center gap-2 text-green-600 font-bold">
+                            <span className="text-xl">✅</span>
+                            <span>Vídeo pronto!</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {videoFile && (
+                        <p className="mt-2 text-xs text-gray-500">
+                          Selecionado: {videoFile.name} ({(videoFile.size / (1024 * 1024)).toFixed(2)} MB)
+                        </p>
+                      )}
+                    </div>
                 </div>
             </div>
 
