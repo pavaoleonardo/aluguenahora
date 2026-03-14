@@ -217,7 +217,7 @@ export default function EditPropertyPage() {
       const data = new FormData()
       data.append('video', videoFile)
 
-      const response = await fetch(`${API_BASE_URL}/imoveis/upload-video`, {
+      const response = await fetch(`${API_BASE_URL}/api/imoveis/upload-video`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
