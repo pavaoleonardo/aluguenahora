@@ -27,7 +27,7 @@ const LISTA_CARACTERISTICAS = [
   "Rampa de acessibilidade", "Recepção", "Redário", "Rede elétrica",
   "Represa", "Salão de Festas", "Salão de Jogos", "Sauna",
   "Terraço", "WC adaptado", "WC de serviço"
-];
+].sort((a, b) => a.localeCompare(b, 'pt-BR'));
 
 const MAX_FOTOS_POR_IMOVEL = 30;
 
@@ -496,7 +496,7 @@ export default function EditPropertyPage() {
             {/* Characteristics Grid */}
             <div className="sm:col-span-2 mt-4">
               <label className="block text-lg font-bold text-gray-900 mb-4 border-b pb-2 uppercase">Características</label>
-              <div className="columns-1 sm:columns-2 md:columns-3 gap-x-6 border p-4 rounded-lg bg-gray-50/30">
+              <div className="flex flex-col gap-y-2 lg:columns-3 lg:block lg:gap-x-6 border p-4 rounded-lg bg-gray-50/30">
                 {LISTA_CARACTERISTICAS.map((item) => (
                   <label key={item} className="relative flex items-center group cursor-pointer break-inside-avoid mb-3">
                     <input type="checkbox" checked={formData.caracteristicas.includes(item)} onChange={() => handleCharacteristicToggle(item)} className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer" />

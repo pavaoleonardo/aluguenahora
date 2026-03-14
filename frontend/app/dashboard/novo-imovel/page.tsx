@@ -27,7 +27,7 @@ const LISTA_CARACTERISTICAS = [
   "Rampa de acessibilidade", "Recepção", "Redário", "Rede elétrica",
   "Represa", "Salão de Festas", "Salão de Jogos", "Sauna",
   "Terraço", "WC adaptado", "WC de serviço"
-];
+].sort((a, b) => a.localeCompare(b, 'pt-BR'));
 
 const MAX_FOTOS_POR_IMOVEL = 30;
 
@@ -525,7 +525,7 @@ export default function NewPropertyPage() {
                 {/* Characteristics Section */}
                 <div className="sm:col-span-2 mt-4">
                   <label className="block text-lg font-bold text-gray-900 mb-4 border-b pb-2">Características</label>
-                  <div className="columns-1 sm:columns-2 md:columns-3 gap-x-6">
+                  <div className="flex flex-col gap-y-2 lg:columns-3 lg:block lg:gap-x-6">
                     {LISTA_CARACTERISTICAS.map((item) => (
                       <label key={item} className="relative flex items-center group cursor-pointer break-inside-avoid mb-3">
                         <div className="flex h-6 items-center">
