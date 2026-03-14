@@ -51,55 +51,7 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
     }
 
     if (tipo) {
-      if (tipo === 'Casa-Térrea') {
-        filters.push({
-          $or: [
-            { tipo: { $eq: 'Casa-Térrea' } },
-            { tipo: { $eq: 'Casa-Térrea-Condomínio' } },
-            { tipo: { $eq: 'Casa de Vila' } },
-            { tipo: { $eq: 'Casa Comercial' } }
-          ]
-        })
-      } else if (tipo === 'Sobrado') {
-        filters.push({
-          $or: [
-            { tipo: { $eq: 'Sobrado' } },
-            { tipo: { $eq: 'Sobrado-Condomínio' } }
-          ]
-        })
-      } else if (tipo === 'Apartamento') {
-        filters.push({
-          $or: [
-            { tipo: { $eq: 'Apartamento' } },
-            { tipo: { $eq: 'Apart Hotel / Flat / Loft' } },
-            { tipo: { $eq: 'Apto. Cobertura / Duplex' } },
-            { tipo: { $eq: 'Studio' } },
-            { tipo: { $eq: 'Kitnet' } },
-            { tipo: { $containsi: 'Condomínio' } }
-          ]
-        })
-      } else if (tipo === 'Rural-Group') {
-        filters.push({
-          $or: [
-            { tipo: { $eq: 'Chácara' } },
-            { tipo: { $eq: 'Sitio' } },
-            { tipo: { $eq: 'Fazenda' } },
-            { tipo: { $eq: 'Haras' } },
-            { tipo: { $eq: 'Pesqueiro' } }
-          ]
-        })
-      } else if (tipo === 'Terreno') {
-        filters.push({
-          $or: [
-            { tipo: { $eq: 'Terreno' } },
-            { tipo: { $eq: 'Terreno-Condomínio' } },
-            { tipo: { $eq: 'Área' } },
-            { tipo: { $eq: 'Área / Gleba' } }
-          ]
-        })
-      } else {
-        filters.push({ tipo: { $eq: tipo } })
-      }
+      filters.push({ tipo: { $eq: tipo } })
     }
 
     if (finalidade) {

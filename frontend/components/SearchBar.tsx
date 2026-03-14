@@ -107,31 +107,37 @@ export default function SearchBar() {
                   onChange={(e) => setFilters({ ...filters, tipo: e.target.value })}
                   className="block w-full rounded-xl border-0 bg-gray-50 py-3 pl-10 pr-8 text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-primary sm:text-sm sm:leading-6 transition-all hover:bg-gray-100 cursor-pointer appearance-none"
                 >
-                <option value="">Todos os Imóveis</option>
-                <optgroup label="Residencial">
-                    <option value="Apartamento">Apartamento / Condomínio</option>
-                    <option value="Apto. Cobertura / Duplex">Cobertura / Duplex</option>
-                    <option value="Casa-Térrea">Casa</option>
-                    <option value="Sobrado">Sobrado</option>
+                <option value="">Todos os tipos</option>
+                <optgroup label="--- RESIDENCIAL ---">
+                    <option value="Apart Hotel / Flat / Loft">Apart Hotel / Flat / Loft</option>
+                    <option value="Apartamento">Apartamento</option>
+                    <option value="Apto. Cobertura / Duplex">Apto. Cobertura / Duplex</option>
+                    <option value="Casa de Vila">Casa de Vila</option>
+                    <option value="Casa-Térrea">Casa-Térrea</option>
+                    <option value="Casa-Térrea-Condomínio">Casa-Térrea-Condomínio</option>
                     <option value="Kitnet">Kitnet</option>
+                    <option value="Sobrado">Sobrado</option>
+                    <option value="Sobrado-Condomínio">Sobrado-Condomínio</option>
                     <option value="Studio">Studio</option>
-                    <option value="Apart Hotel / Flat / Loft">Flat / Loft</option>
+                    <option value="Terreno">Terreno</option>
+                    <option value="Terreno-Condomínio">Terreno-Condomínio</option>
                 </optgroup>
-                <optgroup label="Comercial">
-                    <option value="Sala / Salão / Loja">Sala / Salão / Loja</option>
-                    <option value="Galpão / Depósito">Galpão / Depósito</option>
-                    <option value="Imóvel Comercial">Prédio / Comercial</option>
+                <optgroup label="--- COMERCIAL ---">
+                    <option value="Área">Área</option>
                     <option value="Casa Comercial">Casa Comercial</option>
+                    <option value="Galpão / Depósito">Galpão / Depósito</option>
+                    <option value="Imóvel Comercial">Imóvel Comercial</option>
+                    <option value="Indústria / Fábrica">Indústria / Fábrica</option>
+                    <option value="Ponto Comercial / Box">Ponto Comercial / Box</option>
+                    <option value="Pousada / Hotel / Motel">Pousada / Hotel / Motel</option>
+                    <option value="Sala / Salão / Loja">Sala / Salão / Loja</option>
                 </optgroup>
-                <optgroup label="Terrenos">
-                    <option value="Terreno">Terreno / Lote</option>
-                    <option value="Terreno-Condomínio">Terreno em Condomínio</option>
-                    <option value="Área">Área / Gleba</option>
-                </optgroup>
-                <optgroup label="Rural">
-                    <option value="Rural-Group">Chácara / Sítio / Fazenda</option>
-                    <option value="Pesqueiro">Pesqueiro</option>
+                <optgroup label="--- RURAL ---">
+                    <option value="Chácara">Chácara</option>
+                    <option value="Fazenda">Fazenda</option>
                     <option value="Haras">Haras</option>
+                    <option value="Pesqueiro">Pesqueiro</option>
+                    <option value="Sitio">Sitio</option>
                 </optgroup>
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
