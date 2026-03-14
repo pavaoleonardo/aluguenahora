@@ -34,7 +34,17 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
   const items: GalleryItem[] = useMemo(() => {
     const allItems: GalleryItem[] = []
 
-    // If fachada exists, it's the first. If not, the first of 'fotos' is the main one.
+    // 1. Add video first if it exists
+    if (video_url) {
+      allItems.push({
+        url: video_url,
+        thumb: video_url,
+        label: 'Vídeo do Imóvel',
+        isVideo: true,
+      })
+    }
+
+    // 2. Identify main photo (Fachada)
     let mainPhoto = foto_fachada
     let galleryStartIdx = 0
 
@@ -43,13 +53,14 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
       galleryStartIdx = 1
     }
 
+    // 3. Add main photo
     if (mainPhoto?.url) {
       const url = mainPhoto.url
       const thumb = mainPhoto.formats?.thumbnail?.url || url
       allItems.push({ url: url, thumb: thumb || url, label: 'Fachada frontal', isVideo: false })
     }
 
-    // Add remaining photos
+    // 4. Add remaining photos
     const otherPhotos = (fotos || [])
       .slice(galleryStartIdx)
       .map((foto) => {
@@ -61,16 +72,6 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
       .filter(Boolean) as GalleryItem[]
 
     allItems.push(...otherPhotos)
-
-    // Add video as the last gallery item
-    if (video_url) {
-      allItems.push({
-        url: video_url,
-        thumb: video_url, // We'll overlay a play icon
-        label: 'Vídeo do Imóvel',
-        isVideo: true,
-      })
-    }
 
     return allItems
   }, [fotos, foto_fachada, video_url])
