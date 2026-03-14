@@ -3,15 +3,15 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Dialog, DialogPanel } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Dialog, DialogPanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
+import { Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '@/context/AuthContext'
 
 const navigation = [
   { name: 'Home', href: '/' },
   { name: 'Buscar Imóveis', href: '/imoveis' },
   { name: 'Anunciar Imóveis', href: '/dashboard/novo-imovel' },
-  { name: 'Sobre', href: '/sobre' },
+  { name: 'Alugue na hora', href: '/sobre' },
 ]
 
 export default function Navbar() {
@@ -47,11 +47,46 @@ export default function Navbar() {
           </button>
         </div>
         <div className="hidden lg:flex lg:gap-x-10">
-          {navigation.map((item) => (
-            <Link key={item.name} href={item.href} className="text-base font-semibold text-gray-900 hover:text-primary transition-colors">
-              {item.name}
-            </Link>
-          ))}
+          {navigation.map((item) => {
+            if (item.name === 'Anunciar Imóveis') {
+              return (
+                <Menu as="div" key={item.name} className="relative inline-block text-left">
+                  <MenuButton className="inline-flex items-center text-base font-semibold text-gray-900 hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md">
+                    {item.name}
+                    <ChevronDownIcon aria-hidden="true" className="ml-1 -mr-1 size-4 text-gray-400" />
+                  </MenuButton>
+                  <MenuItems
+                    transition
+                    className="absolute right-0 z-10 mt-2 w-64 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                  >
+                    <div className="py-1">
+                      <MenuItem>
+                        <Link
+                          href="/dashboard/novo-imovel/corretor"
+                          className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900"
+                        >
+                          Sou corretor(a) / imobiliária
+                        </Link>
+                      </MenuItem>
+                      <MenuItem>
+                        <Link
+                          href="/dashboard/novo-imovel/proprietario"
+                          className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900"
+                        >
+                          Sou proprietário(a)
+                        </Link>
+                      </MenuItem>
+                    </div>
+                  </MenuItems>
+                </Menu>
+              )
+            }
+            return (
+              <Link key={item.name} href={item.href} className="text-base font-semibold text-gray-900 hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md">
+                {item.name}
+              </Link>
+            )
+          })}
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end gap-x-6 items-center">
           {!loading && (
@@ -106,16 +141,43 @@ export default function Navbar() {
           <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-gray-500/10">
               <div className="space-y-2 py-6">
-                {navigation.map((item) => (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
-                  >
-                    {item.name}
-                  </Link>
-                ))}
+                {navigation.map((item) => {
+                  if (item.name === 'Anunciar Imóveis') {
+                    return (
+                      <div key={item.name} className="-mx-3">
+                        <div className="block px-3 py-2 text-base/7 font-semibold text-gray-900">
+                          {item.name}
+                        </div>
+                        <div className="pl-6 space-y-1 pb-2">
+                           <Link
+                              href="/dashboard/novo-imovel/corretor"
+                              onClick={() => setMobileMenuOpen(false)}
+                              className="block rounded-lg px-3 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                            >
+                              Sou corretor(a) / imobiliária
+                            </Link>
+                            <Link
+                              href="/dashboard/novo-imovel/proprietario"
+                              onClick={() => setMobileMenuOpen(false)}
+                              className="block rounded-lg px-3 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                            >
+                              Sou proprietário(a)
+                            </Link>
+                        </div>
+                      </div>
+                    )
+                  }
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                    >
+                      {item.name}
+                    </Link>
+                  )
+                })}
               </div>
               <div className="py-6 space-y-4">
                 {!loading && (
