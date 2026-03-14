@@ -9,23 +9,25 @@ import { formatCurrency, parseCurrency } from '@/lib/format'
 import { compressImages } from '@/lib/image'
 
 const LISTA_CARACTERISTICAS = [
-  "Água", "Asfalto", "Calçada", "Elevador", "Esgoto", "Muro", "Piso tátil", 
-  "Rampa de acessibilidade", "Rede elétrica", "WC adaptado", "Academia", 
-  "Adega", "Alarme", "Algibre", "Aquecedor solar", "Área de lazer", 
-  "Área de serviço", "Árvores frutíferas", "Automação residencial", 
-  "Brinquedoteca", "Caixa de água", "Câmeras de segurança", "Campo de futebol", 
-  "Canil", "Cerca elétrica", "Churrasqueira", "Closet", "Conveniência autônoma", 
-  "Copa", "Cozinha", "Cozinha americana", "Cozinha Industrial", "Cozinha planejada", 
-  "Deck", "Depósito", "Despensa", "Edícula", "Energia solar fotovoltaica", 
-  "Escritório", "Estacionamento para visitas", "Gazebo", "Gradil", "Guarita", 
-  "Hall de entrada", "Hidromassagem", "Home theater", "Interfone", "Jardim", 
-  "Lago", "Lareira", "Lavabo", "Lavanderia", "Mezanino", "Pé direito duplo", 
-  "Piscina", "Piscina aquecida", "Piscina coberta", "Piscina infantil", 
-  "Play-ground", "Poço artesiano", "Portão elétrico", "Portaria", 
-  "Porteiro eletrônico", "Quadra de areia", "Quarto empregada", "Quiosque", 
-  "Recepção", "Redário", "Represa", "Salão de Festas", "Salão de Jogos", 
-  "Sauna", "Terraço", "WC de serviço"
-].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  "Academia", "Adega", "Água", "Alarme", "Algibre", "Aquecedor solar",
+  "Área de lazer", "Área de serviço", "Árvores frutíferas", "Asfalto",
+  "Automação residencial", "Brinquedoteca", "Caixa de água",
+  "Calçada", "Câmeras de segurança", "Campo de futebol", "Canil",
+  "Cerca elétrica", "Churrasqueira", "Closet", "Conveniência autônoma",
+  "Copa", "Cozinha", "Cozinha americana", "Cozinha Industrial", "Cozinha planejada",
+  "Deck", "Depósito", "Despensa", "Edícula", "Elevador",
+  "Energia solar fotovoltaica", "Escritório", "Esgoto",
+  "Estacionamento para visitas", "Gazebo", "Gradil", "Guarita",
+  "Hall de entrada", "Hidromassagem", "Home theater", "Interfone",
+  "Jardim", "Lago", "Lareira", "Lavabo", "Lavanderia",
+  "Mezanino", "Muro", "Pé direito duplo", "Piscina", "Piscina aquecida",
+  "Piscina coberta", "Piscina infantil", "Piso tátil", "Play-ground",
+  "Poço artesiano", "Portão elétrico", "Portaria", "Porteiro eletrônico",
+  "Quadra de areia", "Quarto empregada", "Quiosque",
+  "Rampa de acessibilidade", "Recepção", "Redário", "Rede elétrica",
+  "Represa", "Salão de Festas", "Salão de Jogos", "Sauna",
+  "Terraço", "WC adaptado", "WC de serviço"
+];
 
 const MAX_FOTOS_POR_IMOVEL = 30;
 
