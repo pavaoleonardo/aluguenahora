@@ -318,12 +318,18 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
       
       const fileAny = file as any;
 
+      // Strapi 5 / Formidable 3 properties
+      const fileSize = fileAny.size;
+      const fileType = fileAny.mimetype || fileAny.type; // Fallback for safety
+      const fileTempPath = fileAny.filepath || fileAny.path;
+      const fileNameOriginal = fileAny.originalFilename || fileAny.name;
+
       // Validation
-      if (fileAny.size > VIDEO_MAX_SIZE) {
+      if (fileSize > VIDEO_MAX_SIZE) {
         return ctx.badRequest('O vídeo excede o limite de 60MB.');
       }
 
-      if (!ALLOWED_VIDEO_TYPES.includes(fileAny.type)) {
+      if (!ALLOWED_VIDEO_TYPES.includes(fileType)) {
         return ctx.badRequest('Formato de vídeo não suportado. Use MP4, MOV, WebM ou OGG.');
       }
 
@@ -334,22 +340,24 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
         fs.mkdirSync(uploadDir, { recursive: true });
       }
 
-      const extension = path.extname(fileAny.name || '');
+      const extension = path.extname(fileNameOriginal || '');
       const fileName = `${crypto.randomUUID()}${extension}`;
       const filePath = path.join(uploadDir, fileName);
 
       // Copy file to local storage
-      fs.copyFileSync(fileAny.path, filePath);
-      
-      // Clean up temp file
-      if (fileAny.path && fs.existsSync(fileAny.path)) {
-        try { fs.unlinkSync(fileAny.path); } catch(e) {}
+      if (fileTempPath) {
+        fs.copyFileSync(fileTempPath, filePath);
+        
+        // Clean up temp file
+        if (fs.existsSync(fileTempPath)) {
+          try { fs.unlinkSync(fileTempPath); } catch(e) {}
+        }
       }
 
       // Return consistent URL path
       return ctx.send({
         url: `/uploads/videos/${fileName}`,
-        name: fileAny.name,
+        name: fileNameOriginal,
       });
 
     } catch (err: any) {
