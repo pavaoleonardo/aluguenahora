@@ -25,7 +25,7 @@ const LISTA_CARACTERISTICAS = [
   "Porteiro eletrônico", "Quadra de areia", "Quarto empregada", "Quiosque", 
   "Recepção", "Redário", "Represa", "Salão de Festas", "Salão de Jogos", 
   "Sauna", "Terraço", "WC de serviço"
-];
+].sort((a, b) => a.localeCompare(b, 'pt-BR'));
 
 const MAX_FOTOS_POR_IMOVEL = 30;
 
@@ -361,9 +361,8 @@ export default function EditPropertyPage() {
 
             <div>
               <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Finalidade</label>
-              <select name="finalidade" required value={formData.finalidade} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm bg-gray-50 border-gray-200">
+              <select name="finalidade" required value={formData.finalidade} disabled onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm bg-gray-100 cursor-not-allowed cursor-default appearance-none border-gray-200">
                 <option value="aluguel">Aluguel</option>
-                <option value="venda">Venda</option>
               </select>
             </div>
 

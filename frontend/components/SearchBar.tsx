@@ -88,7 +88,7 @@ export default function SearchBar() {
                 </div>
                 <input 
                   type="text" 
-                  value="Campo Grande, MS" 
+                  value="Campo Grande - MS" 
                   readOnly 
                   className="block w-full rounded-xl border-0 bg-gray-50 py-3 pl-10 pr-4 text-gray-900 font-semibold ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-primary sm:text-sm transition-all cursor-default"
                 />
