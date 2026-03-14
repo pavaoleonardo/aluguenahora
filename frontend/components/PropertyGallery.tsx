@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 
 type FotoItem = {
@@ -15,16 +15,24 @@ type FotoItem = {
   }
 }
 
+type GalleryItem = {
+  url: string
+  thumb: string
+  label: string
+  isVideo?: boolean
+}
+
 type PropertyGalleryProps = {
   fotos?: FotoItem[]
   foto_fachada?: FotoItem
   titulo: string
   finalidadeLabel?: string
+  video_url?: string
 }
 
-export default function PropertyGallery({ fotos = [], foto_fachada, titulo, finalidadeLabel }: PropertyGalleryProps) {
-  const items = useMemo(() => {
-    const allItems = []
+export default function PropertyGallery({ fotos = [], foto_fachada, titulo, finalidadeLabel, video_url }: PropertyGalleryProps) {
+  const items: GalleryItem[] = useMemo(() => {
+    const allItems: GalleryItem[] = []
 
     // If fachada exists, it's the first. If not, the first of 'fotos' is the main one.
     let mainPhoto = foto_fachada
@@ -38,8 +46,7 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
     if (mainPhoto?.url) {
       const url = mainPhoto.url
       const thumb = mainPhoto.formats?.thumbnail?.url || url
-      // Use the direct URL which is the full size image to avoid pixelation
-      allItems.push({ url: url, thumb: thumb || url, label: 'Fachada frontal' })
+      allItems.push({ url: url, thumb: thumb || url, label: 'Fachada frontal', isVideo: false })
     }
 
     // Add remaining photos
@@ -47,19 +54,30 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
       .slice(galleryStartIdx)
       .map((foto) => {
         const url = foto?.url
-        // Skip if this is the same as the main photo to avoid duplication
         if (!url || url === mainPhoto?.url) return null
         const thumb = foto?.formats?.thumbnail?.url || url
-        // Prioritize full size URL
-        return { url: url, thumb: thumb || url, label: foto?.caption || foto?.alternativeText || foto?.name || '' }
+        return { url: url, thumb: thumb || url, label: foto?.caption || foto?.alternativeText || foto?.name || '', isVideo: false }
       })
-      .filter(Boolean) as { url: string; thumb: string; label: string }[]
+      .filter(Boolean) as GalleryItem[]
 
-    return [...allItems, ...otherPhotos]
-  }, [fotos, foto_fachada])
+    allItems.push(...otherPhotos)
+
+    // Add video as the last gallery item
+    if (video_url) {
+      allItems.push({
+        url: video_url,
+        thumb: video_url, // We'll overlay a play icon
+        label: 'Vídeo do Imóvel',
+        isVideo: true,
+      })
+    }
+
+    return allItems
+  }, [fotos, foto_fachada, video_url])
 
   const [activeIndex, setActiveIndex] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
   const active = items[activeIndex]
   const total = items.length
 
@@ -75,6 +93,13 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
     setActiveIndex((prev) => (prev + 1) % items.length)
   }
 
+  // Pause video when navigating away from it
+  useEffect(() => {
+    if (videoRef.current && !active?.isVideo) {
+      videoRef.current.pause()
+    }
+  }, [activeIndex, active?.isVideo])
+
   useEffect(() => {
     if (!isModalOpen) return;
 
@@ -89,7 +114,6 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    // Prevent scrolling behind modal
     document.body.style.overflow = 'hidden';
 
     return () => {
@@ -97,6 +121,17 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
       document.body.style.overflow = 'auto';
     };
   }, [isModalOpen, items.length]);
+
+  // Play icon SVG overlay component
+  const PlayIconOverlay = ({ size = 'lg' }: { size?: 'sm' | 'lg' }) => (
+    <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+      <div className={`${size === 'lg' ? 'w-16 h-16' : 'w-8 h-8'} bg-black/60 rounded-full flex items-center justify-center backdrop-blur-sm`}>
+        <svg className={`${size === 'lg' ? 'w-8 h-8' : 'w-4 h-4'} text-white ml-0.5`} fill="currentColor" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z" />
+        </svg>
+      </div>
+    </div>
+  )
 
   return (
     <div className="flex flex-col gap-4">
@@ -106,20 +141,39 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
       >
         {active ? (
           <>
-            <Image
-              src={active.url}
-              alt={titulo}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
-              priority
-            />
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center z-10 pointer-events-none">
-               <svg className="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
-            </div>
-            {activeIndex === 0 && (
-              <div className="absolute left-0 top-0 bg-black/60 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white rounded-br-md z-20 h-8 flex items-center pointer-events-none">
-                Fachada frontal
-              </div>
+            {active.isVideo ? (
+              <>
+                <video
+                  ref={videoRef}
+                  src={active.url}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  muted
+                  playsInline
+                  preload="metadata"
+                />
+                <PlayIconOverlay />
+                <div className="absolute left-0 top-0 bg-secondary px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white rounded-br-md z-20 h-8 flex items-center pointer-events-none">
+                  🎬 Vídeo
+                </div>
+              </>
+            ) : (
+              <>
+                <Image
+                  src={active.url}
+                  alt={titulo}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  priority
+                />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center z-10 pointer-events-none">
+                   <svg className="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
+                </div>
+                {activeIndex === 0 && (
+                  <div className="absolute left-0 top-0 bg-black/60 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white rounded-br-md z-20 h-8 flex items-center pointer-events-none">
+                    Fachada frontal
+                  </div>
+                )}
+              </>
             )}
           </>
         ) : (
@@ -157,15 +211,22 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
         <div className="flex gap-2 overflow-x-auto pb-1">
           {items.map((item, idx) => (
             <button
-              key={`${item.thumb}-${idx}`}
+              key={`${item.url}-${idx}`}
               type="button"
               onClick={() => setActiveIndex(idx)}
               className={`relative aspect-square min-w-[80px] overflow-hidden rounded-sm border ${
                 idx === activeIndex ? 'border-secondary ring-2 ring-secondary/40' : 'border-gray-200'
               }`}
-              aria-label={`Selecionar foto ${idx + 1}`}
+              aria-label={item.isVideo ? 'Selecionar vídeo' : `Selecionar foto ${idx + 1}`}
             >
-              <Image src={item.thumb} alt={`${titulo} - ${idx + 1}`} fill className="object-cover" />
+              {item.isVideo ? (
+                <>
+                  <video src={item.url} muted playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover" />
+                  <PlayIconOverlay size="sm" />
+                </>
+              ) : (
+                <Image src={item.thumb} alt={`${titulo} - ${idx + 1}`} fill className="object-cover" />
+              )}
             </button>
           ))}
         </div>
@@ -180,7 +241,19 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
             
             <div className="relative w-full h-full flex flex-col items-center justify-center max-w-7xl mx-auto" onClick={(e) => e.stopPropagation()}>
                <div className="relative w-full h-full flex items-center justify-center">
-                  <Image src={active.url} alt={titulo} fill className="object-contain" quality={100} priority />
+                  {active.isVideo ? (
+                    <video
+                      src={active.url}
+                      controls
+                      autoPlay
+                      className="max-w-full max-h-full rounded-lg"
+                      style={{ maxHeight: '85vh' }}
+                    >
+                      Seu navegador não suporta a exibição de vídeos.
+                    </video>
+                  ) : (
+                    <Image src={active.url} alt={titulo} fill className="object-contain" quality={100} priority />
+                  )}
                </div>
                
                {items.length > 1 && (
@@ -192,7 +265,7 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
                         ›
                      </button>
                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white font-bold tracking-widest bg-black/50 px-4 py-2 rounded-full text-sm">
-                        {activeIndex + 1} / {total}
+                        {active.isVideo ? '🎬 Vídeo' : `${activeIndex + 1} / ${total}`}
                      </div>
                   </>
                )}
