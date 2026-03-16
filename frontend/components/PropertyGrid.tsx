@@ -134,18 +134,29 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
               className="group flex flex-col items-start justify-between hover:shadow-lg transition-shadow rounded-2xl p-4 bg-white border border-gray-100"
             >
               <div className="relative w-full overflow-hidden rounded-xl bg-gray-200 aspect-[16/9]">
-                {(property.foto_fachada?.url || (property.fotos && property.fotos[0]?.url)) ? (
-                  <Image
-                    src={property.foto_fachada?.url || property.fotos[0]?.url}
-                    alt={property.titulo}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-gray-400">
-                    Sem Foto
-                  </div>
-                )}
+                {(() => {
+                  const mainFoto = property.foto_fachada || (property.fotos && property.fotos[0])
+                  if (!mainFoto?.url) {
+                    return (
+                      <div className="flex h-full items-center justify-center text-gray-400">
+                        Sem Foto
+                      </div>
+                    )
+                  }
+                  
+                  // Use medium or small format for the grid to save bandwidth and load faster
+                  const displayUrl = mainFoto.formats?.medium?.url || mainFoto.formats?.small?.url || mainFoto.url
+                  
+                  return (
+                    <Image
+                      src={displayUrl}
+                      alt={property.titulo}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      unoptimized={true}
+                    />
+                  )
+                })()}
                 {finalidadeLabel ? (
                   <span className="absolute left-3 top-3 rounded-full bg-secondary/90 px-3 py-1 text-xs font-semibold text-white shadow">
                     {finalidadeLabel}
