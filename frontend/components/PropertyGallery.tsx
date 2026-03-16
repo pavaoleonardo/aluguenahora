@@ -173,6 +173,7 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                   priority
+                  unoptimized={true}
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center z-10 pointer-events-none">
                    <svg className="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
@@ -234,7 +235,7 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
                   <PlayIconOverlay size="sm" />
                 </>
               ) : (
-                <Image src={item.thumb} alt={`${titulo} - ${idx + 1}`} fill className="object-cover" />
+                <Image src={item.thumb} alt={`${titulo} - ${idx + 1}`} fill className="object-cover" unoptimized={true} />
               )}
             </button>
           ))}
@@ -261,7 +262,7 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
                       Seu navegador não suporta a exibição de vídeos.
                     </video>
                   ) : (
-                    <Image src={active.originalUrl} alt={titulo} fill className="object-contain" quality={100} priority />
+                    <Image src={active.originalUrl} alt={titulo} fill className="object-contain" quality={100} priority unoptimized={true} />
                   )}
                </div>
                

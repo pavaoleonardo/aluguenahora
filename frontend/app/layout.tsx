@@ -14,7 +14,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Alugue na Hora",
-  description: "Encontre o seu próximo lar! Imóveis para alugar com agilidade e os melhores preços.",
+  description: "Encontre o seu próximo lar! Imóveis para alugar com agilidade e os melhores preços em Campo Grande - MS.",
+  keywords: "aluguel, imóveis, campo grande, ms, casa, apartamento, alugar",
 };
 
 import Navbar from "@/components/Navbar";
@@ -31,6 +32,7 @@ export default function RootLayout({
     <html lang="pt-BR" className="overflow-x-clip">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+        <meta httpEquiv="content-language" content="pt-br" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen overflow-x-clip`}
