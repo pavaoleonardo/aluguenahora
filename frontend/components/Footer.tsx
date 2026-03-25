@@ -64,7 +64,7 @@ export default function Footer() {
                  <div className="flex items-center gap-2">
                     <span className="sr-only">Alugue na Hora</span>
                     <Image 
-                      src="/logo.png" 
+                      src="/logo.svg" 
                       alt="Alugue na Hora Logo" 
                       width={160}
                       height={60}

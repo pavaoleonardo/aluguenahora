@@ -25,7 +25,7 @@ export default function Navbar() {
           <Link href="/" className="p-1.5 flex flex-col items-center group transition-transform hover:scale-105">
             <span className="sr-only">Alugue na Hora</span>
             <Image 
-              src="/logo.png" 
+              src="/logo.svg" 
               alt="Alugue na Hora Logo" 
               width={160}
               height={80}
@@ -127,7 +127,7 @@ export default function Navbar() {
             <Link href="/" className="p-1.5 flex items-center">
               <span className="sr-only">Alugue na Hora</span>
               <Image 
-                src="/logo.png" 
+                src="/logo.svg" 
                 alt="Alugue na Hora Logo" 
                 width={140}
                 height={50}
