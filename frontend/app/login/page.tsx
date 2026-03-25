@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { API_BASE_URL } from '@/lib/apiBase'
@@ -22,13 +23,6 @@ export default function LoginPage() {
     setError('')
 
     try {
-      // Logic for login would typically use a clean axios instance or fetch
-      // But we need to be careful not to use the hardcoded token from `api` instance if it overrides user context.
-      // However, for /auth/local, we just post data.
-      // We'll use fetch here to avoid the pre-configured headers in `api.ts` if they interfere, 
-      // or we can just use `api.post` if the hardcoded token allows auth requests (usually yes).
-      
-      // Let's use `fetch` to be safe and raw.
       const res = await fetch(`${API_BASE_URL}/api/auth/local`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -41,9 +35,7 @@ export default function LoginPage() {
         throw new Error(data.error?.message || 'Erro ao entrar')
       }
 
-      // Store JWT in context (which handles localStorage)
       login(data.jwt, data.user)
-      
       router.push('/dashboard')
       router.refresh()
     } catch (err: any) {
@@ -54,80 +46,113 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="force-light flex min-h-screen flex-1 flex-col justify-center bg-white px-6 py-12 text-gray-900 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-          Entre na sua conta
-        </h2>
-      </div>
+    <section className="h-screen w-full force-light bg-white">
+      <div className="grid xl:grid-cols-2 grid-cols-1 h-full">
+        <div className="max-w-lg mx-auto w-full flex flex-col justify-center md:items-start items-center p-6">
+          <div className="md:text-start text-center mb-7 w-full">
+            <Link href="/" className="grow block mb-8 focus:outline-none focus:ring-2 focus:ring-primary rounded-md inline-block">
+               <Image 
+                 src="/logo.svg" 
+                 alt="Alugue na Hora Logo" 
+                 width={160}
+                 height={60}
+                 className="h-10 w-auto md:mx-0 mx-auto object-contain bg-gray-900 rounded-lg p-1"
+               />
+            </Link>
 
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
-              Email
-            </label>
-            <div className="mt-2">
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
+            <div className="md:text-start text-center">
+              <h3 className="text-2xl font-bold text-gray-900 mb-3 tracking-tight">Bem-vindo(a) ao alugue na hora!</h3>
+              <p className="text-base font-medium text-gray-500">Bem-vindo de volta! Faça login para continuar.</p>
+            </div>
+          </div>
+
+          <form className="text-start w-full" onSubmit={handleSubmit}>
+            <div className="mb-4">
+              <label htmlFor="email" className="block text-base font-semibold text-gray-900 mb-2">
+                Endereço de email
+              </label>
+              <input 
+                id="email" 
+                type="email" 
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                className="block w-full rounded-md py-2.5 px-4 text-gray-900 text-base font-medium border-gray-300 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-gray-400 shadow-sm" 
+                placeholder="Insira seu e-mail" 
               />
             </div>
-          </div>
 
-          <div>
-            <div className="flex items-center justify-between">
-              <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
+            <div className="mb-4">
+              <label htmlFor="password" className="block text-base font-semibold text-gray-900 mb-2">
                 Senha
               </label>
+              <div className="flex relative shadow-sm rounded-md">
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  id="password" 
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="block w-full rounded-s-md py-2.5 px-4 border border-gray-300 text-gray-900 text-base font-medium focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-gray-400 z-10" 
+                  placeholder="Digite sua senha" 
+                />
+                <button 
+                  type="button" 
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="inline-flex items-center justify-center py-2.5 px-4 border rounded-e-md -ms-px border-gray-300 bg-white hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary z-20 transition-colors"
+                >
+                  {showPassword ? (
+                    <EyeSlashIcon className="h-5 w-5 text-gray-600" aria-hidden="true" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5 text-gray-600" aria-hidden="true" />
+                  )}
+                </button>
+              </div>
             </div>
-            <div className="mt-2 relative">
-              <input
-                id="password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 flex items-center pr-3"
-                onClick={() => setShowPassword(!showPassword)}
+
+            <div className="flex justify-between items-center flex-wrap gap-x-1 gap-y-2 mb-6 mt-3">
+              <div className="inline-flex items-center">
+                <input 
+                  type="checkbox" 
+                  id="checkbox-signin" 
+                  className="h-4 w-4 text-base rounded border-gray-300 text-primary focus:ring focus:ring-primary focus:ring-offset-0" 
+                />
+                <label className="text-base ms-2 text-gray-500 font-medium align-middle select-none cursor-pointer" htmlFor="checkbox-signin">
+                  Lembre de mim
+                </label>
+              </div>
+              <Link href="/login" className="text-base text-gray-900 hover:text-primary font-medium transition-colors">
+                <small>Esqueceu sua senha?</small>
+              </Link>
+            </div>
+            
+            {error && (
+              <div className="mb-4 text-red-500 text-sm font-medium">{error}</div>
+            )}
+
+            <div className="text-center mb-7">
+              <button 
+                type="submit" 
+                disabled={loading}
+                className="w-full inline-flex items-center justify-center px-6 py-2.5 bg-primary hover:bg-primary-hover font-bold text-base text-white rounded-md transition-all duration-300 disabled:opacity-50 shadow-sm"
               >
-                {showPassword ? (
-                  <EyeSlashIcon className="h-5 w-5 text-gray-400 hover:text-gray-500" aria-hidden="true" />
-                ) : (
-                  <EyeIcon className="h-5 w-5 text-gray-400 hover:text-gray-500" aria-hidden="true" />
-                )}
+                {loading ? 'Carregando...' : 'Conecte-se'}
               </button>
             </div>
-          </div>
 
-          {error && (
-             <div className="text-red-500 text-sm">{error}</div>
-          )}
+            <p className="shrink text-gray-500 text-center text-lg mt-8">
+              Não tem uma conta?
+              <Link href="/registro" className="text-gray-900 font-semibold ms-1 hover:text-primary transition-colors">
+                <b>Cadastre-se</b>
+              </Link>
+            </p>
+          </form>
+        </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex w-full justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50 transition-colors"
-            >
-              {loading ? 'Carregando...' : 'Entrar'}
-            </button>
-          </div>
-        </form>
-
+        <div className="hidden xl:block">
+          <div className="relative w-full h-screen bg-[url('/img-2.jpg')] bg-center bg-cover border-l border-gray-200"></div>
+        </div>
       </div>
-    </div>
+    </section>
   )
 }
