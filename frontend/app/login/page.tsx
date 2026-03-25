@@ -48,19 +48,19 @@ export default function LoginPage() {
   return (
     <section className="h-screen w-full force-light bg-white">
       <div className="grid xl:grid-cols-2 grid-cols-1 h-full">
-        <div className="max-w-lg mx-auto w-full flex flex-col justify-center md:items-start items-center p-6">
-          <div className="md:text-start text-center mb-7 w-full">
-            <Link href="/" className="grow block mb-8 focus:outline-none focus:ring-2 focus:ring-primary rounded-md inline-block">
+        <div className="max-w-lg mx-auto w-full flex flex-col justify-center items-center p-6">
+          <div className="text-center mb-7 w-full">
+            <Link href="/" className="inline-block mb-8 focus:outline-none focus:ring-2 focus:ring-primary rounded-md">
                <Image 
                  src="/logo.svg" 
                  alt="Alugue na Hora Logo" 
                  width={160}
                  height={60}
-                 className="h-10 w-auto md:mx-0 mx-auto object-contain bg-gray-900 rounded-lg p-1"
+                 className="h-12 w-auto mx-auto object-contain"
                />
             </Link>
 
-            <div className="md:text-start text-center">
+            <div className="text-center">
               <h3 className="text-2xl font-bold text-gray-900 mb-3 tracking-tight">Bem-vindo(a) ao alugue na hora!</h3>
               <p className="text-base font-medium text-gray-500">Bem-vindo de volta! Faça login para continuar.</p>
             </div>
