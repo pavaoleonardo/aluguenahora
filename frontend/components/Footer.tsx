@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import Image from 'next/image'
+
 
 const navigation = {
   main: [
@@ -57,20 +57,8 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-6 pb-8 pt-16 sm:pt-24 lg:px-8 lg:pt-32">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8">
-             <Link href="/" className="-m-1.5 p-1.5">
-                <span className="sr-only">Alugue Na Hora</span>
-                 {/* White version of logo or just text if logo is dark */}
-                 {/* Usually we'd want a reversed logo for dark bg, but let's use the image and assume it might work or text fallback */}
-                 <div className="flex items-center gap-2">
-                    <span className="sr-only">Alugue na Hora</span>
-                    <Image 
-                      src="/logo.svg" 
-                      alt="Alugue na Hora Logo" 
-                      width={160}
-                      height={60}
-                      className="h-12 w-auto object-contain bg-white/10 rounded-lg p-1"
-                    />
-                 </div>
+             <Link href="/" className="focus:outline-none focus:ring-2 focus:ring-white/20 rounded-md inline-block">
+                <span className="text-xl font-bold tracking-tight text-white leading-6 inline-block">Alugue Na Hora</span>
               </Link>
             <p className="text-sm leading-6 text-gray-300">
               Facilitando a sua vida na hora de alugar ou comprar o imóvel dos seus sonhos.
