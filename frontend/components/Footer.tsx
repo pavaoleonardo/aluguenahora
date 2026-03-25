@@ -62,7 +62,14 @@ export default function Footer() {
                  {/* White version of logo or just text if logo is dark */}
                  {/* Usually we'd want a reversed logo for dark bg, but let's use the image and assume it might work or text fallback */}
                  <div className="flex items-center gap-2">
-                    <span className="text-2xl font-bold text-white">Alugue<span className="text-secondary">NaHora</span></span>
+                    <span className="sr-only">Alugue na Hora</span>
+                    <Image 
+                      src="/logo.png" 
+                      alt="Alugue na Hora Logo" 
+                      width={160}
+                      height={60}
+                      className="h-12 w-auto object-contain bg-white/10 rounded-lg p-1"
+                    />
                  </div>
               </Link>
             <p className="text-sm leading-6 text-gray-300">

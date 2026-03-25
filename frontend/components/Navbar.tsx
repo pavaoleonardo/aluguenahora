@@ -25,15 +25,13 @@ export default function Navbar() {
           <Link href="/" className="p-1.5 flex flex-col items-center group transition-transform hover:scale-105">
             <span className="sr-only">Alugue na Hora</span>
             <Image 
-              src="/mascot-final.png" 
-              alt="Mascot" 
-              width={80}
+              src="/logo.png" 
+              alt="Alugue na Hora Logo" 
+              width={160}
               height={80}
               className="h-16 w-auto object-contain"
+              priority
             />
-            <div className="text-[#003399] font-extrabold text-base tracking-tight -mt-1 group-hover:text-primary transition-colors">
-              Alugue na Hora
-            </div>
           </Link>
         </div>
         <div className="flex lg:hidden">
@@ -126,8 +124,15 @@ export default function Navbar() {
         <div className="fixed inset-0 z-50" />
         <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
-            <Link href="/" className="p-1.5 font-bold text-xl text-primary">
-              Alugue<span className="text-accent">NaHora</span>
+            <Link href="/" className="p-1.5 flex items-center">
+              <span className="sr-only">Alugue na Hora</span>
+              <Image 
+                src="/logo.png" 
+                alt="Alugue na Hora Logo" 
+                width={140}
+                height={50}
+                className="h-10 w-auto object-contain"
+              />
             </Link>
             <button
               type="button"
