@@ -21,6 +21,7 @@ export default function RegisterProprietarioPage() {
   })
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,6 +42,7 @@ export default function RegisterProprietarioPage() {
 
     setLoading(true)
     setError('')
+    setSuccess('')
 
     try {
       // In Strapi, the default required fields are username, email, password.
@@ -64,11 +66,16 @@ export default function RegisterProprietarioPage() {
         throw new Error(data.error?.message || 'Erro ao cadastrar conta')
       }
 
-      // Store JWT in context and automatically login
-      login(data.jwt, data.user)
-      
-      // Redirect to Admin Dashboard
-      router.push('/dashboard')
+      if (!data.jwt) {
+        setSuccess('Conta criada com sucesso! Enviamos um link mágico de confirmação para o seu e-mail. Por favor, acesse sua caixa de entrada para ativar sua conta antes de fazer o login!')
+        setFormData({
+          nomeCompleto: '', telefone: '', celular: '', email: '', password: '', termos: false
+        })
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      } else {
+        login(data.jwt, data.user)
+        router.push('/dashboard')
+      }
     } catch (err: any) {
       setError(err.message)
     } finally {
@@ -96,6 +103,12 @@ export default function RegisterProprietarioPage() {
               <p className="text-sm font-medium text-gray-500">Bem-vindo(a) ao alugue na hora!</p>
             </div>
           </div>
+
+          {success && (
+            <div className="mb-6 p-4 rounded-md bg-green-50 text-green-800 text-sm font-medium border border-green-200">
+              {success}
+            </div>
+          )}
 
           <form className="text-start w-full space-y-4" onSubmit={handleSubmit}>
             {/* 1. Nome completo */}
