@@ -109,7 +109,7 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <Link href="/register" className="text-base font-semibold text-gray-900 flex items-center hover:text-primary transition-colors">
+                <Link href="/registro" className="text-base font-semibold text-gray-900 flex items-center hover:text-primary transition-colors">
                   Cadastrar
                 </Link>
                 <Link href="/login" className="rounded-full bg-primary px-6 py-2 text-base font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors">
@@ -215,7 +215,7 @@ export default function Navbar() {
                   ) : (
                     <>
                       <Link
-                        href="/register"
+                        href="/registro"
                         onClick={() => setMobileMenuOpen(false)}
                         className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold text-gray-900 hover:bg-gray-50 transition-colors"
                       >
