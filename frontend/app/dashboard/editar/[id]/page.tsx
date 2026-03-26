@@ -539,11 +539,12 @@ export default function EditPropertyPage() {
               </div>
 
               <div className="sm:col-span-1">
-                <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase text-xs">ÁREA TOTAL (m²)</label>
-                <input type="text" name="area_total" value={formData.area_total} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
+                <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">ÁREA TOTAL (m²)</label>
+                <input type="text" name="area_total" value={formData.area_total} onChange={handleChange} placeholder="0,00" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
               </div>
+            </div>
 
-            {/* Characteristics Grid */}
+            {/* Characteristics Section */}
             <div className="mt-8">
               <label className="block text-lg font-bold text-gray-900 mb-4 border-b pb-2 uppercase">Características</label>
               <div className="flex flex-col gap-y-2 lg:columns-3 lg:block lg:gap-x-6 border p-4 rounded-lg bg-gray-50/30">
@@ -618,7 +619,7 @@ export default function EditPropertyPage() {
             </div>
 
             {/* VIDEO SECTION */}
-            <div className="sm:col-span-2 border rounded-xl p-6 bg-gray-50/50">
+            <div className="mt-8 border rounded-xl p-6 bg-gray-50/50">
               <label className="block text-sm font-bold text-gray-900 uppercase mb-4">Vídeo do Imóvel</label>
               <p className="mt-1 text-xs text-gray-500 mb-4">Selecione um vídeo de até 60MB. Se o imóvel já possui um vídeo, o novo irá substituí-lo.</p>
               
@@ -662,7 +663,6 @@ export default function EditPropertyPage() {
                 </p>
               )}
             </div>
-          </div>
 
           <div className="flex justify-end pt-8 gap-4">
             <button type="button" onClick={() => router.push('/dashboard')} className="rounded-md bg-white px-6 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">Cancelar</button>
