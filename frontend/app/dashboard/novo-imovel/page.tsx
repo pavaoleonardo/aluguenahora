@@ -56,6 +56,7 @@ export default function NewPropertyPage() {
     endereco: '',
     caracteristicas: [] as string[],
     video_url: '',
+    vagas: '',
   })
   const [geocoding, setGeocoding] = useState(false)
   const [compressing, setCompressing] = useState(false)
@@ -304,6 +305,7 @@ export default function NewPropertyPage() {
             iptu: parseCurrency(formData.iptu),
             quartos: Number(formData.quartos),
             banheiros: Number(formData.banheiros),
+            vagas: Number(formData.vagas),
             bairro: { regiao: '', bairro: formData.bairro },
             cidade: formData.cidade,
             finalidade: formData.finalidade,
@@ -353,57 +355,11 @@ export default function NewPropertyPage() {
              </ul>
            </div>
          )}
-         <form onSubmit={handleSubmit} noValidate className="space-y-6">
-            <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2">
-                <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Título do Anúncio</label>
-                    <input type="text" name="titulo" value={formData.titulo} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
-                </div>
-                
-                <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Descrição do Imóvel</label>
-                    <textarea name="descricao" rows={3} value={formData.descricao} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
-                </div>
 
+          <form onSubmit={handleSubmit} noValidate className="space-y-6">
+            <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-3">
+                {/* 1, 2, 3: Same line */}
                 <div>
-                    <label className="block text-sm font-medium leading-6 text-gray-900">VALOR (R$)</label>
-                    <input type="text" name="preco" value={formData.preco} onChange={handlePriceChange} placeholder="R$ 0,00" inputMode="decimal" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Finalidade</label>
-                    <select
-                      name="finalidade"
-                      value={formData.finalidade}
-                      onChange={handleChange}
-                      disabled
-                      className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm bg-gray-100 cursor-not-allowed cursor-default appearance-none"
-                    >
-                      <option value="aluguel">Aluguel</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Cidade/UF</label>
-                    <input
-                      type="text"
-                      value="Campo Grande - MS"
-                      disabled
-                      className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm bg-gray-100 cursor-not-allowed"
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Condomínio (Mensal)</label>
-                    <input type="text" name="condominio" value={formData.condominio} onChange={handlePriceChange} placeholder="R$ 0,00" className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium leading-6 text-gray-900">IPTU (Mensal)</label>
-                    <input type="text" name="iptu" value={formData.iptu} onChange={handlePriceChange} placeholder="R$ 0,00" className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
-                </div>
-
-                <div className="sm:col-span-2">
                     <label className="block text-sm font-medium leading-6 text-gray-900">Tipo do imóvel</label>
                     <select
                       name="tipo"
@@ -446,18 +402,20 @@ export default function NewPropertyPage() {
                     </select>
                 </div>
 
-                <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Cidade</label>
-                    <input
-                      type="text"
-                      name="cidade"
-                      value={formData.cidade}
-                      readOnly
-                      className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-500 shadow-sm ring-1 ring-inset ring-gray-200 bg-gray-50 sm:text-sm sm:leading-6"
-                    />
+                <div>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Finalidade</label>
+                    <select
+                      name="finalidade"
+                      value={formData.finalidade}
+                      onChange={handleChange}
+                      disabled
+                      className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm bg-gray-100 cursor-not-allowed cursor-default appearance-none"
+                    >
+                      <option value="aluguel">Aluguel</option>
+                    </select>
                 </div>
 
-                <div className="sm:col-span-2 relative" ref={bairroRef}>
+                <div className="relative" ref={bairroRef}>
                     <label className="block text-sm font-medium leading-6 text-gray-900">Bairro</label>
                     <input
                       type="text"
@@ -489,7 +447,19 @@ export default function NewPropertyPage() {
                     )}
                 </div>
 
-                <div className="sm:col-span-2">
+                {/* 4, 5: Same line */}
+                <div className="sm:col-span-3">
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Cidade/UF</label>
+                    <input
+                      type="text"
+                      value="Campo Grande - MS"
+                      disabled
+                      className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm bg-gray-100 cursor-not-allowed"
+                    />
+                </div>
+
+                {/* 6: Endereço */}
+                <div className="sm:col-span-3">
                     <label className="block text-sm font-medium leading-6 text-gray-900">Endereço Completo</label>
                     <input
                       type="text"
@@ -502,47 +472,83 @@ export default function NewPropertyPage() {
                     <p className="mt-1 text-xs text-gray-500">O endereço será usado para mostrar a localização no mapa</p>
                 </div>
 
+                {/* 7: Título */}
+                <div className="sm:col-span-3">
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Título do Anúncio</label>
+                    <input type="text" name="titulo" value={formData.titulo} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
+                </div>
+                
+                {/* 8: Descrição */}
+                <div className="sm:col-span-3">
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Descrição do Imóvel</label>
+                    <textarea name="descricao" rows={3} value={formData.descricao} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
+                </div>
+
+                {/* 10, 11, 12: Same line */}
+                <div>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">VALOR DO ALUGUEL (R$)</label>
+                    <input type="text" name="preco" value={formData.preco} onChange={handlePriceChange} placeholder="R$ 0,00" inputMode="decimal" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">IPTU (Mensal)</label>
+                    <input type="text" name="iptu" value={formData.iptu} onChange={handlePriceChange} placeholder="R$ 0,00" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Condomínio (Mensal)</label>
+                    <input type="text" name="condominio" value={formData.condominio} onChange={handlePriceChange} placeholder="R$ 0,00" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
+                </div>
+
+                {/* 13, 14, 15: Same line */}
                 <div>
                     <label className="block text-sm font-medium leading-6 text-gray-900">Quartos</label>
-                    <input type="number" name="quartos" value={formData.quartos} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
+                    <input type="number" name="quartos" value={formData.quartos} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
                 </div>
 
                 <div>
                     <label className="block text-sm font-medium leading-6 text-gray-900">Banheiros</label>
-                    <input type="number" name="banheiros" value={formData.banheiros} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
+                    <input type="number" name="banheiros" value={formData.banheiros} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium leading-6 text-gray-900">ÁREA CONSTRUÍDA / ÚTIL (m²)</label>
-                    <input type="text" name="tamanho" value={formData.tamanho} onChange={handleChange} placeholder="0,00" className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Vagas de Garagem</label>
+                    <input type="number" name="vagas" value={formData.vagas} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium leading-6 text-gray-900">ÁREA TOTAL (m²)</label>
-                    <input type="text" name="area_total" value={formData.area_total} onChange={handleChange} placeholder="0,00" className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
+                {/* 16, 17 Area */}
+                <div className="sm:col-span-1">
+                    <label className="block text-sm font-medium leading-6 text-gray-900 uppercase">Área Construída / Útil (m²)</label>
+                    <input type="text" name="tamanho" value={formData.tamanho} onChange={handleChange} placeholder="0,00" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
                 </div>
 
-                {/* Characteristics Section */}
-                <div className="sm:col-span-2 mt-4">
-                  <label className="block text-lg font-bold text-gray-900 mb-4 border-b pb-2">Características</label>
-                  <div className="flex flex-col gap-y-2 lg:columns-3 lg:block lg:gap-x-6">
-                    {LISTA_CARACTERISTICAS.map((item) => (
-                      <label key={item} className="relative flex items-center group cursor-pointer break-inside-avoid mb-3">
-                        <div className="flex h-6 items-center">
-                          <input
-                            type="checkbox"
-                            checked={formData.caracteristicas.includes(item)}
-                            onChange={() => handleCharacteristicToggle(item)}
-                            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer transition-colors"
-                          />
-                        </div>
-                        <div className="ml-3 text-sm leading-6">
-                          <span className="text-gray-700 group-hover:text-primary transition-colors">{item}</span>
-                        </div>
-                      </label>
-                    ))}
-                  </div>
+                <div className="sm:col-span-1">
+                    <label className="block text-sm font-medium leading-6 text-gray-900 uppercase">Área Total (m²)</label>
+                    <input type="text" name="area_total" value={formData.area_total} onChange={handleChange} placeholder="0,00" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
                 </div>
+            </div>
+
+            {/* Characteristics Section */}
+            <div className="mt-4">
+              <label className="block text-lg font-bold text-gray-900 mb-4 border-b pb-2">Características</label>
+              <div className="flex flex-col gap-y-2 lg:columns-3 lg:block lg:gap-x-6">
+                {LISTA_CARACTERISTICAS.map((item) => (
+                  <label key={item} className="relative flex items-center group cursor-pointer break-inside-avoid mb-3">
+                    <div className="flex h-6 items-center">
+                      <input
+                        type="checkbox"
+                        checked={formData.caracteristicas.includes(item)}
+                        onChange={() => handleCharacteristicToggle(item)}
+                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer transition-colors"
+                      />
+                    </div>
+                    <div className="ml-3 text-sm leading-6">
+                      <span className="text-gray-700 group-hover:text-primary transition-colors">{item}</span>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </div>
 
                 <div className="sm:col-span-2">
                     <label className="block text-sm font-medium leading-6 text-gray-900">Fotos do Imóvel</label>
@@ -631,7 +637,6 @@ export default function NewPropertyPage() {
                       )}
                     </div>
                 </div>
-            </div>
 
             <div className="pt-6">
                 <button
