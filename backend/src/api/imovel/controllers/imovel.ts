@@ -208,61 +208,6 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
     }
   },
 
-  async fix(ctx) {
-    try {
-      const users = await strapi.db.query('plugin::users-permissions.user').findMany();
-      
-      // List all users
-      const userList = users.map((u: any) => ({
-        id: u.id,
-        documentId: u.documentId,
-        username: u.username,
-        email: u.email,
-      }));
-
-      // If action=reassign, reassign specific properties to a user
-      const action = ctx.query.action;
-      const targetUserDocId = ctx.query.targetUser as string;
-      const propertyDocIds = ctx.query.properties as string; // comma-separated
-
-      if (action === 'reassign' && targetUserDocId && propertyDocIds) {
-        const docIdList = propertyDocIds.split(',');
-        const results: any[] = [];
-        const errs: any[] = [];
-
-        for (const docId of docIdList) {
-          try {
-            await strapi.documents('api::imovel.imovel').update({
-              documentId: docId.trim(),
-              data: { usuario: targetUserDocId }
-            });
-            results.push({ docId: docId.trim(), status: 'reassigned' });
-          } catch (e: any) {
-            errs.push({ docId: docId.trim(), error: e.message });
-          }
-        }
-
-        return ctx.send({ action: 'reassign', results, errs, targetUserDocId });
-      }
-
-      // Default: list users and all properties with their owners
-      const allProperties = await strapi.db.query('api::imovel.imovel').findMany({
-        populate: ['usuario'],
-      });
-
-      const propertyList = allProperties.map((p: any) => ({
-        id: p.id,
-        documentId: p.documentId,
-        titulo: p.titulo,
-        ownerUserId: p.usuario?.id || null,
-        ownerUsername: p.usuario?.username || 'NONE',
-      }));
-
-      return ctx.send({ users: userList, properties: propertyList });
-    } catch (err: any) {
-      return ctx.badRequest(err.message);
-    }
-  },
 
   async create(ctx) {
     try {

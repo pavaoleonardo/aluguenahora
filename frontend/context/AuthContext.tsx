@@ -41,6 +41,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(newUser)
     localStorage.setItem('token', newToken)
     localStorage.setItem('user', JSON.stringify(newUser))
+    // Also set a cookie so Next.js middleware can protect routes server-side
+    document.cookie = `token=${newToken}; path=/; max-age=2592000; SameSite=Lax`
   }
 
   const logout = () => {
@@ -48,6 +50,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null)
     localStorage.removeItem('token')
     localStorage.removeItem('user')
+    // Clear the cookie too
+    document.cookie = 'token=; path=/; max-age=0'
     router.push('/sair')
     router.refresh()
   }
