@@ -46,7 +46,7 @@ export default function Navbar() {
         </div>
         <div className="hidden lg:flex lg:gap-x-10">
           {navigation.map((item) => {
-            if (item.name === 'Anunciar Imóveis') {
+            if (item.name === 'Anunciar Imóveis' && !user) {
               return (
                 <Menu as="div" key={item.name} className="relative inline-block text-left">
                   <MenuButton className="inline-flex items-center text-base font-semibold text-gray-900 hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md">
@@ -60,7 +60,7 @@ export default function Navbar() {
                     <div className="py-1">
                       <MenuItem>
                         <Link
-                          href="/dashboard/novo-imovel/corretor"
+                          href="/registro/corretor"
                           className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900"
                         >
                           Sou corretor(a) / imobiliária
@@ -68,7 +68,7 @@ export default function Navbar() {
                       </MenuItem>
                       <MenuItem>
                         <Link
-                          href="/dashboard/novo-imovel/proprietario"
+                          href="/registro/proprietario"
                           className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900"
                         >
                           Sou proprietário(a)
@@ -147,7 +147,7 @@ export default function Navbar() {
             <div className="-my-6 divide-y divide-gray-500/10">
               <div className="space-y-2 py-6">
                 {navigation.map((item) => {
-                  if (item.name === 'Anunciar Imóveis') {
+                  if (item.name === 'Anunciar Imóveis' && !user) {
                     return (
                       <div key={item.name} className="-mx-3">
                         <div className="block px-3 py-2 text-base/7 font-semibold text-gray-900">
@@ -155,14 +155,14 @@ export default function Navbar() {
                         </div>
                         <div className="pl-6 space-y-1 pb-2">
                            <Link
-                              href="/dashboard/novo-imovel/corretor"
+                              href="/registro/corretor"
                               onClick={() => setMobileMenuOpen(false)}
                               className="block rounded-lg px-3 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
                             >
                               Sou corretor(a) / imobiliária
                             </Link>
                             <Link
-                              href="/dashboard/novo-imovel/proprietario"
+                              href="/registro/proprietario"
                               onClick={() => setMobileMenuOpen(false)}
                               className="block rounded-lg px-3 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
                             >
