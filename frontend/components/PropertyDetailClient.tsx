@@ -245,10 +245,7 @@ export default function PropertyDetailClient({ id }: { id: string }) {
                   </div>
                   <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-gray-50/50">
                     <svg className="h-6 w-6 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                       <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6a3 3 0 00-3-3H6.5a3 3 0 00-3 3v10.5a3 3 0 003 3h7a3 3 0 003-3V6zM8 10h1.5m2.5 0h1.5M8 14h1.5m2.5 0h1.5M10.5 17.5V19m-3-13h6" />
-                       <circle cx="6.5" cy="16.5" r="1" fill="currentColor" />
-                       <circle cx="13.5" cy="16.5" r="1" fill="currentColor" />
-                       <path strokeLinecap="round" d="M3.5 13h13" />
+                       <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m.9 0a1.5 1.5 0 0 1 3 0m-3 0a1.5 1.5 0 0 0 3 0m-3 0H21m-10.5-3.375a3.375 3.375 0 0 1 6.75 0M9.75 15.375a3.375 3.375 0 0 0-6.75 0m6.75 0v-1.5c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v1.5m-9 0h9" />
                     </svg>
                     <span className="text-sm font-bold text-gray-900">{property.vagas || 0}</span>
                     <span className="text-[10px] text-gray-500 uppercase font-medium">Vagas</span>

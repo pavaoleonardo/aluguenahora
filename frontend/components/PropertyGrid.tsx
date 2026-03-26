@@ -207,7 +207,7 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
                     <span className="flex items-center gap-1">
                        {/* Car Icon for Vagas */}
                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6a3 3 0 00-3-3H6.5a3 3 0 00-3 3v10.5a3 3 0 003 3h7a3 3 0 003-3V6zM8 10h1.5m2.5 0h1.5M8 14h1.5m2.5 0h1.5M10.5 17.5V19m-3-13h6" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m.9 0a1.5 1.5 0 0 1 3 0m-3 0a1.5 1.5 0 0 0 3 0m-3 0H21m-10.5-3.375a3.375 3.375 0 0 1 6.75 0M9.75 15.375a3.375 3.375 0 0 0-6.75 0m6.75 0v-1.5c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v1.5m-9 0h9" />
                        </svg>
                        <span>{property.vagas || 0}</span>
                     </span>
