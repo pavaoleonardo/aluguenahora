@@ -96,7 +96,7 @@ export default function RecoverPasswordPage() {
                 disabled={loading}
                 className="relative inline-flex items-center justify-center px-6 py-2.5 bg-primary hover:bg-primary-hover font-bold text-base text-white rounded-md transition-all duration-300 disabled:opacity-50 shadow-sm"
               >
-                {loading ? 'Enviando...' : 'Esqueceu sua senha'}
+                {loading ? 'Enviando...' : 'Recuperar sua senha'}
               </button>
             </div>
           </form>
