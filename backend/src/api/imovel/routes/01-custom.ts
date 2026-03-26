@@ -5,7 +5,7 @@ export default {
       path: '/imoveis/upload-video',
       handler: 'api::imovel.imovel.uploadVideo',
       config: {
-        auth: true, // Only authenticated users can upload videos
+        // No auth: false means this route IS protected by default in Strapi v5
       },
     },
   ],
