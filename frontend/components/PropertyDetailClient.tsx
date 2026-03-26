@@ -230,8 +230,8 @@ export default function PropertyDetailClient({ id }: { id: string }) {
               <div className="mt-6">
                 <div className="grid grid-cols-3 gap-4 border-y border-gray-100 py-6">
                   <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-gray-50/50">
-                    <svg className="h-6 w-6 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 7h18a2 2 0 0 1 2 2v10h-2v-3H3v3H1V9a2 2 0 0 1 2-2zm2 2v3h6V9H5zm8 0v3h6V9h-6z" />
+                    <svg className="h-6 w-6 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                       <path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9" />
                     </svg>
                     <span className="text-sm font-bold text-gray-900">{property.quartos}</span>
                     <span className="text-[10px] text-gray-500 uppercase font-medium">Quartos</span>
@@ -244,8 +244,11 @@ export default function PropertyDetailClient({ id }: { id: string }) {
                     <span className="text-[10px] text-gray-500 uppercase font-medium">Banheiros</span>
                   </div>
                   <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-gray-50/50">
-                    <svg className="h-6 w-6 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                       <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m.9 0a1.5 1.5 0 0 1 3 0m-3 0a1.5 1.5 0 0 0 3 0m-3 0H21m-10.5-3.375a3.375 3.375 0 0 1 6.75 0M9.75 15.375a3.375 3.375 0 0 0-6.75 0m6.75 0v-1.5c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v1.5m-9 0h9" />
+                    <svg className="h-6 w-6 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                       <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
+                       <circle cx="7" cy="17" r="2" />
+                       <path d="M9 17h6" />
+                       <circle cx="17" cy="17" r="2" />
                     </svg>
                     <span className="text-sm font-bold text-gray-900">{property.vagas || 0}</span>
                     <span className="text-[10px] text-gray-500 uppercase font-medium">Vagas</span>
