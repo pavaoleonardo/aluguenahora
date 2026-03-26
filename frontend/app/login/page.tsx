@@ -121,7 +121,7 @@ export default function LoginPage() {
                   Lembre de mim
                 </label>
               </div>
-              <Link href="/login" className="text-base text-gray-900 hover:text-primary font-medium transition-colors">
+              <Link href="/esqueci-senha" className="text-base text-gray-900 hover:text-primary font-medium transition-colors">
                 <small>Esqueceu sua senha?</small>
               </Link>
             </div>

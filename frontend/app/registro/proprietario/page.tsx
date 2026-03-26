@@ -67,8 +67,8 @@ export default function RegisterProprietarioPage() {
       // Store JWT in context and automatically login
       login(data.jwt, data.user)
       
-      // Auto redirect to Anunciar Imóvel
-      router.push('/dashboard/novo-imovel')
+      // Redirect to Admin Dashboard
+      router.push('/dashboard')
     } catch (err: any) {
       setError(err.message)
     } finally {

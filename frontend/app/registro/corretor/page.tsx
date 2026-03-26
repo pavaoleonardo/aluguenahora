@@ -71,8 +71,8 @@ export default function RegisterCorretorPage() {
       // Store JWT in context and automatically login
       login(data.jwt, data.user)
       
-      // Auto redirect to Anunciar Imóvel as requested
-      router.push('/dashboard/novo-imovel')
+      // Redirect to Admin Dashboard
+      router.push('/dashboard')
     } catch (err: any) {
       setError(err.message)
     } finally {
