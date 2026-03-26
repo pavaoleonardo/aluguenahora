@@ -10,3 +10,5 @@ dist/
 build/
 .agents/
 Authea_v1.0/
+frontend/playwright-report/
+frontend/test-results/
