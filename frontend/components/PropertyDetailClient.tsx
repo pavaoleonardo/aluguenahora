@@ -44,6 +44,7 @@ type ImovelDetail = {
   unidade_medida?: string
   caracteristicas?: string[]
   video_url?: string
+  vagas?: number
 }
 
 export default function PropertyDetailClient({ id }: { id: string }) {
@@ -240,12 +241,22 @@ export default function PropertyDetailClient({ id }: { id: string }) {
                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 4a4 4 0 014 4v2a2 2 0 002 2h4a2 2 0 002-2V8a4 4 0 00-4-4H8zm0 0V2m4 2V2m4 2V2M12 16v6M8 18v4M16 18v4" />
                     </svg>
                     <span className="text-sm font-bold text-gray-900">{property.banheiros}</span>
-                    <span className="text-[10px] text-gray-500 uppercase font-medium">Suítes/Banheiros</span>
+                    <span className="text-[10px] text-gray-500 uppercase font-medium">Banheiros</span>
+                  </div>
+                  <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-gray-50/50">
+                    <svg className="h-6 w-6 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                       <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6a3 3 0 00-3-3H6.5a3 3 0 00-3 3v10.5a3 3 0 003 3h7a3 3 0 003-3V6zM8 10h1.5m2.5 0h1.5M8 14h1.5m2.5 0h1.5M10.5 17.5V19m-3-13h6" />
+                       <circle cx="6.5" cy="16.5" r="1" fill="currentColor" />
+                       <circle cx="13.5" cy="16.5" r="1" fill="currentColor" />
+                       <path strokeLinecap="round" d="M3.5 13h13" />
+                    </svg>
+                    <span className="text-sm font-bold text-gray-900">{property.vagas || 0}</span>
+                    <span className="text-[10px] text-gray-500 uppercase font-medium">Vagas</span>
                   </div>
                   <div className="flex flex-col items-center justify-center p-3 rounded-xl bg-gray-50/50">
                     <ArrowsPointingOutIcon className="h-6 w-6 text-gray-400 mb-2" />
                     <span className="text-sm font-bold text-gray-900">{formatNumber(property.area_total || 0)}</span>
-                    <span className="text-[10px] text-gray-500 uppercase font-medium">m² At/Ac</span>
+                    <span className="text-[10px] text-gray-500 uppercase font-medium">m² Total</span>
                   </div>
                 </div>
               </div>

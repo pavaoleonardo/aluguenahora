@@ -73,6 +73,7 @@ export default function EditPropertyPage() {
     endereco: '',
     caracteristicas: [] as string[],
     video_url: '',
+    vagas: '',
   })
 
   const [showBairroSuggestions, setShowBairroSuggestions] = useState(false)
@@ -145,6 +146,7 @@ export default function EditPropertyPage() {
           iptu: item.iptu != null ? formatCurrency(item.iptu) : '',
           quartos: item.quartos != null ? String(item.quartos) : '',
           banheiros: item.banheiros != null ? String(item.banheiros) : '',
+          vagas: item.vagas != null ? String(item.vagas) : '',
           bairro,
           cidade: item.cidade || 'Campo Grande',
           finalidade: item.finalidade || 'aluguel',
@@ -355,6 +357,7 @@ export default function EditPropertyPage() {
             iptu: parseCurrency(formData.iptu),
             quartos: Number(formData.quartos),
             banheiros: Number(formData.banheiros),
+            vagas: Number(formData.vagas),
             bairro: { regiao: '', bairro: formData.bairro },
             cidade: formData.cidade,
             finalidade: formData.finalidade,
@@ -395,119 +398,166 @@ export default function EditPropertyPage() {
         <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl text-center mb-8">Editar Imóvel</h2>
         
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2">
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Título do Anúncio</label>
-              <input type="text" name="titulo" required value={formData.titulo} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
-            </div>
-            
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Descrição do Imóvel</label>
-              <textarea name="descricao" rows={4} value={formData.descricao} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
-            </div>
+          <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-3">
+             {/* 1, 2, 3: Same line */}
+              <div className="relative">
+                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Tipo do imóvel</label>
+                  <div className="relative">
+                      <select name="tipo" required value={formData.tipo} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm appearance-none bg-white">
+                        <option value="">TODOS OS IMÓVEIS</option>
+                        <optgroup label="--- RESIDENCIAL ---">
+                          <option value="Apart Hotel / Flat / Loft">Apart Hotel / Flat / Loft</option>
+                          <option value="Apartamento">Apartamento</option>
+                          <option value="Apto. Cobertura / Duplex">Apto. Cobertura / Duplex</option>
+                          <option value="Casa de Vila">Casa de Vila</option>
+                          <option value="Casa-Térrea">Casa-Térrea</option>
+                          <option value="Casa-Térrea-Condomínio">Casa-Térrea-Condomínio</option>
+                          <option value="Kitnet">Kitnet</option>
+                          <option value="Sobrado">Sobrado</option>
+                          <option value="Sobrado-Condomínio">Sobrado-Condomínio</option>
+                          <option value="Studio">Studio</option>
+                          <option value="Terreno">Terreno</option>
+                          <option value="Terreno-Condomínio">Terreno-Condomínio</option>
+                        </optgroup>
+                        <optgroup label="--- COMERCIAL ---">
+                          <option value="Área">Área</option>
+                          <option value="Casa Comercial">Casa Comercial</option>
+                          <option value="Galpão / Depósito">Galpão / Depósito</option>
+                          <option value="Imóvel Comercial">Imóvel Comercial</option>
+                          <option value="Indústria / Fábrica">Indústria / Fábrica</option>
+                          <option value="Ponto Comercial / Box">Ponto Comercial / Box</option>
+                          <option value="Pousada / Hotel / Motel">Pousada / Hotel / Motel</option>
+                          <option value="Sala / Salão / Loja">Sala / Salão / Loja</option>
+                        </optgroup>
+                        <optgroup label="--- RURAL ---">
+                          <option value="Chácara">Chácara</option>
+                          <option value="Fazenda">Fazenda</option>
+                          <option value="Haras">Haras</option>
+                          <option value="Pesqueiro">Pesqueiro</option>
+                          <option value="Sitio">Sitio</option>
+                        </optgroup>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none mt-2">
+                          <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                      </div>
+                  </div>
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">VALOR (R$)</label>
-              <input type="text" name="preco" required value={formData.preco} onChange={handlePriceChange} placeholder="R$ 0,00" className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
-            </div>
+              <div className="relative">
+                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Finalidade</label>
+                  <div className="relative">
+                      <select name="finalidade" required value={formData.finalidade} disabled onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm bg-gray-100 cursor-not-allowed appearance-none">
+                        <option value="aluguel">Aluguel</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none mt-2">
+                          <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                      </div>
+                  </div>
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Finalidade</label>
-              <select name="finalidade" required value={formData.finalidade} disabled onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm bg-gray-100 cursor-not-allowed appearance-none">
-                <option value="aluguel">Aluguel</option>
-              </select>
-            </div>
+              <div className="relative" ref={bairroRef}>
+                <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Bairro</label>
+                <input type="text" name="bairro" required value={formData.bairro} onChange={(e) => handleBairroChange(e.target.value)} onFocus={() => setShowBairroSuggestions(true)} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
+                {showBairroSuggestions && bairroSuggestions.length > 0 && (
+                  <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg border border-gray-200 py-1 max-h-48 overflow-y-auto">
+                    {bairroSuggestions.map((s) => (
+                      <button key={s} type="button" onClick={() => { setFormData({...formData, bairro: s}); setShowBairroSuggestions(false); }} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-primary hover:text-white">{s}</button>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Cidade/UF</label>
-              <input
-                type="text"
-                value="Campo Grande - MS"
-                disabled
-                className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm bg-gray-100 cursor-not-allowed"
-              />
-            </div>
+             {/* 4, 5: Same line */}
+              <div className="sm:col-span-3">
+                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Cidade/UF</label>
+                  <input
+                    type="text"
+                    value="Campo Grande - MS"
+                    disabled
+                    className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm bg-gray-100 cursor-not-allowed"
+                  />
+              </div>
 
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Tipo do imóvel</label>
-              <select name="tipo" required value={formData.tipo} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm">
-                <option value="">TODOS OS IMÓVEIS</option>
-                <optgroup label="--- RESIDENCIAL ---">
-                  <option value="Apart Hotel / Flat / Loft">Apart Hotel / Flat / Loft</option>
-                  <option value="Apartamento">Apartamento</option>
-                  <option value="Apto. Cobertura / Duplex">Apto. Cobertura / Duplex</option>
-                  <option value="Casa de Vila">Casa de Vila</option>
-                  <option value="Casa-Térrea">Casa-Térrea</option>
-                  <option value="Casa-Térrea-Condomínio">Casa-Térrea-Condomínio</option>
-                  <option value="Kitnet">Kitnet</option>
-                  <option value="Sobrado">Sobrado</option>
-                  <option value="Sobrado-Condomínio">Sobrado-Condomínio</option>
-                  <option value="Studio">Studio</option>
-                  <option value="Terreno">Terreno</option>
-                  <option value="Terreno-Condomínio">Terreno-Condomínio</option>
-                </optgroup>
-                <optgroup label="--- COMERCIAL ---">
-                  <option value="Área">Área</option>
-                  <option value="Casa Comercial">Casa Comercial</option>
-                  <option value="Galpão / Depósito">Galpão / Depósito</option>
-                  <option value="Imóvel Comercial">Imóvel Comercial</option>
-                  <option value="Indústria / Fábrica">Indústria / Fábrica</option>
-                  <option value="Ponto Comercial / Box">Ponto Comercial / Box</option>
-                  <option value="Pousada / Hotel / Motel">Pousada / Hotel / Motel</option>
-                  <option value="Sala / Salão / Loja">Sala / Salão / Loja</option>
-                </optgroup>
-                <optgroup label="--- RURAL ---">
-                  <option value="Chácara">Chácara</option>
-                  <option value="Fazenda">Fazenda</option>
-                  <option value="Haras">Haras</option>
-                  <option value="Pesqueiro">Pesqueiro</option>
-                  <option value="Sitio">Sitio</option>
-                </optgroup>
-              </select>
-            </div>
+              {/* 6: Endereço */}
+              <div className="sm:col-span-3">
+                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Endereço Completo</label>
+                  <input type="text" name="endereco" value={formData.endereco} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
+              </div>
 
-            <div className="sm:col-span-2 relative" ref={bairroRef}>
-              <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Bairro</label>
-              <input type="text" name="bairro" required value={formData.bairro} onChange={(e) => handleBairroChange(e.target.value)} onFocus={() => setShowBairroSuggestions(true)} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
-              {showBairroSuggestions && bairroSuggestions.length > 0 && (
-                <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg border border-gray-200 py-1 max-h-48 overflow-y-auto">
-                  {bairroSuggestions.map((s) => (
-                    <button key={s} type="button" onClick={() => { setFormData({...formData, bairro: s}); setShowBairroSuggestions(false); }} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-primary hover:text-white">{s}</button>
-                  ))}
-                </div>
-              )}
-            </div>
+              {/* 7: Título */}
+              <div className="sm:col-span-3">
+                <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Título do Anúncio</label>
+                <input type="text" name="titulo" required value={formData.titulo} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
+              </div>
+              
+              {/* 8: Descrição */}
+              <div className="sm:col-span-3">
+                <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Descrição do Imóvel</label>
+                <textarea name="descricao" rows={3} value={formData.descricao} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
+              </div>
 
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Endereço Completo</label>
-              <input type="text" name="endereco" value={formData.endereco} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
-            </div>
+              {/* 10, 11, 12: Same line */}
+              <div>
+                <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">VALOR (R$)</label>
+                <input type="text" name="preco" required value={formData.preco} onChange={handlePriceChange} placeholder="R$ 0,00" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">ÁREA CONSTRUÍDA (m²)</label>
-              <input type="text" name="tamanho" value={formData.tamanho} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
-            </div>
+              <div>
+                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase text-xs">IPTU (Mensal)</label>
+                  <input type="text" name="iptu" value={formData.iptu} onChange={handlePriceChange} placeholder="R$ 0,00" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
+              </div>
 
-            <div>
-              <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">ÁREA TOTAL (m²)</label>
-              <input type="text" name="area_total" value={formData.area_total} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
-            </div>
+              <div>
+                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase text-xs">Condomínio</label>
+                  <input type="text" name="condominio" value={formData.condominio} onChange={handlePriceChange} placeholder="R$ 0,00" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
+              </div>
+
+              {/* 13, 14, 15: Same line */}
+              <div>
+                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Quartos</label>
+                  <input type="number" name="quartos" value={formData.quartos} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
+              </div>
+
+              <div>
+                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Banheiros</label>
+                  <input type="number" name="banheiros" value={formData.banheiros} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
+              </div>
+
+              <div>
+                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Vagas</label>
+                  <input type="number" name="vagas" value={formData.vagas} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
+              </div>
+
+              {/* 16, 17 Area */}
+              <div className="sm:col-span-1">
+                <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase text-xs">ÁREA CONSTRUÍDA (m²)</label>
+                <input type="text" name="tamanho" value={formData.tamanho} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
+              </div>
+
+              <div className="sm:col-span-1">
+                <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase text-xs">ÁREA TOTAL (m²)</label>
+                <input type="text" name="area_total" value={formData.area_total} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
+              </div>
 
             {/* Characteristics Grid */}
-            <div className="sm:col-span-2 mt-4">
+            <div className="mt-8">
               <label className="block text-lg font-bold text-gray-900 mb-4 border-b pb-2 uppercase">Características</label>
               <div className="flex flex-col gap-y-2 lg:columns-3 lg:block lg:gap-x-6 border p-4 rounded-lg bg-gray-50/30">
                 {LISTA_CARACTERISTICAS.map((item) => (
                   <label key={item} className="relative flex items-center group cursor-pointer break-inside-avoid mb-3">
                     <input type="checkbox" checked={formData.caracteristicas.includes(item)} onChange={() => handleCharacteristicToggle(item)} className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer" />
-                    <span className="ml-3 text-xs text-gray-700 font-medium group-hover:text-primary">{item}</span>
+                    <span className="ml-3 text-[13px] text-gray-700 font-medium group-hover:text-primary">{item}</span>
                   </label>
                 ))}
               </div>
             </div>
 
             {/* Photos Section */}
-            <div className="sm:col-span-2 bg-gray-50/50 p-6 rounded-xl border-2 border-dashed border-gray-200">
+            <div className="mt-8 bg-gray-50/50 p-6 rounded-xl border-2 border-dashed border-gray-200">
               <label className="block text-sm font-bold text-gray-900 uppercase mb-4">Gerenciar Fotos</label>
               
               {/* Existing Photos */}

@@ -358,62 +358,76 @@ export default function NewPropertyPage() {
 
           <form onSubmit={handleSubmit} noValidate className="space-y-6">
             <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-3">
-                {/* 1, 2, 3: Same line */}
-                <div>
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Tipo do imóvel</label>
-                    <select
-                      name="tipo"
-                      value={formData.tipo}
-                      onChange={handleChange}
-                      className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm"
-                    >
-                      <option value="">Selecione o tipo...</option>
-                      <optgroup label="--- RESIDENCIAL ---">
-                        <option value="Apart Hotel / Flat / Loft">Apart Hotel / Flat / Loft</option>
-                        <option value="Apartamento">Apartamento</option>
-                        <option value="Apto. Cobertura / Duplex">Apto. Cobertura / Duplex</option>
-                        <option value="Casa de Vila">Casa de Vila</option>
-                        <option value="Casa-Térrea">Casa-Térrea</option>
-                        <option value="Casa-Térrea-Condomínio">Casa-Térrea-Condomínio</option>
-                        <option value="Kitnet">Kitnet</option>
-                        <option value="Sobrado">Sobrado</option>
-                        <option value="Sobrado-Condomínio">Sobrado-Condomínio</option>
-                        <option value="Studio">Studio</option>
-                        <option value="Terreno">Terreno</option>
-                        <option value="Terreno-Condomínio">Terreno-Condomínio</option>
-                      </optgroup>
-                      <optgroup label="--- COMERCIAL ---">
-                        <option value="Área">Área</option>
-                        <option value="Casa Comercial">Casa Comercial</option>
-                        <option value="Galpão / Depósito">Galpão / Depósito</option>
-                        <option value="Imóvel Comercial">Imóvel Comercial</option>
-                        <option value="Indústria / Fábrica">Indústria / Fábrica</option>
-                        <option value="Ponto Comercial / Box">Ponto Comercial / Box</option>
-                        <option value="Pousada / Hotel / Motel">Pousada / Hotel / Motel</option>
-                        <option value="Sala / Salão / Loja">Sala / Salão / Loja</option>
-                      </optgroup>
-                      <optgroup label="--- RURAL ---">
-                        <option value="Chácara">Chácara</option>
-                        <option value="Fazenda">Fazenda</option>
-                        <option value="Haras">Haras</option>
-                        <option value="Pesqueiro">Pesqueiro</option>
-                        <option value="Sitio">Sitio</option>
-                      </optgroup>
-                    </select>
-                </div>
+                 {/* 1, 2, 3: Same line */}
+                 <div className="relative">
+                     <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Tipo do imóvel</label>
+                     <div className="relative">
+                         <select
+                           name="tipo"
+                           value={formData.tipo}
+                           onChange={handleChange}
+                           className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm appearance-none bg-white"
+                         >
+                           <option value="">Selecione o tipo...</option>
+                           <optgroup label="--- RESIDENCIAL ---">
+                             <option value="Apart Hotel / Flat / Loft">Apart Hotel / Flat / Loft</option>
+                             <option value="Apartamento">Apartamento</option>
+                             <option value="Apto. Cobertura / Duplex">Apto. Cobertura / Duplex</option>
+                             <option value="Casa de Vila">Casa de Vila</option>
+                             <option value="Casa-Térrea">Casa-Térrea</option>
+                             <option value="Casa-Térrea-Condomínio">Casa-Térrea-Condomínio</option>
+                             <option value="Kitnet">Kitnet</option>
+                             <option value="Sobrado">Sobrado</option>
+                             <option value="Sobrado-Condomínio">Sobrado-Condomínio</option>
+                             <option value="Studio">Studio</option>
+                             <option value="Terreno">Terreno</option>
+                             <option value="Terreno-Condomínio">Terreno-Condomínio</option>
+                           </optgroup>
+                           <optgroup label="--- COMERCIAL ---">
+                             <option value="Área">Área</option>
+                             <option value="Casa Comercial">Casa Comercial</option>
+                             <option value="Galpão / Depósito">Galpão / Depósito</option>
+                             <option value="Imóvel Comercial">Imóvel Comercial</option>
+                             <option value="Indústria / Fábrica">Indústria / Fábrica</option>
+                             <option value="Ponto Comercial / Box">Ponto Comercial / Box</option>
+                             <option value="Pousada / Hotel / Motel">Pousada / Hotel / Motel</option>
+                             <option value="Sala / Salão / Loja">Sala / Salão / Loja</option>
+                           </optgroup>
+                           <optgroup label="--- RURAL ---">
+                             <option value="Chácara">Chácara</option>
+                             <option value="Fazenda">Fazenda</option>
+                             <option value="Haras">Haras</option>
+                             <option value="Pesqueiro">Pesqueiro</option>
+                             <option value="Sitio">Sitio</option>
+                           </optgroup>
+                         </select>
+                         <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none mt-2">
+                             <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                             </svg>
+                         </div>
+                     </div>
+                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Finalidade</label>
-                    <select
-                      name="finalidade"
-                      value={formData.finalidade}
-                      onChange={handleChange}
-                      disabled
-                      className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm bg-gray-100 cursor-not-allowed cursor-default appearance-none"
-                    >
-                      <option value="aluguel">Aluguel</option>
-                    </select>
-                </div>
+                 <div className="relative">
+                     <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Finalidade</label>
+                     <div className="relative">
+                         <select
+                           name="finalidade"
+                           value={formData.finalidade}
+                           onChange={handleChange}
+                           disabled
+                           className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm bg-gray-100 cursor-not-allowed appearance-none"
+                         >
+                           <option value="aluguel">Aluguel</option>
+                         </select>
+                         <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none mt-2">
+                             <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                             </svg>
+                         </div>
+                     </div>
+                 </div>
 
                 <div className="relative" ref={bairroRef}>
                     <label className="block text-sm font-medium leading-6 text-gray-900">Bairro</label>
