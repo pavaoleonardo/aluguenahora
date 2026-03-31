@@ -24,8 +24,28 @@ export default function RegisterProprietarioPage() {
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
 
+  // Real-time phone mask: (XX) XXXX-XXXX or (XX) XXXXX-XXXX
+  const applyPhoneMask = (val: string) => {
+    let digits = val.replace(/\D/g, '')
+    if (digits.length === 0) return ''
+    if (digits.length <= 2) return `(${digits}`
+    if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
+    if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
+    
+    // Apply phone mask in real-time
+    if (name === 'telefone' || name === 'celular') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: applyPhoneMask(value)
+      }))
+      return
+    }
+
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
@@ -55,6 +75,7 @@ export default function RegisterProprietarioPage() {
           email: formData.email, 
           password: formData.password,
           // Passing extra fields (Strapi captures these only if added to User schema via Extensions)
+          // Passing extra fields
           telefone: formData.telefone,
           celular: formData.celular
         }),
