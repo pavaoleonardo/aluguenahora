@@ -32,7 +32,44 @@ module.exports = (plugin: any) => {
     };
   };
 
-  // 2. Extend the user content type with custom fields for registration
+  // 2. Override the register controller to handle custom fields (Strapi 5 strictness)
+  const originalRegister = plugin.controllers.auth.register;
+  
+  plugin.controllers.auth.register = async (ctx: any) => {
+    // 1. Extract our custom parameters from the body
+    const { nome_imobiliaria, creci, telefone, celular, ...registerData } = ctx.request.body;
+    
+    // 2. Set the body to ONLY standard fields to avoid "Invalid parameters" error from Yup/Sanitizer
+    ctx.request.body = registerData;
+    
+    // 3. Execute the original registration logic
+    await originalRegister(ctx);
+    
+    // 4. If registration was successful (it will set ctx.body with { jwt, user }), update the user
+    if (ctx.body && ctx.body.user && ctx.body.user.id) {
+      const userId = ctx.body.user.id;
+      
+      // Update the user record directly in the DB with the custom fields
+      await strapi.db.query('plugin::users-permissions.user').update({
+        where: { id: userId },
+        data: {
+          nome_imobiliaria,
+          creci,
+          telefone,
+          celular
+        }
+      });
+      
+      // Refresh the user object in the response to include the new fields
+      const updatedUser = await strapi.db.query('plugin::users-permissions.user').findOne({
+        where: { id: userId }
+      });
+      
+      ctx.body.user = updatedUser;
+    }
+  };
+
+  // 3. Extend the user content type with custom fields for persistence
   if (plugin.contentTypes && plugin.contentTypes.user) {
     plugin.contentTypes.user.schema.attributes = {
       ...plugin.contentTypes.user.schema.attributes,
