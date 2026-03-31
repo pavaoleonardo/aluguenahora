@@ -185,39 +185,38 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
                       property.preco || 0
                     )}
                   </p>
-                  <div className="mt-4 flex gap-4 text-sm text-gray-600">
-                    <span className="flex items-center gap-1">
+                  <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-gray-500 font-medium">
+                    <span className="flex items-center gap-1.5">
                       {/* Bed Icon (Quartos) */}
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9" />
+                      <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" className="hidden" /> {/* Temp removal for cleaner look */}
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12h19.5M2.25 12v6.75c0 .414.336.75.75.75h18c.414 0 .75-.336.75-.75V12M2.25 12V5.25c0-.414.336-.75.75-.75h18c.414 0 .75.336.75.75V12M6.75 7.5v3M17.25 7.5v3" />
                       </svg>
-                      <span>{property.quartos} Quartos</span>
+                      <span>{property.quartos} {property.quartos === 1 ? 'Quarto' : 'Quartos'}</span>
                     </span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1">
-                      {/* Shower Icon */}
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+
+                    <span className="flex items-center gap-1.5">
+                      {/* Shower Icon (Banheiros) */}
+                      <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M8 4a4 4 0 014 4v2a2 2 0 002 2h4a2 2 0 002-2V8a4 4 0 00-4-4H8zm0 0V2m4 2V2m4 2V2M12 16v6M8 18v4M16 18v4" />
                       </svg>
-                      <span>{property.banheiros} Banheiros</span>
+                      <span>{property.banheiros} {property.banheiros === 1 ? 'Banh.' : 'Banh.'}</span>
                     </span>
-                    <span className="flex items-center gap-1">
-                       {/* Area Icon (Arrows Pointing Out) */}
-                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+
+                    <span className="flex items-center gap-1.5">
+                       {/* Area Icon (Tamanho) */}
+                       <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
                        </svg>
                        <span>{property.tamanho} m²</span>
                     </span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1">
-                       {/* Car Icon for Vagas */}
-                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                         <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
-                         <circle cx="7" cy="17" r="2" />
-                         <path d="M9 17h6" />
-                         <circle cx="17" cy="17" r="2" />
+
+                    <span className="flex items-center gap-1.5">
+                       {/* Car/Garage Icon (Vagas) */}
+                       <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6V4.5a1.5 1.5 0 00-1.5-1.5h-6A1.5 1.5 0 007.5 4.5V6m9 0h1.5a1.5 1.5 0 011.5 1.5v3m-12-4.5H6A1.5 1.5 0 004.5 7.5v3m3 3h9m-9 3h9M5.25 18a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5zm13.5 0a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z" />
                        </svg>
-                       <span>{property.vagas || 0}</span>
+                       <span>{property.vagas || 0} {property.vagas === 1 ? 'Vaga' : 'Vagas'}</span>
                     </span>
                   </div>
                 </div>

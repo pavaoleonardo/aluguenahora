@@ -236,7 +236,7 @@ export default function PropertyDetailClient({ id }: { id: string }) {
                   
                   <div className="flex items-center gap-2 group transition-colors hover:text-primary">
                     <svg className="h-5 w-5 text-gray-400 group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                       <path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9" />
+                       <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12h19.5M2.25 12v6.75c0 .414.336.75.75.75h18c.414 0 .75-.336.75-.75V12M2.25 12V5.25c0-.414.336-.75.75-.75h18c.414 0 .75.336.75.75V12M6.75 7.5v3M17.25 7.5v3" />
                     </svg>
                     <span className="text-base font-medium text-gray-900">{property.quartos} {property.quartos === 1 ? 'quarto' : 'quartos'}</span>
                   </div>
@@ -250,10 +250,7 @@ export default function PropertyDetailClient({ id }: { id: string }) {
 
                   <div className="flex items-center gap-2 group transition-colors hover:text-primary">
                     <svg className="h-5 w-5 text-gray-400 group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                       <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
-                       <circle cx="7" cy="17" r="2" />
-                       <path d="M9 17h6" />
-                       <circle cx="17" cy="17" r="2" />
+                       <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6V4.5a1.5 1.5 0 00-1.5-1.5h-6A1.5 1.5 0 007.5 4.5V6m9 0h1.5a1.5 1.5 0 011.5 1.5v3m-12-4.5H6A1.5 1.5 0 004.5 7.5v3m3 3h9m-9 3h9M5.25 18a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5zm13.5 0a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z" />
                     </svg>
                     <span className="text-base font-medium text-gray-900">{property.vagas || 0} {property.vagas === 1 ? 'vaga' : 'vagas'}</span>
                   </div>
