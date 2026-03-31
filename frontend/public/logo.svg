@@ -1,24 +1,34 @@
-<svg id="AlugueNaHora_Logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 100">
+<svg id="AlugueNaHora_Logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 120">
   <defs>
     <style>
-      .blue { fill: #282F69; }
-      .orange { fill: #F37021; }
-      .white { fill: #FFFFFF; }
-      .text-blue { fill: #282F69; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 38px; }
-      .text-orange { fill: #F37021; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 38px; }
+      .blue-base { fill: #282F69; }
+      .orange-brand { fill: #F37021; }
+      .house-white { fill: #FFFFFF; }
+      .accent-dot { fill: #FAB200; } /* Using the brand yellow for dots from screenshot */
+      .text-alugue { fill: #282F69; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 48px; }
+      .text-na-hora { fill: #F37021; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 48px; }
     </style>
   </defs>
   
-  <!-- Rounded Rect Background for Icon -->
-  <rect x="10" y="10" width="80" height="80" rx="15" class="blue"/>
+  <!-- Main Rounded Icon Block -->
+  <rect x="10" y="10" width="100" height="100" rx="20" class="blue-base"/>
   
-  <!-- House Silhouette -->
-  <path d="M50 28 L28 48 L28 72 L42 72 L42 58 L58 58 L58 72 L72 72 L72 48 Z" class="white"/>
+  <!-- Decorative Dots from screenshot -->
+  <circle cx="25" cy="35" r="3" class="accent-dot"/>
+  <circle cx="35" cy="25" r="3" class="accent-dot"/>
+  <circle cx="85" cy="85" r="3" class="accent-dot"/>
+  <circle cx="75" cy="95" r="3" class="accent-dot"/>
+
+  <!-- Detailed House -->
+  <path d="M60 35 L35 55 L35 85 L85 85 L85 55 Z" class="house-white"/>
+  <rect x="54" y="65" width="12" height="20" class="blue-base"/> <!-- Door -->
+  <rect x="42" y="60" width="8" height="8" class="blue-base"/>   <!-- Window 1 -->
+  <rect x="70" y="60" width="8" height="8" class="blue-base"/>   <!-- Window 2 -->
   
-  <!-- Vibrant Orange Tick -->
-  <path d="M40 50 L52 62 L85 30" fill="none" stroke="#F37021" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Large Orange Tick Overlay -->
+  <path d="M45 55 L65 75 L105 35" fill="none" stroke="#F37021" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
   
-  <!-- Branding Text -->
-  <text x="110" y="65" class="text-blue">Alugue</text>
-  <text x="260" y="65" class="text-orange">na Hora</text>
+  <!-- Typography -->
+  <text x="130" y="75" class="text-alugue">Alugue</text>
+  <text x="315" y="75" class="text-na-hora">na Hora</text>
 </svg>
