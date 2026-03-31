@@ -3,12 +3,13 @@ set -o errexit
 echo "Pulling latest code from GitHub..."
 git pull origin main
 
-echo "Building Frontend and Backend..."
-# Frontend build
+echo "Building Frontend..."
 cd frontend && npm install && npm run build && cd ..
 
-# Backend (Strapi) build and restart
-cd backend && npm install && npm run build
-pm2 restart ecosystem.config.js || pm2 start ecosystem.config.js --env production && cd ..
+echo "Building Backend..."
+cd backend && npm install && npm run build && cd ..
+
+echo "Restarting Services..."
+pm2 restart ecosystem.config.js || pm2 start ecosystem.config.js --env production
 
 echo "Deployment complete! ✅"
