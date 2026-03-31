@@ -13,7 +13,7 @@ module.exports = {
       name: 'aluguenahora-frontend',
       cwd: './frontend',
       script: 'npm',
-      args: 'start',
+      args: 'run start',
       env: {
         NODE_ENV: 'production',
       },
