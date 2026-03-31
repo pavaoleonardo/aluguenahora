@@ -185,38 +185,16 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
                       property.preco || 0
                     )}
                   </p>
-                  <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-gray-500 font-medium">
-                    <span className="flex items-center gap-1.5">
-                      {/* Bed Icon (Quartos) - QuintoAndar Style */}
-                      <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 14h18M3 14v4m0-4V9a2 2 0 012-2h14a2 2 0 012 2v5m0 0v4m-18 0h18M7 11a1 1 0 011-1h2a1 1 0 011 1v3H7v-3z" />
-                      </svg>
-                      <span>{property.quartos} {property.quartos === 1 ? 'Quarto' : 'Quartos'}</span>
-                    </span>
-
-                    <span className="flex items-center gap-1.5">
-                      {/* Shower Icon (Banheiros) - QuintoAndar Style */}
-                      <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 4h4a4 4 0 014 4v2m-3 0h6m-5 4v.5m2-.5v.5m2-.5v.5" />
-                      </svg>
-                      <span>{property.banheiros} {property.banheiros === 1 ? 'Banh.' : 'Banh.'}</span>
-                    </span>
-
-                    <span className="flex items-center gap-1.5">
-                       {/* Area Icon (Ruler) - QuintoAndar Style */}
-                       <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12h19.5M5 12v2m4-2v2m4-2v2m4-2v2" />
-                       </svg>
-                       <span>{property.tamanho} m²</span>
-                    </span>
-
-                    <span className="flex items-center gap-1.5">
-                       {/* Car/Garage Icon (Vagas - Front View) - QuintoAndar Style */}
-                       <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                         <path strokeLinecap="round" strokeLinejoin="round" d="M7 8h10a2 2 0 012 2v4a2 2 0 01-2 2H7a2 2 0 01-2-2v-4a2 2 0 012-2zM5 11h14M8 13h0.01M16 13h0.01M6 16v1a1 1 0 001 1h1m10-2v1a1 1 0 01-1 1h-1" />
-                       </svg>
-                       <span>{property.vagas || 0} {property.vagas === 1 ? 'Vaga' : 'Vagas'}</span>
-                    </span>
+                  <div className="mt-2 text-sm text-gray-900">
+                    <span className="font-semibold">{property.tamanho} m²</span>
+                    <span className="mx-1.5 text-gray-400">•</span>
+                    <span>{property.quartos} {property.quartos === 1 ? 'quarto' : 'quartos'}</span>
+                    {property.vagas && property.vagas > 0 ? (
+                      <>
+                        <span className="mx-1.5 text-gray-400">•</span>
+                        <span>{property.vagas} {property.vagas === 1 ? 'vaga' : 'vagas'}</span>
+                      </>
+                    ) : null}
                   </div>
                 </div>
               </div>
