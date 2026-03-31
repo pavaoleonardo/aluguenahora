@@ -68,6 +68,11 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
       }
     }
 
+    const vagas = searchParams.get('vagas')
+    if (vagas) {
+      filters.push({ vagas: { $gte: Number(vagas) } })
+    }
+
     // Build the final params object using Strapi's bracket notation
     const params: any = {
       populate: '*',

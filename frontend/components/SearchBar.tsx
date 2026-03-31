@@ -41,6 +41,7 @@ export default function SearchBar() {
     if (filters.bairro) params.set('bairro', filters.bairro);
     if (filters.tipo) params.set('tipo', filters.tipo);
     if (filters.finalidade) params.set('finalidade', filters.finalidade);
+    if ((filters as any).vagas) params.set('vagas', (filters as any).vagas);
     
     router.push(`/imoveis?${params.toString()}`);
   };
@@ -148,6 +149,36 @@ export default function SearchBar() {
             </div>
           </div>
 
+          {/* Parking (Vagas) Input - NEW ITEM */}
+          <div className="relative group">
+            <label className="block text-xs font-medium text-gray-500 mb-1 ml-10">Vagas</label>
+            <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-gray-400 group-focus-within:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
+                        <circle cx="7" cy="17" r="2" />
+                        <path d="M9 17h6" />
+                        <circle cx="17" cy="17" r="2" />
+                    </svg>
+                </div>
+                <select 
+                  value={(filters as any).vagas || ''}
+                  onChange={(e) => setFilters({ ...filters, [ 'vagas' as any]: e.target.value })}
+                  className="block w-full rounded-xl border-0 bg-gray-50 py-3 pl-10 pr-8 text-gray-900 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-primary sm:text-sm sm:leading-6 transition-all hover:bg-gray-100 cursor-pointer appearance-none"
+                >
+                    <option value="">Qualquer</option>
+                    <option value="1">1+ Vagas</option>
+                    <option value="2">2+ Vagas</option>
+                    <option value="3">3+ Vagas</option>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+            </div>
+          </div>
+
           {/* District Input (Searchable) - Fourth Item */}
           <div className="relative group" ref={dropdownRef}>
             <label className="block text-xs font-medium text-gray-500 mb-1 ml-10">Bairro</label>
@@ -207,6 +238,6 @@ export default function SearchBar() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 

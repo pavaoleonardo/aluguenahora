@@ -529,7 +529,7 @@ export default function EditPropertyPage() {
 
               <div>
                   <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Vagas</label>
-                  <input type="number" name="vagas" value={formData.vagas} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
+                  <input type="number" name="vagas" value={formData.vagas} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
               </div>
 
               {/* 16, 17 Area */}
