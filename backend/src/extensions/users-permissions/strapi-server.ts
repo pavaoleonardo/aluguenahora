@@ -32,5 +32,16 @@ module.exports = (plugin: any) => {
     };
   };
 
+  // 2. Extend the user content type with custom fields for registration
+  if (plugin.contentTypes && plugin.contentTypes.user) {
+    plugin.contentTypes.user.schema.attributes = {
+      ...plugin.contentTypes.user.schema.attributes,
+      nome_imobiliaria: { type: 'string' },
+      creci: { type: 'string' },
+      telefone: { type: 'string' },
+      celular: { type: 'string' },
+    };
+  }
+
   return plugin;
 };
