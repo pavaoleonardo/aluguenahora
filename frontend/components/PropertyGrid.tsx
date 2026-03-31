@@ -187,34 +187,33 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
                   </p>
                   <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-gray-500 font-medium">
                     <span className="flex items-center gap-1.5">
-                      {/* Bed Icon (Quartos) */}
+                      {/* Bed Icon (Quartos) - QuintoAndar Style */}
                       <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" className="hidden" /> {/* Temp removal for cleaner look */}
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12h19.5M2.25 12v6.75c0 .414.336.75.75.75h18c.414 0 .75-.336.75-.75V12M2.25 12V5.25c0-.414.336-.75.75-.75h18c.414 0 .75.336.75.75V12M6.75 7.5v3M17.25 7.5v3" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 14h18M3 14v4m0-4V9a2 2 0 012-2h14a2 2 0 012 2v5m0 0v4m-18 0h18M7 11a1 1 0 011-1h2a1 1 0 011 1v3H7v-3z" />
                       </svg>
                       <span>{property.quartos} {property.quartos === 1 ? 'Quarto' : 'Quartos'}</span>
                     </span>
 
                     <span className="flex items-center gap-1.5">
-                      {/* Shower Icon (Banheiros) */}
+                      {/* Shower Icon (Banheiros) - QuintoAndar Style */}
                       <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 4a4 4 0 014 4v2a2 2 0 002 2h4a2 2 0 002-2V8a4 4 0 00-4-4H8zm0 0V2m4 2V2m4 2V2M12 16v6M8 18v4M16 18v4" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 4h4a4 4 0 014 4v2m-3 0h6m-5 4v.5m2-.5v.5m2-.5v.5" />
                       </svg>
                       <span>{property.banheiros} {property.banheiros === 1 ? 'Banh.' : 'Banh.'}</span>
                     </span>
 
                     <span className="flex items-center gap-1.5">
-                       {/* Area Icon (Tamanho) */}
+                       {/* Area Icon (Ruler) - QuintoAndar Style */}
                        <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12h19.5M5 12v2m4-2v2m4-2v2m4-2v2" />
                        </svg>
                        <span>{property.tamanho} m²</span>
                     </span>
 
                     <span className="flex items-center gap-1.5">
-                       {/* Car/Garage Icon (Vagas) */}
+                       {/* Car/Garage Icon (Vagas - Front View) - QuintoAndar Style */}
                        <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6V4.5a1.5 1.5 0 00-1.5-1.5h-6A1.5 1.5 0 007.5 4.5V6m9 0h1.5a1.5 1.5 0 011.5 1.5v3m-12-4.5H6A1.5 1.5 0 004.5 7.5v3m3 3h9m-9 3h9M5.25 18a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5zm13.5 0a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z" />
+                         <path strokeLinecap="round" strokeLinejoin="round" d="M7 8h10a2 2 0 012 2v4a2 2 0 01-2 2H7a2 2 0 01-2-2v-4a2 2 0 012-2zM5 11h14M8 13h0.01M16 13h0.01M6 16v1a1 1 0 001 1h1m10-2v1a1 1 0 01-1 1h-1" />
                        </svg>
                        <span>{property.vagas || 0} {property.vagas === 1 ? 'Vaga' : 'Vagas'}</span>
                     </span>

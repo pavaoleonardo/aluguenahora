@@ -236,21 +236,21 @@ export default function PropertyDetailClient({ id }: { id: string }) {
                   
                   <div className="flex items-center gap-2 group transition-colors hover:text-primary">
                     <svg className="h-5 w-5 text-gray-400 group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                       <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12h19.5M2.25 12v6.75c0 .414.336.75.75.75h18c.414 0 .75-.336.75-.75V12M2.25 12V5.25c0-.414.336-.75.75-.75h18c.414 0 .75.336.75.75V12M6.75 7.5v3M17.25 7.5v3" />
+                       <path strokeLinecap="round" strokeLinejoin="round" d="M3 14h18M3 14v4m0-4V9a2 2 0 012-2h14a2 2 0 012 2v5m0 0v4m-18 0h18M7 11a1 1 0 011-1h2a1 1 0 011 1v3H7v-3z" />
                     </svg>
                     <span className="text-base font-medium text-gray-900">{property.quartos} {property.quartos === 1 ? 'quarto' : 'quartos'}</span>
                   </div>
 
                   <div className="flex items-center gap-2 group transition-colors hover:text-primary">
                     <svg className="h-5 w-5 text-gray-400 group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                       <path strokeLinecap="round" strokeLinejoin="round" d="M8 4a4 4 0 014 4v2a2 2 0 002 2h4a2 2 0 002-2V8a4 4 0 00-4-4H8zm0 0V2m4 2V2m4 2V2M12 16v6M8 18v4M16 18v4" />
+                       <path strokeLinecap="round" strokeLinejoin="round" d="M4 4h4a4 4 0 014 4v2m-3 0h6m-5 4v.5m2-.5v.5m2-.5v.5" />
                     </svg>
                     <span className="text-base font-medium text-gray-900">{property.banheiros} {property.banheiros === 1 ? 'banheiro' : 'banheiros'}</span>
                   </div>
 
                   <div className="flex items-center gap-2 group transition-colors hover:text-primary">
                     <svg className="h-5 w-5 text-gray-400 group-hover:text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                       <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6V4.5a1.5 1.5 0 00-1.5-1.5h-6A1.5 1.5 0 007.5 4.5V6m9 0h1.5a1.5 1.5 0 011.5 1.5v3m-12-4.5H6A1.5 1.5 0 004.5 7.5v3m3 3h9m-9 3h9M5.25 18a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5zm13.5 0a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z" />
+                       <path strokeLinecap="round" strokeLinejoin="round" d="M7 8h10a2 2 0 012 2v4a2 2 0 01-2 2H7a2 2 0 01-2-2v-4a2 2 0 012-2zM5 11h14M8 13h0.01M16 13h0.01M6 16v1a1 1 0 001 1h1m10-2v1a1 1 0 01-1 1h-1" />
                     </svg>
                     <span className="text-base font-medium text-gray-900">{property.vagas || 0} {property.vagas === 1 ? 'vaga' : 'vagas'}</span>
                   </div>

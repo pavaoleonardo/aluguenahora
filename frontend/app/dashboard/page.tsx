@@ -173,7 +173,7 @@ export default function DashboardPage() {
                                      <span className="text-gray-300">•</span>
                                      <p className="text-sm text-gray-500 font-medium flex items-center gap-1">
                                        <svg className="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6V4.5a1.5 1.5 0 00-1.5-1.5h-6A1.5 1.5 0 007.5 4.5V6m9 0h1.5a1.5 1.5 0 011.5 1.5v3m-12-4.5H6A1.5 1.5 0 004.5 7.5v3m3 3h9m-9 3h9M5.25 18a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5zm13.5 0a2.25 2.25 0 100 4.5 2.25 2.25 0 000-4.5z" />
+                                         <path strokeLinecap="round" strokeLinejoin="round" d="M7 8h10a2 2 0 012 2v4a2 2 0 01-2 2H7a2 2 0 01-2-2v-4a2 2 0 012-2zM5 11h14M8 13h0.01M16 13h0.01M6 16v1a1 1 0 001 1h1m10-2v1a1 1 0 01-1 1h-1" />
                                        </svg>
                                        {property.vagas || 0}
                                      </p>
