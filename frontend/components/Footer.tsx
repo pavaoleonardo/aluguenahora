@@ -119,7 +119,7 @@ export default function Footer() {
                     contato@aluguenahora.com.br
                   </li>
                   <li className="text-sm leading-6 text-gray-300">
-                    +55 (67) 99999-9999
+                    +55 (00) 00000-0000
                   </li>
                 </ul>
               </div>

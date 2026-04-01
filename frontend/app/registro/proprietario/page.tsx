@@ -160,7 +160,7 @@ export default function RegisterProprietarioPage() {
                   id="celular" name="celular" type="text" required
                   value={formData.celular} onChange={handleChange}
                   className="block w-full rounded-md py-2 px-3 text-gray-900 text-sm font-medium border-gray-300 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-gray-400 shadow-sm" 
-                  placeholder="(00) 90000-0000" 
+                  placeholder="(00) 00000-0000" 
                 />
               </div>
             </div>
