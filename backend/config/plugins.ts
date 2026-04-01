@@ -27,8 +27,8 @@ export default ({ env }: { env: any }) => ({
         },
       },
       settings: {
-        defaultFrom: 'Alugue na Hora <noreply@mail.aluguenahora.com.br>',
-        defaultReplyTo: 'noreply@mail.aluguenahora.com.br',
+        defaultFrom: env('SMTP_DEFAULT_FROM', 'Alugue na Hora <noreply@aluguenahora.com.br>'),
+        defaultReplyTo: env('SMTP_DEFAULT_REPLY_TO', 'noreply@aluguenahora.com.br'),
       },
     },
   },
