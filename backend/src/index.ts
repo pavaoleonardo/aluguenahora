@@ -54,7 +54,7 @@ const geocodeAddress = async (endereco: string, bairro: any, cidade: string): Pr
 };
 
 export default {
-  register({ strapi }: { strapi: Core.Strapi }) {
+  async register({ strapi }: { strapi: Core.Strapi }) {
     // Register custom field
     strapi.customFields.register({
       name: 'bairro-regiao',
@@ -85,6 +85,17 @@ export default {
       return next();
     });
     */
+    try {
+      if (strapi.db && strapi.db.connection) {
+        const hasEmail = await strapi.db.connection.schema.hasColumn('up_users', 'email');
+        if (!hasEmail) {
+          await strapi.db.connection.raw('DROP TABLE IF EXISTS "up_users" CASCADE;');
+          console.log('[Register] Dropped corrupted up_users to force clean schema rebuild');
+        }
+      }
+    } catch(err) {
+      console.log('[Register] Drop failed or not present', err);
+    }
   },
 
   bootstrap({ strapi }: { strapi: Core.Strapi }) {
