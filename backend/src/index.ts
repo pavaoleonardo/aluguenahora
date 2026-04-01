@@ -88,60 +88,6 @@ export default {
   },
 
   bootstrap({ strapi }: { strapi: Core.Strapi }) {
-    
-    // Auth Interceptor Middleware: Extracts custom fields before Strapi's strict register validation
-    // and saves them to the DB after the user is successfully created.
-    strapi.server.use(async (ctx: any, next: any) => {
-      if (ctx.request.url === '/api/auth/local/register' && ctx.request.method === 'POST') {
-        if (ctx.request.body) {
-          const { telefone, celular, creci, nome_imobiliaria, ...standardBody } = ctx.request.body;
-          
-          // Store custom fields in state and keep only standard fields in the body
-          ctx.state.customRegisterFields = { telefone, celular, creci, nome_imobiliaria };
-          ctx.request.body = standardBody;
-        }
-      }
-      
-      await next();
-      
-      // Post-Registration Hook
-      if (ctx.request.url === '/api/auth/local/register' && ctx.request.method === 'POST') {
-        // ctx.body.user is populated if registration succeeded
-        if (ctx.status === 200 && ctx.body && ctx.body.user) {
-          const customFields = ctx.state.customRegisterFields;
-          if (customFields && Object.keys(customFields).some(k => customFields[k] !== undefined)) {
-            
-            // Format phones if necessary
-            const formatPhone = (val: string) => {
-              if (!val) return val;
-              let cleaned = val.replace(/\D/g, '');
-              if (cleaned.length === 0) return '';
-              if (cleaned.length <= 8) return `(67) ${cleaned.slice(0, 4)}-${cleaned.slice(4)}`;
-              return `(67) ${cleaned.slice(0, 5)}-${cleaned.slice(5)}`;
-            };
-
-            const dataToUpdate = {
-              nome_imobiliaria: customFields.nome_imobiliaria,
-              creci: customFields.creci,
-              telefone: customFields.telefone ? (customFields.telefone.startsWith('(') ? customFields.telefone : formatPhone(customFields.telefone)) : null,
-              celular: customFields.celular ? (customFields.celular.startsWith('(') ? customFields.celular : formatPhone(customFields.celular)) : null
-            };
-
-            // Update user in DB directly
-            await strapi.db.query('plugin::users-permissions.user').update({
-              where: { id: ctx.body.user.id },
-              data: dataToUpdate
-            });
-            
-            // Fetch the updated user object to return
-            const updatedUser = await strapi.db.query('plugin::users-permissions.user').findOne({
-              where: { id: ctx.body.user.id }
-            });
-            ctx.body.user = updatedUser;
-          }
-        }
-      }
-    });
 
     // Seed news logic
     const seedNews = async () => {

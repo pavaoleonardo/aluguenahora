@@ -67,28 +67,48 @@ export default function RegisterCorretorPage() {
     setSuccess('')
 
     try {
-      // In Strapi, the default required fields are username, email, password.
-      // We map Nome Completo to username.
+      // 1. Cadastro apenas com campos padrões definidos pelo Strapi
       const res = await fetch(`${API_BASE_URL}/api/auth/local/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           username: formData.nomeCompleto, 
           email: formData.email, 
-          password: formData.password,
-          // Passing extra fields (Strapi captures these only if added to User schema via Extensions)
-          // Passing extra fields
-          nome_imobiliaria: formData.nomeImobiliaria,
-          creci: formData.creci,
-          telefone: formData.telefone,
-          celular: formData.celular
+          password: formData.password
         }),
       })
       
-      const data = await res.json()
+      let data = await res.json()
       
       if (!res.ok) {
         throw new Error(data.error?.message || 'Erro ao cadastrar conta')
+      }
+
+      // 2. Se o cadastro for ok e retornar jwt, atualizamos os campos customizados
+      if (data.jwt && data.user) {
+        const updateUserId = data.user.documentId || data.user.id;
+        try {
+          const updateRes = await fetch(`${API_BASE_URL}/api/users/${updateUserId}`, {
+            method: 'PUT',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${data.jwt}`
+            },
+            body: JSON.stringify({ 
+              nome_imobiliaria: formData.nomeImobiliaria,
+              creci: formData.creci,
+              telefone: formData.telefone,
+              celular: formData.celular
+            }),
+          });
+          
+          if (updateRes.ok) {
+            const updatedUser = await updateRes.json();
+            data.user = updatedUser; // Update our local user obj
+          }
+        } catch (updateErr) {
+          console.error("Não foi possível atualizar dados secundários:", updateErr);
+        }
       }
 
       if (!data.jwt) {
