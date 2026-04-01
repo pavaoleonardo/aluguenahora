@@ -85,36 +85,34 @@ export default {
       return next();
     });
     */
-    try {
-      if (strapi.db && strapi.db.connection) {
-        const hasEmail = await strapi.db.connection.schema.hasColumn('up_users', 'email');
-        if (!hasEmail) {
-          await strapi.db.connection.raw('DROP TABLE IF EXISTS "up_users" CASCADE;');
-          console.log('[Register] Dropped corrupted up_users to force clean schema rebuild');
-        }
-      }
-    } catch(err) {
-      console.log('[Register] Drop failed or not present', err);
-    }
   },
-
   bootstrap({ strapi }: { strapi: Core.Strapi }) {
-    
-    // Auto-migrate custom user columns to the up_users database safely without losing data
+    // Auto-recovery for corrupted up_users table (e.g., from schema.json conflict)
     (async () => {
       try {
-        const hasTelefone = await strapi.db.connection.schema.hasColumn('up_users', 'telefone');
-        if (!hasTelefone) {
-          await strapi.db.connection.schema.alterTable('up_users', (table: any) => {
-            table.string('telefone', 255);
-            table.string('celular', 255);
-            table.string('creci', 255);
-            table.string('nome_imobiliaria', 255);
-          });
-          console.log('[Bootstrap] Successfully added custom structural columns to up_users.');
+        if (strapi.db && strapi.db.connection) {
+          const hasEmail = await strapi.db.connection.schema.hasColumn('up_users', 'email');
+          if (!hasEmail) {
+            console.log('🚨 [Bootstrap] CRITICAL: Corrupted up_users table detected (missing email column). Dropping table to allow clean rebuild...');
+            await strapi.db.connection.raw('DROP TABLE IF EXISTS "up_users" CASCADE;');
+            console.log('🚨 [Bootstrap] Table dropped! Restarting Strapi to force schema generation...');
+            process.exit(1); // PM2 will auto-restart and Strapi will seamlessly rebuild the robust table
+          } else {
+            // Apply safe custom columns if table is healthy
+            const hasTelefone = await strapi.db.connection.schema.hasColumn('up_users', 'telefone');
+            if (!hasTelefone) {
+              await strapi.db.connection.schema.alterTable('up_users', (table: any) => {
+                table.string('telefone', 255);
+                table.string('celular', 255);
+                table.string('creci', 255);
+                table.string('nome_imobiliaria', 255);
+              });
+              console.log('[Bootstrap] Successfully added custom structural columns to healthy up_users table.');
+            }
+          }
         }
       } catch (err: any) {
-        console.warn('[Bootstrap] Auto-migration logic error:', err.message);
+        console.warn('[Bootstrap] Auto-recovery logic error:', err.message);
       }
     })();
 
