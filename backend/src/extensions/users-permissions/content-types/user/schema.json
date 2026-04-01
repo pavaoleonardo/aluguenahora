@@ -1,0 +1,16 @@
+{
+  "attributes": {
+    "telefone": {
+      "type": "string"
+    },
+    "celular": {
+      "type": "string"
+    },
+    "creci": {
+      "type": "string"
+    },
+    "nome_imobiliaria": {
+      "type": "string"
+    }
+  }
+}
