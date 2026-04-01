@@ -1,5 +1,5 @@
 import type { StrapiApp } from '@strapi/strapi/admin';
-import AuthLogo from './extensions/logo.png';
+import AuthLogo from './extensions/logo.svg';
 import favicon from './extensions/favicon.png';
 
 export default {
