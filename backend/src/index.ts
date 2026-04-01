@@ -87,17 +87,12 @@ export default {
     */
   },
   bootstrap({ strapi }: { strapi: Core.Strapi }) {
-    // Auto-recovery for corrupted up_users table (e.g., from schema.json conflict)
+    // Auto-recovery for corrupted up_users table
     (async () => {
       try {
         if (strapi.db && strapi.db.connection) {
-          const hasEmail = await strapi.db.connection.schema.hasColumn('up_users', 'email');
-          if (!hasEmail) {
-            console.log('🚨 [Bootstrap] CRITICAL: Corrupted up_users table detected (missing email column). Dropping table to allow clean rebuild...');
-            await strapi.db.connection.raw('DROP TABLE IF EXISTS "up_users" CASCADE;');
-            console.log('🚨 [Bootstrap] Table dropped! Restarting Strapi to force schema generation...');
-            process.exit(1); // PM2 will auto-restart and Strapi will seamlessly rebuild the robust table
-          } else {
+          const hasTable = await strapi.db.connection.schema.hasTable('up_users');
+          if (hasTable) {
             // Apply safe custom columns if table is healthy
             const hasTelefone = await strapi.db.connection.schema.hasColumn('up_users', 'telefone');
             if (!hasTelefone) {
