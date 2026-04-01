@@ -100,9 +100,11 @@ export default {
           // Strapi natively hardcodes 'no-reply@strapi.io', which actively crashes Resend. Override this to the verified Sender.
           templateSettings.email_confirmation.options.from.email = 'noreply@mail.aluguenahora.com.br';
           templateSettings.email_confirmation.options.from.name = 'Alugue na Hora';
+          templateSettings.email_confirmation.options.response_email = 'noreply@mail.aluguenahora.com.br';
           
           templateSettings.reset_password.options.from.email = 'noreply@mail.aluguenahora.com.br';
           templateSettings.reset_password.options.from.name = 'Alugue na Hora';
+          templateSettings.reset_password.options.response_email = 'noreply@mail.aluguenahora.com.br';
           
           await pluginStore.set({ key: 'email', value: templateSettings });
           console.log('✅ [Bootstrap] Re-aligned Users-Permissions email shipper domains for Resend SMTP compatibility.');
