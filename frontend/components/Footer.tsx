@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 
 const navigation = {
@@ -58,7 +59,15 @@ export default function Footer() {
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
           <div className="space-y-8">
              <Link href="/" className="focus:outline-none focus:ring-2 focus:ring-white/20 rounded-md inline-block">
-                <span className="text-xl font-bold tracking-tight text-white leading-6 inline-block">Alugue Na Hora</span>
+                <span className="sr-only">Alugue na Hora</span>
+                <Image 
+                  src="/logo.svg" 
+                  alt="Alugue na Hora Logo" 
+                  width={150}
+                  height={60}
+                  className="h-12 w-auto object-contain brightness-0 invert"
+                  priority
+                />
               </Link>
             <p className="text-sm leading-6 text-gray-300">
               Facilitando a sua vida na hora de alugar ou comprar o imóvel dos seus sonhos.
