@@ -87,13 +87,40 @@ export default {
     */
   },
   bootstrap({ strapi }: { strapi: Core.Strapi }) {
-    // Auto-recovery for corrupted up_users table
+    // Auto-recovery for corrupted or missing up_users table
     (async () => {
       try {
         if (strapi.db && strapi.db.connection) {
           const hasTable = await strapi.db.connection.schema.hasTable('up_users');
-          if (hasTable) {
-            // Apply safe custom columns if table is healthy
+          if (!hasTable) {
+            console.log('🚨 [Bootstrap] up_users table is missing! Natively reconstructing base schema...');
+            await strapi.db.connection.schema.createTable('up_users', (table: any) => {
+              table.increments('id').primary();
+              table.string('username', 255);
+              table.string('email', 255);
+              table.string('provider', 255);
+              table.string('password', 255);
+              table.string('reset_password_token', 255);
+              table.string('confirmation_token', 255);
+              table.boolean('confirmed').defaultTo(false);
+              table.boolean('blocked').defaultTo(false);
+              table.integer('role_id'); // Relation to up_roles
+              table.datetime('created_at').defaultTo(strapi.db.connection.fn.now());
+              table.datetime('updated_at').defaultTo(strapi.db.connection.fn.now());
+              table.integer('created_by_id');
+              table.integer('updated_by_id');
+              table.string('document_id', 255);
+              table.string('published_at', 255);
+              
+              // Our custom fields
+              table.string('telefone', 255);
+              table.string('celular', 255);
+              table.string('creci', 255);
+              table.string('nome_imobiliaria', 255);
+            });
+            console.log('✅ [Bootstrap] up_users table successfully reconstructed with custom fields.');
+          } else {
+            // Apply safe custom columns if table exists but is missing our custom fields
             const hasTelefone = await strapi.db.connection.schema.hasColumn('up_users', 'telefone');
             if (!hasTelefone) {
               await strapi.db.connection.schema.alterTable('up_users', (table: any) => {
