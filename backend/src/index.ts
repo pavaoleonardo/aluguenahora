@@ -87,6 +87,31 @@ export default {
     */
   },
   bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    // 1. Force the Users-Permissions "Shipper email" to match Resend's strict domain rules so 400 Bad Request errors stop
+    (async () => {
+      try {
+        const pluginStore = strapi.store({
+          environment: '',
+          type: 'plugin',
+          name: 'users-permissions',
+        });
+        const templateSettings = await pluginStore.get({ key: 'email' }) as any;
+        if (templateSettings && templateSettings.email_confirmation) {
+          // Strapi natively hardcodes 'no-reply@strapi.io', which actively crashes Resend. Override this to the verified Sender.
+          templateSettings.email_confirmation.options.from.email = 'noreply@mail.aluguenahora.com.br';
+          templateSettings.email_confirmation.options.from.name = 'Alugue na Hora';
+          
+          templateSettings.reset_password.options.from.email = 'noreply@mail.aluguenahora.com.br';
+          templateSettings.reset_password.options.from.name = 'Alugue na Hora';
+          
+          await pluginStore.set({ key: 'email', value: templateSettings });
+          console.log('✅ [Bootstrap] Re-aligned Users-Permissions email shipper domains for Resend SMTP compatibility.');
+        }
+      } catch (err: any) {
+        console.log('[Bootstrap] Error fetching email template settings:', err.message);
+      }
+    })();
+
     // 2. Auto-recovery for corrupted or missing up_users table
     (async () => {
       try {
