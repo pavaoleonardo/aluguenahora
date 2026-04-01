@@ -88,6 +88,24 @@ export default {
   },
 
   bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    
+    // Auto-migrate custom user columns to the up_users database safely without losing data
+    (async () => {
+      try {
+        const hasTelefone = await strapi.db.connection.schema.hasColumn('up_users', 'telefone');
+        if (!hasTelefone) {
+          await strapi.db.connection.schema.alterTable('up_users', (table: any) => {
+            table.string('telefone', 255);
+            table.string('celular', 255);
+            table.string('creci', 255);
+            table.string('nome_imobiliaria', 255);
+          });
+          console.log('[Bootstrap] Successfully added custom structural columns to up_users.');
+        }
+      } catch (err: any) {
+        console.warn('[Bootstrap] Auto-migration logic error:', err.message);
+      }
+    })();
 
     // Seed news logic
     const seedNews = async () => {
