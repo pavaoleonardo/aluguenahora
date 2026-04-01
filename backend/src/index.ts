@@ -87,25 +87,6 @@ export default {
     */
   },
   bootstrap({ strapi }: { strapi: Core.Strapi }) {
-    // 1. Disable Email Confirmation Programmatically to avoid 400 Bad Request errors on VPS right now
-    (async () => {
-      try {
-        const pluginStore = strapi.store({
-          environment: '',
-          type: 'plugin',
-          name: 'users-permissions',
-        });
-        const settings = await pluginStore.get({ key: 'advanced' }) as any;
-        if (settings && settings.email_confirmation) {
-          settings.email_confirmation = false;
-          await pluginStore.set({ key: 'advanced', value: settings });
-          console.log('✅ [Bootstrap] Disabling email_confirmation to prevent registration 400 errors until SMTP is active.');
-        }
-      } catch (err: any) {
-        console.log('[Bootstrap] Error fetching advanced settings:', err.message);
-      }
-    })();
-
     // 2. Auto-recovery for corrupted or missing up_users table
     (async () => {
       try {
