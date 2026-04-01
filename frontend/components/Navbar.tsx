@@ -22,14 +22,14 @@ export default function Navbar() {
     <header className="bg-white/95 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-100 shadow-sm transition-all duration-300">
       <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8">
         <div className="flex lg:flex-1">
-          <Link href="/" className="p-1.5 flex flex-col items-center group transition-transform hover:scale-105">
+          <Link href="/" className="p-1 flex items-center group transition-transform hover:scale-105">
             <span className="sr-only">Alugue na Hora</span>
             <Image 
               src="/logo.svg" 
               alt="Alugue na Hora Logo" 
-              width={160}
-              height={80}
-              className="h-16 w-auto object-contain"
+              width={200}
+              height={42}
+              className="h-11 w-auto object-contain"
               priority
             />
           </Link>
@@ -124,13 +124,13 @@ export default function Navbar() {
         <div className="fixed inset-0 z-50" />
         <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
-            <Link href="/" className="p-1.5 flex items-center">
+            <Link href="/" className="p-1 flex items-center">
               <span className="sr-only">Alugue na Hora</span>
               <Image 
                 src="/logo.svg" 
                 alt="Alugue na Hora Logo" 
-                width={140}
-                height={50}
+                width={180}
+                height={38}
                 className="h-10 w-auto object-contain"
               />
             </Link>
