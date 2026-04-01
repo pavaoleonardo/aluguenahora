@@ -109,8 +109,24 @@ export default {
           await pluginStore.set({ key: 'email', value: templateSettings });
           console.log('✅ [Bootstrap] Re-aligned Users-Permissions email shipper domains for Resend SMTP compatibility.');
         }
+
+        // Grant 'Authenticated' role permission to update their own user details (needed for your frontend registration 2nd step)
+        const authenticatedRole = await strapi.db.query('plugin::users-permissions.role').findOne({
+          where: { type: 'authenticated' }
+        });
+        
+        if (authenticatedRole) {
+           await strapi.db.query('plugin::users-permissions.permission').updateMany({
+             where: { 
+               role: authenticatedRole.id,
+               action: 'plugin::users-permissions.user.update'
+             },
+             data: { enabled: true }
+           });
+           console.log('✅ [Bootstrap] Granted Authenticated role permission to update profile fields.');
+        }
       } catch (err: any) {
-        console.log('[Bootstrap] Error fetching email template settings:', err.message);
+        console.log('[Bootstrap] Error during plugin configuration:', err.message);
       }
     })();
 
@@ -176,6 +192,27 @@ export default {
                  table.integer('role');
                });
                console.log('[Bootstrap] Added explicitly missing role column to up_users.');
+            }
+
+            // Safety: Strapi 5 Admin Panel crashes if users are missing a valid documentId or locale.
+            // We force-populate them here if they were missed during manual DB creation.
+            const usersMissingDocs = await strapi.db.connection('up_users')
+              .whereNull('document_id')
+              .orWhereNull('locale');
+
+            if (usersMissingDocs.length > 0) {
+              console.log(`🚨 [Bootstrap] Found ${usersMissingDocs.length} users with missing documentId/locale. Healing data for Admin UI stability...`);
+              const crypto = require('crypto');
+              for (const u of usersMissingDocs) {
+                await strapi.db.connection('up_users')
+                  .where({ id: u.id })
+                  .update({ 
+                    document_id: u.document_id || crypto.randomBytes(12).toString('hex'),
+                    locale: u.locale || 'pt-BR',
+                    published_at: u.published_at || new Date().toISOString()
+                  });
+              }
+              console.log('✅ [Bootstrap] Healed malformed users. Admin UI should be stable now.');
             }
           }
         }
