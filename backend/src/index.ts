@@ -111,6 +111,7 @@ export default {
               table.integer('updated_by_id');
               table.string('document_id', 255);
               table.string('published_at', 255);
+              table.string('locale', 255);
               
               // Our custom fields
               table.string('telefone', 255);
@@ -130,6 +131,15 @@ export default {
                 table.string('nome_imobiliaria', 255);
               });
               console.log('[Bootstrap] Successfully added custom structural columns to healthy up_users table.');
+            }
+            
+            // Fix: Strapi i18n plugin demands "locale" column but might be missing on manual db reconstruction
+            const hasLocale = await strapi.db.connection.schema.hasColumn('up_users', 'locale');
+            if (!hasLocale) {
+               await strapi.db.connection.schema.alterTable('up_users', (table: any) => {
+                 table.string('locale', 255);
+               });
+               console.log('[Bootstrap] Added explicitly missing locale column to up_users.');
             }
           }
         }
