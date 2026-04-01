@@ -168,6 +168,15 @@ export default {
                });
                console.log('[Bootstrap] Added explicitly missing locale column to up_users.');
             }
+            
+            // Fix: Strapi 5 uses "role" direct column in some queries for users-permissions limits and authentications
+            const hasRole = await strapi.db.connection.schema.hasColumn('up_users', 'role');
+            if (!hasRole) {
+               await strapi.db.connection.schema.alterTable('up_users', (table: any) => {
+                 table.integer('role');
+               });
+               console.log('[Bootstrap] Added explicitly missing role column to up_users.');
+            }
           }
         }
       } catch (err: any) {
