@@ -36,6 +36,9 @@
         "banheiros": {
             "type": "integer"
         },
+        "vagas": {
+            "type": "integer"
+        },
         "bairro": {
             "type": "customField",
             "customField": "global::bairro-regiao"
@@ -108,6 +111,9 @@
         },
         "caracteristicas": {
             "type": "json"
+        },
+        "video_url": {
+            "type": "string"
         }
     }
 }

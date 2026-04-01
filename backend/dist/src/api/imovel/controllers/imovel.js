@@ -2,14 +2,22 @@
 /**
  * imovel controller - BUILD TRIGGER v4
  */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const strapi_1 = require("@strapi/strapi");
+const path_1 = __importDefault(require("path"));
+const fs_1 = __importDefault(require("fs"));
+const crypto_1 = __importDefault(require("crypto"));
 const isOwnerOfProperty = (property, user) => {
     if (!(property === null || property === void 0 ? void 0 : property.usuario) || !user)
         return false;
     return (property.usuario.documentId === user.documentId ||
         property.usuario.id === user.id);
 };
+const VIDEO_MAX_SIZE = 60 * 1024 * 1024; // 60MB
+const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/quicktime', 'video/webm', 'video/ogg'];
 const sanitizePropertyInput = (input) => {
     const data = { ...(input || {}) };
     delete data.usuario;
@@ -158,65 +166,23 @@ exports.default = strapi_1.factories.createCoreController('api::imovel.imovel', 
             const sanitizedInput = await this.sanitizeInput(ctx.request.body.data, ctx);
             const safeData = sanitizePropertyInput(sanitizedInput);
             ctx.request.body.data = safeData;
-            // Delegate to default which handles media mappings properly
+            // Delegate to default which handles media mappings properly (modifies Draft)
             const result = await super.update(ctx);
+            // FORCE UNPUBLISH: When a user edits a property, immediately pull it down from live
+            // so the admin has to review the new photos/description and re-publish it.
+            try {
+                await strapi.documents('api::imovel.imovel').unpublish({
+                    documentId: id,
+                });
+            }
+            catch (unpublishErr) {
+                console.error('Failed to auto-unpublish property after edit:', unpublishErr);
+            }
             return result;
         }
         catch (err) {
             console.error('Custom update error', err);
             return ctx.badRequest(err.message || 'Erro ao atualizar imóvel.');
-        }
-    },
-    async fix(ctx) {
-        try {
-            const users = await strapi.db.query('plugin::users-permissions.user').findMany();
-            // List all users
-            const userList = users.map((u) => ({
-                id: u.id,
-                documentId: u.documentId,
-                username: u.username,
-                email: u.email,
-            }));
-            // If action=reassign, reassign specific properties to a user
-            const action = ctx.query.action;
-            const targetUserDocId = ctx.query.targetUser;
-            const propertyDocIds = ctx.query.properties; // comma-separated
-            if (action === 'reassign' && targetUserDocId && propertyDocIds) {
-                const docIdList = propertyDocIds.split(',');
-                const results = [];
-                const errs = [];
-                for (const docId of docIdList) {
-                    try {
-                        await strapi.documents('api::imovel.imovel').update({
-                            documentId: docId.trim(),
-                            data: { usuario: targetUserDocId }
-                        });
-                        results.push({ docId: docId.trim(), status: 'reassigned' });
-                    }
-                    catch (e) {
-                        errs.push({ docId: docId.trim(), error: e.message });
-                    }
-                }
-                return ctx.send({ action: 'reassign', results, errs, targetUserDocId });
-            }
-            // Default: list users and all properties with their owners
-            const allProperties = await strapi.db.query('api::imovel.imovel').findMany({
-                populate: ['usuario'],
-            });
-            const propertyList = allProperties.map((p) => {
-                var _a, _b;
-                return ({
-                    id: p.id,
-                    documentId: p.documentId,
-                    titulo: p.titulo,
-                    ownerUserId: ((_a = p.usuario) === null || _a === void 0 ? void 0 : _a.id) || null,
-                    ownerUsername: ((_b = p.usuario) === null || _b === void 0 ? void 0 : _b.username) || 'NONE',
-                });
-            });
-            return ctx.send({ users: userList, properties: propertyList });
-        }
-        catch (err) {
-            return ctx.badRequest(err.message);
         }
     },
     async create(ctx) {
@@ -254,6 +220,57 @@ exports.default = strapi_1.factories.createCoreController('api::imovel.imovel', 
         catch (err) {
             console.error('[Create Imovel] ERROR:', err);
             return ctx.badRequest(err.message || 'Erro ao criar imóvel.');
+        }
+    },
+    async uploadVideo(ctx) {
+        try {
+            if (!ctx.request.files || !ctx.request.files.video) {
+                return ctx.badRequest('Arquivo de vídeo não encontrado.');
+            }
+            const file = Array.isArray(ctx.request.files.video)
+                ? ctx.request.files.video[0]
+                : ctx.request.files.video;
+            const fileAny = file;
+            // Strapi 5 / Formidable 3 properties
+            const fileSize = fileAny.size;
+            const fileType = fileAny.mimetype || fileAny.type; // Fallback for safety
+            const fileTempPath = fileAny.filepath || fileAny.path;
+            const fileNameOriginal = fileAny.originalFilename || fileAny.name;
+            // Validation
+            if (fileSize > VIDEO_MAX_SIZE) {
+                return ctx.badRequest('O vídeo excede o limite de 60MB.');
+            }
+            if (!ALLOWED_VIDEO_TYPES.includes(fileType)) {
+                return ctx.badRequest('Formato de vídeo não suportado. Use MP4, MOV, WebM ou OGG.');
+            }
+            // Prepare local path
+            const uploadDir = path_1.default.join(process.cwd(), 'public', 'uploads', 'videos');
+            if (!fs_1.default.existsSync(uploadDir)) {
+                fs_1.default.mkdirSync(uploadDir, { recursive: true });
+            }
+            const extension = path_1.default.extname(fileNameOriginal || '');
+            const fileName = `${crypto_1.default.randomUUID()}${extension}`;
+            const filePath = path_1.default.join(uploadDir, fileName);
+            // Copy file to local storage
+            if (fileTempPath) {
+                fs_1.default.copyFileSync(fileTempPath, filePath);
+                // Clean up temp file
+                if (fs_1.default.existsSync(fileTempPath)) {
+                    try {
+                        fs_1.default.unlinkSync(fileTempPath);
+                    }
+                    catch (e) { }
+                }
+            }
+            // Return consistent URL path
+            return ctx.send({
+                url: `/uploads/videos/${fileName}`,
+                name: fileNameOriginal,
+            });
+        }
+        catch (err) {
+            console.error('[Video Upload] ERROR:', err);
+            return ctx.badRequest('Falha ao processar o upload do vídeo.');
         }
     },
 }));

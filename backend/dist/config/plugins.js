@@ -16,4 +16,22 @@ exports.default = ({ env }) => ({
             },
         },
     },
+    email: {
+        config: {
+            provider: 'nodemailer',
+            providerOptions: {
+                host: env('SMTP_HOST', 'smtp-mail.outlook.com'),
+                port: env.int('SMTP_PORT', 587),
+                secure: env.bool('SMTP_SECURE', false),
+                auth: {
+                    user: env('SMTP_USERNAME'),
+                    pass: env('SMTP_PASSWORD'),
+                },
+            },
+            settings: {
+                defaultFrom: 'Alugue na Hora <noreply@mail.aluguenahora.com.br>',
+                defaultReplyTo: 'noreply@mail.aluguenahora.com.br',
+            },
+        },
+    },
 });

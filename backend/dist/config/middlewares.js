@@ -5,6 +5,8 @@ exports.default = ({ env }) => {
     const frontendUrls = [
         'http://localhost:3000',
         'http://127.0.0.1:3000',
+        'https://aluguenahora.com.br',
+        'https://www.aluguenahora.com.br'
     ];
     return [
         'strapi::logger',
@@ -16,8 +18,8 @@ exports.default = ({ env }) => {
                     useDefaults: true,
                     directives: {
                         'connect-src': ["'self'", 'https:'],
-                        'img-src': ["'self'", 'data:', 'blob:', 'res.cloudinary.com', 'market-assets.strapiapp.com'],
-                        'media-src': ["'self'", 'data:', 'blob:', 'res.cloudinary.com', 'market-assets.strapiapp.com'],
+                        'img-src': ["'self'", 'data:', 'blob:', 'res.cloudinary.com', 'market-assets.strapiapp.com', 'aluguenahora.com.br'],
+                        'media-src': ["'self'", 'data:', 'blob:', 'res.cloudinary.com', 'market-assets.strapiapp.com', 'aluguenahora.com.br'],
                         'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
                         'frame-src': ["'self'"],
                     },
