@@ -197,19 +197,22 @@ export default function PropertyDetailClient({ id }: { id: string }) {
   }
 
   return (
-    <div className="bg-white py-12 sm:py-20 lg:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="lg:grid lg:grid-cols-2 lg:gap-x-12">
-          <PropertyGallery
-            fotos={property.fotos}
-            foto_fachada={property.foto_fachada || (property.fotos && property.fotos[0])}
-            titulo={property.titulo}
-            finalidadeLabel={finalidadeLabel}
-            video_url={property.video_url ? `${API_BASE_URL}${property.video_url}` : undefined}
-          />
+    <div className="bg-white">
+      {/* Full-Screen Edge-to-Edge Filmstrip Gallery */}
+      <div className="w-full bg-[#111] overflow-hidden">
+        <PropertyGallery
+          fotos={property.fotos}
+          foto_fachada={property.foto_fachada || (property.fotos && property.fotos[0])}
+          titulo={property.titulo}
+          finalidadeLabel={finalidadeLabel}
+          video_url={property.video_url ? `${API_BASE_URL}${property.video_url}` : undefined}
+        />
+      </div>
 
-          <div className="mt-8 lg:mt-0 flex flex-col">
-            <div className="flex-1">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <div className="flex flex-col lg:flex-row lg:gap-x-12">
+          {/* Main Content Box */}
+          <div className="flex-1">
               <nav aria-label="Breadcrumb" className="mb-4">
                 <ol role="list" className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-500 font-medium">
                   <li>
@@ -314,9 +317,8 @@ export default function PropertyDetailClient({ id }: { id: string }) {
                   ) : null}
                 </div>
               </div>
-            </div>
 
-            <div className="mt-10 flex flex-col sm:flex-row gap-4">
+            <div className="mt-10 flex flex-col sm:flex-row gap-4 lg:w-2/3">
               <button className="flex-1 rounded-xl bg-primary px-6 py-4 text-center text-sm font-bold text-white shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all transform hover:-translate-y-0.5 active:translate-y-0">
                 Falar com Consultor
               </button>
@@ -328,6 +330,9 @@ export default function PropertyDetailClient({ id }: { id: string }) {
               </Link>
             </div>
           </div>
+
+          {/* Virtual Contact Form Sidebar */}
+          <div className="hidden lg:block lg:w-1/3"></div>
         </div>
         
         {/* Full-width sections below the grid */}
@@ -401,8 +406,7 @@ export default function PropertyDetailClient({ id }: { id: string }) {
              </div>
           </div>
         )}
-
       </div>
     </div>
-  )
+  );
 }

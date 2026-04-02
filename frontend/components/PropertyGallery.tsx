@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState, useEffect, useRef } from 'react'
+import { useMemo, useState, useEffect, useRef, useCallback } from 'react'
 import Image from 'next/image'
 
 type FotoItem = {
@@ -80,84 +80,83 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
     return allItems
   }, [fotos, foto_fachada, video_url])
 
-  const [activeIndex, setActiveIndex] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalIndex, setModalIndex] = useState(0)
   const videoRef = useRef<HTMLVideoElement>(null)
-  const active = items[activeIndex]
+  const sliderRef = useRef<HTMLDivElement>(null)
   const total = items.length
 
-  const goPrev = (e?: React.MouseEvent | KeyboardEvent) => {
-    if (e && 'stopPropagation' in e) e.stopPropagation();
-    if (items.length <= 1) return
-    setActiveIndex((prev) => {
-      const nextIndex = (prev - 1 + items.length) % items.length;
-      scrollToSlide(nextIndex);
-      return nextIndex;
-    });
-  }
-
-  const goNext = (e?: React.MouseEvent | KeyboardEvent) => {
-    if (e && 'stopPropagation' in e) e.stopPropagation();
-    if (items.length <= 1) return
-    setActiveIndex((prev) => {
-      const nextIndex = (prev + 1) % items.length;
-      scrollToSlide(nextIndex);
-      return nextIndex;
-    });
-  }
-
-  const sliderRef = useRef<HTMLDivElement>(null);
-
-  const scrollToSlide = (index: number) => {
-    if (!sliderRef.current) return;
-    const slideWidth = sliderRef.current.clientWidth;
-    sliderRef.current.scrollTo({
+  // Each slide is ~33.33% of the container width on desktop, 100% on mobile
+  const scrollToIndex = useCallback((index: number) => {
+    if (!sliderRef.current) return
+    const container = sliderRef.current
+    const slideWidth = container.clientWidth / getVisibleSlides()
+    container.scrollTo({
       left: slideWidth * index,
       behavior: 'smooth'
-    });
-  };
+    })
+  }, [])
 
-  const handleScroll = () => {
-    if (!sliderRef.current) return;
-    const slideWidth = sliderRef.current.clientWidth;
-    const newIndex = Math.round(sliderRef.current.scrollLeft / slideWidth);
-    if (newIndex !== activeIndex) {
-      setActiveIndex(newIndex);
-    }
-  };
+  const getVisibleSlides = () => {
+    if (typeof window === 'undefined') return 3
+    if (window.innerWidth < 640) return 1
+    if (window.innerWidth < 1024) return 2
+    return 3
+  }
 
-  // Handle Keyboard Navigation (enabled for both main gallery and modal)
+  const goPrev = useCallback(() => {
+    if (!sliderRef.current) return
+    const container = sliderRef.current
+    const slideWidth = container.clientWidth / getVisibleSlides()
+    container.scrollBy({ left: -slideWidth, behavior: 'smooth' })
+  }, [])
+
+  const goNext = useCallback(() => {
+    if (!sliderRef.current) return
+    const container = sliderRef.current
+    const slideWidth = container.clientWidth / getVisibleSlides()
+    container.scrollBy({ left: slideWidth, behavior: 'smooth' })
+  }, [])
+
+  const modalGoPrev = useCallback(() => {
+    setModalIndex((prev) => (prev - 1 + total) % total)
+  }, [total])
+
+  const modalGoNext = useCallback(() => {
+    setModalIndex((prev) => (prev + 1) % total)
+  }, [total])
+
+  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't trigger if user is typing in an input
-      if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName || '')) return;
+      if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName || '')) return
 
-      if (e.key === 'ArrowRight') {
-        goNext(e);
-      } else if (e.key === 'ArrowLeft') {
-        goPrev(e);
-      } else if (e.key === 'Escape' && isModalOpen) {
-        setIsModalOpen(false);
+      if (isModalOpen) {
+        if (e.key === 'ArrowRight') modalGoNext()
+        else if (e.key === 'ArrowLeft') modalGoPrev()
+        else if (e.key === 'Escape') setIsModalOpen(false)
+      } else {
+        if (e.key === 'ArrowRight') goNext()
+        else if (e.key === 'ArrowLeft') goPrev()
       }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    if (isModalOpen) {
-      document.body.style.overflow = 'hidden';
     }
+
+    window.addEventListener('keydown', handleKeyDown)
+    if (isModalOpen) document.body.style.overflow = 'hidden'
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'auto';
-    };
-  }, [isModalOpen, items.length, activeIndex]);
-
-  // Pause video when navigating away from it
-  useEffect(() => {
-    if (videoRef.current && !active?.isVideo) {
-      videoRef.current.pause()
+      window.removeEventListener('keydown', handleKeyDown)
+      document.body.style.overflow = 'auto'
     }
-  }, [activeIndex, active?.isVideo])
+  }, [isModalOpen, goNext, goPrev, modalGoNext, modalGoPrev])
+
+  // Pause video when navigating away
+  useEffect(() => {
+    if (videoRef.current && isModalOpen) {
+      const modalItem = items[modalIndex]
+      if (!modalItem?.isVideo) videoRef.current.pause()
+    }
+  }, [modalIndex, isModalOpen, items])
 
   // Play icon SVG overlay component
   const PlayIconOverlay = ({ size = 'lg' }: { size?: 'sm' | 'lg' }) => (
@@ -170,29 +169,38 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
     </div>
   )
 
+  if (items.length === 0) {
+    return (
+      <div className="w-full h-[300px] md:h-[400px] bg-gray-900 flex items-center justify-center text-gray-400">
+        Sem Fotos
+      </div>
+    )
+  }
+
   return (
-    <div className="flex flex-col gap-4">
-      {/* Main Slider Window */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md border border-gray-200 bg-gray-100 group">
+    <>
+      {/* Filmstrip Carousel — Infoimóveis style */}
+      <div className="relative w-full h-[280px] sm:h-[350px] md:h-[420px] lg:h-[480px] bg-[#111] group/gallery">
         
-        {/* CSS Scroll Snapping Carousel Container */}
+        {/* Scrollable filmstrip container */}
         <div 
           ref={sliderRef}
-          onScroll={handleScroll}
-          className="flex w-full h-full overflow-x-auto snap-x snap-mandatory scrollbar-hide select-none touch-pan-x scroll-smooth"
+          className="gallery-filmstrip flex w-full h-full overflow-x-auto scroll-smooth select-none touch-pan-x"
         >
-          {items.length > 0 ? items.map((item, idx) => (
+          {items.map((item, idx) => (
             <div 
               key={`${item.originalUrl}-${idx}`} 
-              className="w-full h-full flex-shrink-0 snap-center relative cursor-pointer overflow-hidden bg-gray-100"
-              onClick={() => setIsModalOpen(true)}
+              className="gallery-slide relative flex-shrink-0 h-full cursor-pointer overflow-hidden"
+              onClick={() => {
+                setModalIndex(idx)
+                setIsModalOpen(true)
+              }}
             >
               {item.isVideo ? (
                 <>
                   <video
-                    ref={idx === activeIndex ? videoRef : null}
                     src={item.displayUrl}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-300"
+                    className="w-full h-full object-cover"
                     muted
                     playsInline
                     preload="metadata"
@@ -208,131 +216,112 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
                     src={item.displayUrl}
                     alt={`${titulo} - Imagem ${idx + 1}`}
                     fill
-                    className="object-cover transition-transform duration-300"
-                    priority={idx === 0}
+                    className="object-cover"
+                    priority={idx < 3}
                     unoptimized={true}
                   />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors flex items-center justify-center z-10 pointer-events-none">
-                     <svg className="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
-                  </div>
-                  {item.label === 'Fachada frontal' && (
-                    <div className="absolute left-0 top-0 bg-black/60 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white rounded-br-md z-20 h-8 flex items-center pointer-events-none">
-                      Fachada frontal
-                    </div>
-                  )}
                 </>
               )}
+
+              {/* Per-slide counter badge (top-right) */}
+              <span className="absolute right-2 top-2 rounded-md bg-black/60 px-3 py-1 text-xs font-bold text-white z-20 pointer-events-none backdrop-blur-sm">
+                {idx + 1} / {total}
+              </span>
+
+              {/* Per-slide caption (bottom-left) */}
+              {item.label && (
+                <span className="absolute left-0 bottom-0 bg-black/50 px-4 py-2 text-xs font-medium text-white z-20 pointer-events-none backdrop-blur-sm rounded-tr-md max-w-[80%] truncate">
+                  {item.label === 'Fachada frontal' ? 'Fachada frontal' : item.label}
+                </span>
+              )}
+
+              {/* Thin separator line between slides */}
+              <div className="absolute right-0 top-0 bottom-0 w-[2px] bg-[#111] z-30 pointer-events-none" />
             </div>
-          )) : (
-             <div className="w-full h-full flex items-center justify-center text-gray-400 flex-shrink-0 snap-center hover:cursor-default" onClick={(e) => e.stopPropagation()}>Sem Foto</div>
-          )}
+          ))}
         </div>
 
-        {/* Counter Badge */}
-        {total > 0 && active ? (
-          <span className="absolute right-0 top-0 rounded-bl-md bg-black/60 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white z-20 h-8 flex items-center pointer-events-none drop-shadow-md">
-            {activeIndex + 1} / {total}
-          </span>
-        ) : null}
-        
         {/* Navigation Arrows */}
-        {items.length > 1 ? (
+        {items.length > 1 && (
           <>
             <button
               type="button"
               onClick={goPrev}
-              className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-3.5 py-2.5 text-xl font-bold text-white shadow-lg hover:bg-black/80 transition-colors z-20 opacity-0 group-hover:opacity-100 disabled:opacity-0"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 shadow-lg flex items-center justify-center text-gray-600 hover:bg-white hover:text-gray-900 transition-all z-30 opacity-0 group-hover/gallery:opacity-100"
               aria-label="Foto anterior"
             >
-              ‹
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" /></svg>
             </button>
             <button
               type="button"
               onClick={goNext}
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-3.5 py-2.5 text-xl font-bold text-white shadow-lg hover:bg-black/80 transition-colors z-20 opacity-0 group-hover:opacity-100 disabled:opacity-0"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 shadow-lg flex items-center justify-center text-gray-600 hover:bg-white hover:text-gray-900 transition-all z-30 opacity-0 group-hover/gallery:opacity-100"
               aria-label="Próxima foto"
             >
-              ›
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" /></svg>
             </button>
           </>
-        ) : null}
+        )}
       </div>
 
-      {/* Thumbnails row below carousel */}
-      {items.length > 1 ? (
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          {items.map((item, idx) => (
-            <button
-              key={`thumb-${item.originalUrl}-${idx}`}
-              type="button"
-              onClick={() => {
-                setActiveIndex(idx);
-                scrollToSlide(idx);
-              }}
-              className={`relative aspect-[4/3] min-w-[90px] overflow-hidden rounded-md border-2 transition-all ${
-                idx === activeIndex ? 'border-primary ring-2 ring-primary/40' : 'border-transparent hover:border-gray-300 opacity-70 hover:opacity-100'
-              }`}
-              aria-label={item.isVideo ? 'Selecionar vídeo' : `Selecionar foto ${idx + 1}`}
-            >
-              {item.isVideo ? (
-                <>
-                  <video src={item.displayUrl} muted playsInline preload="metadata" className="absolute inset-0 w-full h-full object-cover" />
-                  <PlayIconOverlay size="sm" />
-                </>
-              ) : (
-                <Image src={item.thumb} alt={`${titulo} - ${idx + 1}`} fill className="object-cover" unoptimized={true} />
-              )}
-            </button>
-          ))}
-        </div>
-      ) : null}
-
       {/* Lightbox Modal */}
-      {isModalOpen && active && (
-         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 px-4 py-8 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}>
-            <button type="button" onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 text-white hover:text-gray-300 bg-black/50 rounded-full p-2 z-50 transition-colors">
-               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-            
-            <div className="relative w-full h-full flex flex-col items-center justify-center max-w-7xl mx-auto" onClick={(e) => e.stopPropagation()}>
-               <div className="relative w-full h-full flex items-center justify-center">
-                  {active.isVideo ? (
-                    <video
-                      src={active.originalUrl}
-                      controls
-                      autoPlay
-                      className="max-w-full max-h-full rounded-lg"
-                      style={{ maxHeight: '85vh' }}
-                    >
-                      Seu navegador não suporta a exibição de vídeos.
-                    </video>
-                  ) : (
-                    <Image src={active.originalUrl} alt={titulo} fill className="object-contain" quality={100} priority unoptimized={true} />
-                  )}
-               </div>
-               
-               {items.length > 1 && (
-                  <>
-                     <button type="button" onClick={goPrev} className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-5 text-4xl font-semibold text-white hover:bg-white/20 transition-colors z-50 border border-white/20 backdrop-blur-md">
-                        ‹
-                     </button>
-                     <button type="button" onClick={goNext} className="absolute right-2 md:right-8 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-5 text-4xl font-semibold text-white hover:bg-white/20 transition-colors z-50 border border-white/20 backdrop-blur-md">
-                        ›
-                     </button>
-                     <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white font-bold tracking-widest bg-black/60 px-6 py-2 rounded-full text-sm border border-white/10 backdrop-blur-md">
-                        {active.isVideo ? '🎬 Vídeo' : `${activeIndex + 1} / ${total}`}
-                     </div>
-                  </>
-               )}
+      {isModalOpen && items[modalIndex] && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}>
+          <button type="button" onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 text-white hover:text-gray-300 bg-black/50 rounded-full p-2 z-50 transition-colors">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+          
+          <div className="relative w-full h-full flex items-center justify-center max-w-7xl mx-auto px-4" onClick={(e) => e.stopPropagation()}>
+            <div className="relative w-full h-full flex items-center justify-center">
+              {items[modalIndex].isVideo ? (
+                <video
+                  ref={videoRef}
+                  src={items[modalIndex].originalUrl}
+                  controls
+                  autoPlay
+                  className="max-w-full max-h-full rounded-lg"
+                  style={{ maxHeight: '85vh' }}
+                >
+                  Seu navegador não suporta a exibição de vídeos.
+                </video>
+              ) : (
+                <Image 
+                  src={items[modalIndex].originalUrl} 
+                  alt={titulo} 
+                  fill 
+                  className="object-contain" 
+                  quality={100} 
+                  priority 
+                  unoptimized={true} 
+                />
+              )}
             </div>
-         </div>
+            
+            {items.length > 1 && (
+              <>
+                <button type="button" onClick={modalGoPrev} className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-5 text-4xl font-semibold text-white hover:bg-white/20 transition-colors z-50 border border-white/20 backdrop-blur-md">
+                  ‹
+                </button>
+                <button type="button" onClick={modalGoNext} className="absolute right-2 md:right-8 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-5 text-4xl font-semibold text-white hover:bg-white/20 transition-colors z-50 border border-white/20 backdrop-blur-md">
+                  ›
+                </button>
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white font-bold tracking-widest bg-black/60 px-6 py-2 rounded-full text-sm border border-white/10 backdrop-blur-md">
+                  {items[modalIndex].isVideo ? '🎬 Vídeo' : `${modalIndex + 1} / ${total}`}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       )}
-      
-      {/* Hide scrollbar styles needed for clean carousel look */}
+
+      {/* CSS for filmstrip layout */}
       <style dangerouslySetInnerHTML={{__html: `
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .gallery-filmstrip::-webkit-scrollbar { display: none; }
+        .gallery-filmstrip { -ms-overflow-style: none; scrollbar-width: none; }
+        .gallery-slide { width: 100%; }
+        @media (min-width: 640px) { .gallery-slide { width: 50%; } }
+        @media (min-width: 1024px) { .gallery-slide { width: 33.333%; } }
       `}} />
-    </div>
+    </>
   )
 }
