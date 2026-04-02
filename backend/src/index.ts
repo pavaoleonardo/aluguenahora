@@ -110,6 +110,14 @@ export default {
           console.log('✅ [Bootstrap] Re-aligned Users-Permissions email shipper domains for Resend SMTP compatibility.');
         }
 
+        // Configure advanced settings for correct redirections
+        const advancedSettings = await pluginStore.get({ key: 'advanced' }) as any;
+        if (advancedSettings) {
+          advancedSettings.email_confirmation_redirection = 'https://aluguenahora.com.br/login?confirmed=true';
+          await pluginStore.set({ key: 'advanced', value: advancedSettings });
+          console.log('✅ [Bootstrap] Set email confirmation redirection back to frontend.');
+        }
+
         // Grant 'Authenticated' role permission to update their own user details (needed for your frontend registration 2nd step)
         const authenticatedRole = await strapi.db.query('plugin::users-permissions.role').findOne({
           where: { type: 'authenticated' }
