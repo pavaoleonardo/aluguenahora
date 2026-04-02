@@ -210,7 +210,37 @@ export default function PropertyDetailClient({ id }: { id: string }) {
 
           <div className="mt-8 lg:mt-0 flex flex-col">
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
+              <nav aria-label="Breadcrumb" className="mb-4">
+                <ol role="list" className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-500 font-medium">
+                  <li>
+                    <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+                  </li>
+                  <li>
+                    <span className="text-gray-300 px-1">{'>'}</span>
+                    <span className="capitalize">{finalidadeLabel}</span>
+                  </li>
+                  <li>
+                    <span className="text-gray-300 px-1">{'>'}</span>
+                    <span className="capitalize">{property.tipo}</span>
+                  </li>
+                  <li>
+                    <span className="text-gray-300 px-1">{'>'}</span>
+                    <span className="capitalize">MS / {property.cidade || 'Campo Grande'}</span>
+                  </li>
+                  {bairroLabel && (
+                    <li>
+                      <span className="text-gray-300 px-1">{'>'}</span>
+                      <span className="capitalize">{bairroLabel}</span>
+                    </li>
+                  )}
+                  <li>
+                    <span className="text-gray-300 px-1">{'>'}</span>
+                    <span className="text-gray-400">Cód: {property.id}</span>
+                  </li>
+                </ol>
+              </nav>
+
+              <div className="flex items-center gap-2 mb-2 hidden">
                 <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary uppercase tracking-wider">
                   {property.tipo}
                 </span>
