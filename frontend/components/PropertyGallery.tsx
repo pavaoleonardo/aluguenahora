@@ -173,7 +173,7 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
   return (
     <div className="flex flex-col gap-4">
       {/* Main Slider Window */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md border border-gray-200 bg-gray-100 group">
+      <div className="relative aspect-[4/3] lg:aspect-auto lg:h-[600px] w-full overflow-hidden bg-gray-100 group">
         
         {/* CSS Scroll Snapping Carousel Container */}
         <div 
@@ -260,7 +260,7 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
 
       {/* Thumbnails row below carousel */}
       {items.length > 1 ? (
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <div className="flex gap-3 overflow-x-auto pb-4 pt-2 scrollbar-hide justify-start md:justify-center mx-auto max-w-7xl px-4 w-full">
           {items.map((item, idx) => (
             <button
               key={`thumb-${item.originalUrl}-${idx}`}
