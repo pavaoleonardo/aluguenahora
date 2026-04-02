@@ -228,10 +228,10 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
                 {idx + 1} / {total}
               </span>
 
-              {/* Per-slide caption (bottom-left) */}
-              {item.label && (
+              {/* Per-slide caption (bottom-left) — only on first photo */}
+              {idx === 0 && item.label && (
                 <span className="absolute left-0 bottom-0 bg-black/50 px-4 py-2 text-xs font-medium text-white z-20 pointer-events-none backdrop-blur-sm rounded-tr-md max-w-[80%] truncate">
-                  {item.label === 'Fachada frontal' ? 'Fachada frontal' : item.label}
+                  Fachada frontal
                 </span>
               )}
 
