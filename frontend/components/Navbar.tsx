@@ -96,7 +96,7 @@ export default function Navbar() {
                   </Link>
                   <span className="text-gray-300">•</span>
                   <span className="font-medium text-gray-600">
-                    Bem-vindo, <span className="text-primary font-bold">{user.username}</span>
+                    Bem-vindo, <span className="text-primary font-bold">{user.username.split(' ').slice(0, 2).join(' ')}</span>
                   </span>
                   <span className="text-gray-300">•</span>
                   <button
@@ -198,7 +198,7 @@ export default function Navbar() {
                         </Link>
                         <span className="text-gray-300">•</span>
                         <span className="font-medium text-gray-600">
-                          Bem-vindo, <span className="text-primary font-bold">{user.username}</span>
+                          Bem-vindo, <span className="text-primary font-bold">{user.username.split(' ').slice(0, 2).join(' ')}</span>
                         </span>
                         <span className="text-gray-300">•</span>
                         <button
