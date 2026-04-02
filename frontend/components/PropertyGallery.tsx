@@ -89,14 +89,42 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
   const goPrev = (e?: React.MouseEvent | KeyboardEvent) => {
     if (e && 'stopPropagation' in e) e.stopPropagation();
     if (items.length <= 1) return
-    setActiveIndex((prev) => (prev - 1 + items.length) % items.length)
+    setActiveIndex((prev) => {
+      const nextIndex = (prev - 1 + items.length) % items.length;
+      scrollToSlide(nextIndex);
+      return nextIndex;
+    });
   }
 
   const goNext = (e?: React.MouseEvent | KeyboardEvent) => {
     if (e && 'stopPropagation' in e) e.stopPropagation();
     if (items.length <= 1) return
-    setActiveIndex((prev) => (prev + 1) % items.length)
+    setActiveIndex((prev) => {
+      const nextIndex = (prev + 1) % items.length;
+      scrollToSlide(nextIndex);
+      return nextIndex;
+    });
   }
+
+  const sliderRef = useRef<HTMLDivElement>(null);
+
+  const scrollToSlide = (index: number) => {
+    if (!sliderRef.current) return;
+    const slideWidth = sliderRef.current.clientWidth;
+    sliderRef.current.scrollTo({
+      left: slideWidth * index,
+      behavior: 'smooth'
+    });
+  };
+
+  const handleScroll = () => {
+    if (!sliderRef.current) return;
+    const slideWidth = sliderRef.current.clientWidth;
+    const newIndex = Math.round(sliderRef.current.scrollLeft / slideWidth);
+    if (newIndex !== activeIndex) {
+      setActiveIndex(newIndex);
+    }
+  };
 
   // Handle Keyboard Navigation (enabled for both main gallery and modal)
   useEffect(() => {
@@ -144,63 +172,76 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
 
   return (
     <div className="flex flex-col gap-4">
-      <div 
-        className="relative aspect-[4/3] w-full overflow-hidden rounded-md border border-gray-200 bg-gray-100 cursor-pointer group"
-        onClick={() => active && setIsModalOpen(true)}
-      >
-        {active ? (
-          <>
-            {active.isVideo ? (
-              <>
-                <video
-                  ref={videoRef}
-                  src={active.displayUrl}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  muted
-                  playsInline
-                  preload="metadata"
-                />
-                <PlayIconOverlay />
-                <div className="absolute left-0 top-0 bg-secondary px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white rounded-br-md z-20 h-8 flex items-center pointer-events-none">
-                  🎬 Vídeo
-                </div>
-              </>
-            ) : (
-              <>
-                <Image
-                  src={active.displayUrl}
-                  alt={titulo}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  priority
-                  unoptimized={true}
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center z-10 pointer-events-none">
-                   <svg className="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
-                </div>
-                {active.label === 'Fachada frontal' && (
-                  <div className="absolute left-0 top-0 bg-black/60 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white rounded-br-md z-20 h-8 flex items-center pointer-events-none">
-                    Fachada frontal
+      {/* Main Slider Window */}
+      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-md border border-gray-200 bg-gray-100 group">
+        
+        {/* CSS Scroll Snapping Carousel Container */}
+        <div 
+          ref={sliderRef}
+          onScroll={handleScroll}
+          className="flex w-full h-full overflow-x-auto snap-x snap-mandatory scrollbar-hide select-none touch-pan-x scroll-smooth"
+        >
+          {items.length > 0 ? items.map((item, idx) => (
+            <div 
+              key={`${item.originalUrl}-${idx}`} 
+              className="w-full h-full flex-shrink-0 snap-center relative cursor-pointer"
+              onClick={() => setIsModalOpen(true)}
+            >
+              {item.isVideo ? (
+                <>
+                  <video
+                    ref={idx === activeIndex ? videoRef : null}
+                    src={item.displayUrl}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    muted
+                    playsInline
+                    preload="metadata"
+                  />
+                  <PlayIconOverlay />
+                  <div className="absolute left-0 top-0 bg-secondary px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white rounded-br-md z-20 h-8 flex items-center pointer-events-none">
+                    🎬 Vídeo
                   </div>
-                )}
-              </>
-            )}
-          </>
-        ) : (
-          <div className="flex h-full items-center justify-center text-gray-400">Sem Foto</div>
-        )}
+                </>
+              ) : (
+                <>
+                  <Image
+                    src={item.displayUrl}
+                    alt={`${titulo} - Imagem ${idx + 1}`}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    priority={idx === 0}
+                    unoptimized={true}
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center z-10 pointer-events-none">
+                     <svg className="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
+                  </div>
+                  {item.label === 'Fachada frontal' && (
+                    <div className="absolute left-0 top-0 bg-black/60 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white rounded-br-md z-20 h-8 flex items-center pointer-events-none">
+                      Fachada frontal
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )) : (
+             <div className="w-full h-full flex items-center justify-center text-gray-400 flex-shrink-0 snap-center hover:cursor-default" onClick={(e) => e.stopPropagation()}>Sem Foto</div>
+          )}
+        </div>
 
+        {/* Counter Badge */}
         {total > 0 && active ? (
-          <span className="absolute right-0 top-0 rounded-bl-md bg-black/60 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white z-20 h-8 flex items-center pointer-events-none">
+          <span className="absolute right-0 top-0 rounded-bl-md bg-black/60 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white z-20 h-8 flex items-center pointer-events-none drop-shadow-md">
             {activeIndex + 1} / {total}
           </span>
         ) : null}
+        
+        {/* Navigation Arrows */}
         {items.length > 1 ? (
           <>
             <button
               type="button"
               onClick={goPrev}
-              className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-2.5 py-1.5 text-xl font-semibold text-white shadow hover:bg-black/60 z-20"
+              className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-3.5 py-2.5 text-xl font-bold text-white shadow-lg hover:bg-black/80 transition-colors z-20 opacity-0 group-hover:opacity-100 disabled:opacity-0"
               aria-label="Foto anterior"
             >
               ‹
@@ -208,7 +249,7 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
             <button
               type="button"
               onClick={goNext}
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-2.5 py-1.5 text-xl font-semibold text-white shadow hover:bg-black/60 z-20"
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 px-3.5 py-2.5 text-xl font-bold text-white shadow-lg hover:bg-black/80 transition-colors z-20 opacity-0 group-hover:opacity-100 disabled:opacity-0"
               aria-label="Próxima foto"
             >
               ›
@@ -217,15 +258,19 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
         ) : null}
       </div>
 
+      {/* Thumbnails row below carousel */}
       {items.length > 1 ? (
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {items.map((item, idx) => (
             <button
-              key={`${item.originalUrl}-${idx}`}
+              key={`thumb-${item.originalUrl}-${idx}`}
               type="button"
-              onClick={() => setActiveIndex(idx)}
-              className={`relative aspect-square min-w-[80px] overflow-hidden rounded-sm border ${
-                idx === activeIndex ? 'border-secondary ring-2 ring-secondary/40' : 'border-gray-200'
+              onClick={() => {
+                setActiveIndex(idx);
+                scrollToSlide(idx);
+              }}
+              className={`relative aspect-[4/3] min-w-[90px] overflow-hidden rounded-md border-2 transition-all ${
+                idx === activeIndex ? 'border-primary ring-2 ring-primary/40' : 'border-transparent hover:border-gray-300 opacity-70 hover:opacity-100'
               }`}
               aria-label={item.isVideo ? 'Selecionar vídeo' : `Selecionar foto ${idx + 1}`}
             >
@@ -244,8 +289,8 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
 
       {/* Lightbox Modal */}
       {isModalOpen && active && (
-         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black px-4 py-8" onClick={() => setIsModalOpen(false)}>
-            <button type="button" onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 text-white hover:text-gray-300 bg-black/50 rounded-full p-2 z-50">
+         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 px-4 py-8 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}>
+            <button type="button" onClick={() => setIsModalOpen(false)} className="absolute top-6 right-6 text-white hover:text-gray-300 bg-black/50 rounded-full p-2 z-50 transition-colors">
                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
             
@@ -268,13 +313,13 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
                
                {items.length > 1 && (
                   <>
-                     <button type="button" onClick={goPrev} className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-4 text-3xl font-semibold text-white hover:bg-black/80 transition-colors z-50">
+                     <button type="button" onClick={goPrev} className="absolute left-2 md:left-8 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-5 text-4xl font-semibold text-white hover:bg-white/20 transition-colors z-50 border border-white/20 backdrop-blur-md">
                         ‹
                      </button>
-                     <button type="button" onClick={goNext} className="absolute right-2 md:right-8 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-4 text-3xl font-semibold text-white hover:bg-black/80 transition-colors z-50">
+                     <button type="button" onClick={goNext} className="absolute right-2 md:right-8 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-5 text-4xl font-semibold text-white hover:bg-white/20 transition-colors z-50 border border-white/20 backdrop-blur-md">
                         ›
                      </button>
-                     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white font-bold tracking-widest bg-black/50 px-4 py-2 rounded-full text-sm">
+                     <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white font-bold tracking-widest bg-black/60 px-6 py-2 rounded-full text-sm border border-white/10 backdrop-blur-md">
                         {active.isVideo ? '🎬 Vídeo' : `${activeIndex + 1} / ${total}`}
                      </div>
                   </>
@@ -282,6 +327,12 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
             </div>
          </div>
       )}
+      
+      {/* Hide scrollbar styles needed for clean carousel look */}
+      <style dangerouslySetInnerHTML={{__html: `
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+      `}} />
     </div>
   )
 }
