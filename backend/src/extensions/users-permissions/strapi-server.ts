@@ -68,7 +68,6 @@ module.exports = (plugin: any) => {
       if (route.method === 'POST' && route.path === '/auth/local/register') {
         const originalMiddleware = route.config?.middlewares || [];
         route.config.middlewares = [
-          ...originalMiddleware,
           async (ctx: any, next: any) => {
             // Before validation: Move custom fields to state and remove from body
             if (ctx.request.body) {
@@ -90,7 +89,8 @@ module.exports = (plugin: any) => {
               delete body.role; // Don't let users set their own role
             }
             return next();
-          }
+          },
+          ...originalMiddleware
         ];
       }
     });
