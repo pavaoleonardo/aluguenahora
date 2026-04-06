@@ -95,9 +95,7 @@ export default function Navbar() {
                     Painel
                   </Link>
                   <span className="text-gray-300">•</span>
-                  <span className="font-medium text-gray-600">
-                    Bem-vindo, <span className="text-primary font-bold">{user.username.split(' ')[0]}</span>
-                  </span>
+                    Bem-vindo, <span className="text-primary font-bold">{(user.nome_completo || user.username).split(' ')[0]}</span>
                   <span className="text-gray-300">•</span>
                   <button
                     onClick={logout}
@@ -197,9 +195,7 @@ export default function Navbar() {
                           Painel
                         </Link>
                         <span className="text-gray-300">•</span>
-                        <span className="font-medium text-gray-600">
-                          Bem-vindo, <span className="text-primary font-bold">{user.username.split(' ')[0]}</span>
-                        </span>
+                          Bem-vindo, <span className="text-primary font-bold">{(user.nome_completo || user.username).split(' ')[0]}</span>
                         <span className="text-gray-300">•</span>
                         <button
                           onClick={() => {

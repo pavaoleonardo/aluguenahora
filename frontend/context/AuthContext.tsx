@@ -7,6 +7,7 @@ interface User {
   id: number
   username: string
   email: string
+  nome_completo?: string
 }
 
 interface AuthContextType {
