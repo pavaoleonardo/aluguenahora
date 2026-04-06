@@ -64,25 +64,7 @@ export default function DashboardPage() {
         } catch (e) {
           console.error('myProperties request failed:', e)
         }
-
-        // ---- FALLBACK: if primary failed or empty, show all properties ----
-        // (Strapi strips 'usuario' from API response, so client-side user filter is impossible.
-        //  The backend controller is the only way to filter by owner.)
-        if (myProps.length === 0) {
-          try {
-            const res = await fetch(`${API_BASE_URL}/api/imoveis?populate=*&pagination[pageSize]=100`, {
-              headers: { Authorization: `Bearer ${token}` }
-            })
-
-            if (res.ok) {
-              const data = await res.json()
-              myProps = data?.data || []
-            }
-          } catch (fallbackErr) {
-            console.error('Fallback fetch also failed:', fallbackErr)
-          }
-        }
-
+        // Only show properties that belong to the user
         setProperties(myProps)
       } catch (err) {
         console.error('Error fetching properties:', err)
