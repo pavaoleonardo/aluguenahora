@@ -49,9 +49,15 @@ export default (plugin: any) => {
       role: { type: 'relation', relation: 'manyToOne', target: 'plugin::users-permissions.role', inverse: 'users', configurable: false },
     };
 
+    // Set metadata for better Admin UI experience (Main field for relations)
+    plugin.contentTypes.user.schema.info = {
+      ...plugin.contentTypes.user.schema.info,
+      mainField: 'username',
+      displayName: 'Usuário'
+    };
+
     plugin.contentTypes.user.schema.attributes = {
-      ...coreFields,
-      ...existingAttributes, // Keep whatever we already had
+      ...existingAttributes,
       nome_imobiliaria: { type: 'string' },
       creci: { type: 'string' },
       telefone: { type: 'string' },
@@ -59,7 +65,7 @@ export default (plugin: any) => {
       nome_completo: { type: 'string' },
     };
     
-    console.log('✅ [Strapi-Server] Unified User Schema: merged core fields with custom fields.');
+    console.log('✅ [Strapi-Server] User Schema extended with custom fields and display settings.');
   }
 
   // 4. Inject a middleware to handle registration custom fields without 400 Bad Request errors
