@@ -6,9 +6,16 @@
 .env
 .env.*
 node_modules/
+# .agents/ - Deployment scripts and skills needed on VPS
+!.agents/
+!/**/*.sh
+
+# Strapi / Next.js
 dist/
 build/
-.agents/
+backend/dist/
+backend/.tmp/
+backend/build/
 Authea_v1.0/
 frontend/playwright-report/
 frontend/test-results/
