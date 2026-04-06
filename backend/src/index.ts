@@ -263,23 +263,33 @@ export default {
 
             // 2. Heal Imoveis (Fixes the relation "locale null" error)
             const imoveisMissingDocs = await strapi.db.connection('imoveis')
-              .whereNull('document_id')
-              .orWhereNull('locale');
+              .whereNull('document_id');
 
             if (imoveisMissingDocs.length > 0) {
-              console.log(`🚨 [Bootstrap] Found ${imoveisMissingDocs.length} properties with missing metadata. Healing for Admin UI stability...`);
+              console.log(`🚨 [Bootstrap] Found ${imoveisMissingDocs.length} properties with missing documentId. Healing for Admin UI...`);
               const crypto = require('crypto');
               for (const item of imoveisMissingDocs) {
-                // We use a unique ID for document_id but maintain the same locale context
                 await strapi.db.connection('imoveis')
                   .where({ id: item.id })
                   .update({ 
                     document_id: item.document_id || crypto.randomBytes(12).toString('hex'),
-                    locale: item.locale || 'pt-BR',
+                    locale: null, // IMPORTANT: Keep null if i18n is disabled for this content-type
                     published_at: item.published_at || new Date().toISOString()
                   });
               }
-              console.log('✅ [Bootstrap] Healed properties metadata. Relations should work now.');
+              console.log('✅ [Bootstrap] Healed properties metadata bits. Administration of relations should work.');
+            }
+
+            // 3. Force-Fix Mistaken Locales (Cleanup from our previous bug)
+            // If properties got a locale by mistake, set them back to null so they match the schema
+            const imoveisWithMistakenLocale = await strapi.db.connection('imoveis')
+              .where({ locale: 'pt-BR' });
+
+            if (imoveisWithMistakenLocale.length > 0) {
+               await strapi.db.connection('imoveis')
+                .where({ locale: 'pt-BR' })
+                .update({ locale: null });
+               console.log(`✅ [Bootstrap] Normalized ${imoveisWithMistakenLocale.length} properties back to null locale (Admin Fix).`);
             }
           }
         }
