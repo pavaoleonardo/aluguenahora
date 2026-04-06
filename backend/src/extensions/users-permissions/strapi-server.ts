@@ -1,4 +1,4 @@
-module.exports = (plugin: any) => {
+export default (plugin: any) => {
   // 1. Override the role service factor to fix the count query for Strapi 5
   const originalRoleServiceFactory = plugin.services.role;
   
