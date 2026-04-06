@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { API_BASE_URL } from '@/lib/apiBase'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
+import { translateError } from '@/lib/errorTranslations'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -39,7 +40,7 @@ export default function LoginPage() {
       router.push('/dashboard')
       router.refresh()
     } catch (err: any) {
-      setError(err.message)
+      setError(translateError(err.message))
     } finally {
       setLoading(false)
     }

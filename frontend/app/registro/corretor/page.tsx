@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/context/AuthContext'
 import { API_BASE_URL } from '@/lib/apiBase'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
+import { translateError } from '@/lib/errorTranslations'
 
 export default function RegisterCorretorPage() {
   const router = useRouter()
@@ -136,7 +137,7 @@ export default function RegisterCorretorPage() {
         router.push('/dashboard')
       }
     } catch (err: any) {
-      setError(err.message)
+      setError(translateError(err.message))
     } finally {
       setLoading(false)
     }
