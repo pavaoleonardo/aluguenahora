@@ -241,56 +241,61 @@ export default {
             // Safety: Strapi 5 Admin Panel crashes or fails to link relations if records 
             // are missing a valid documentId or locale (Document Service v5 requirement).
             
-            // 1. Heal Users
+            // 1. Heal Users using Document Service (Must be document-aware in Strapi 5)
             const usersMissingDocs = await strapi.db.connection('up_users')
               .whereNull('document_id')
               .orWhereNull('locale');
 
             if (usersMissingDocs.length > 0) {
-              console.log(`🚨 [Bootstrap] Found ${usersMissingDocs.length} users with missing documentId/locale. Healing data...`);
-              const crypto = require('crypto');
+              console.log(`🚨 [Bootstrap] Found ${usersMissingDocs.length} users with missing metadata. Registering via Document Service...`);
               for (const u of usersMissingDocs) {
-                await strapi.db.connection('up_users')
-                  .where({ id: u.id })
-                  .update({ 
-                    document_id: u.document_id || crypto.randomBytes(12).toString('hex'),
-                    locale: u.locale || 'pt-BR',
-                    published_at: u.published_at || new Date().toISOString()
+                try {
+                  await strapi.documents('plugin::users-permissions.user').update({
+                    documentId: u.document_id || undefined,
+                    data: {
+                      locale: u.locale || 'pt-BR',
+                      confirmed: true
+                    },
                   });
+                } catch (e) {
+                  console.warn(`[Bootstrap] Failed to heal user ${u.id}:`, e.message);
+                }
               }
-              console.log('✅ [Bootstrap] Healed users metadata.');
+              console.log('✅ [Bootstrap] Healed users metadata via Document Service.');
             }
 
-            // 2. Heal Imoveis (Fixes the relation "locale null" error)
+            // 2. Heal Imoveis (Fixes the relation "locale null" error by registering in Doc Service)
             const imoveisMissingDocs = await strapi.db.connection('imoveis')
               .whereNull('document_id');
 
             if (imoveisMissingDocs.length > 0) {
-              console.log(`🚨 [Bootstrap] Found ${imoveisMissingDocs.length} properties with missing documentId. Healing for Admin UI...`);
-              const crypto = require('crypto');
+              console.log(`🚨 [Bootstrap] Found ${imoveisMissingDocs.length} properties with missing documentId. Registering...`);
               for (const item of imoveisMissingDocs) {
-                await strapi.db.connection('imoveis')
-                  .where({ id: item.id })
-                  .update({ 
-                    document_id: item.document_id || crypto.randomBytes(12).toString('hex'),
-                    locale: null, // IMPORTANT: Keep null if i18n is disabled for this content-type
-                    published_at: item.published_at || new Date().toISOString()
+                try {
+                  await strapi.documents('api::imovel.imovel').update({
+                    documentId: item.document_id || undefined,
+                    data: {
+                      locale: null, // Keep null for non-localized types
+                    },
+                    status: 'published'
                   });
+                } catch (e) {
+                  // Fallback to raw DB if Document Service fails (e.g. no documentId yet)
+                  const crypto = require('crypto');
+                  await strapi.db.connection('imoveis').where({ id: item.id }).update({
+                    document_id: crypto.randomBytes(12).toString('hex'),
+                    locale: null,
+                    published_at: new Date().toISOString()
+                  });
+                }
               }
-              console.log('✅ [Bootstrap] Healed properties metadata bits. Administration of relations should work.');
+              console.log('✅ [Bootstrap] Healed properties metadata bits.');
             }
 
             // 3. Force-Fix Mistaken Locales (Cleanup from our previous bug)
-            // If properties got a locale by mistake, set them back to null so they match the schema
-            const imoveisWithMistakenLocale = await strapi.db.connection('imoveis')
-              .where({ locale: 'pt-BR' });
-
-            if (imoveisWithMistakenLocale.length > 0) {
-               await strapi.db.connection('imoveis')
-                .where({ locale: 'pt-BR' })
-                .update({ locale: null });
-               console.log(`✅ [Bootstrap] Normalized ${imoveisWithMistakenLocale.length} properties back to null locale (Admin Fix).`);
-            }
+            await strapi.db.connection('imoveis')
+              .where({ locale: 'pt-BR' })
+              .update({ locale: null });
           }
         }
       } catch (err: any) {
