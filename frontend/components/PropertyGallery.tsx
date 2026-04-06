@@ -180,7 +180,7 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
   return (
     <>
       {/* Filmstrip Carousel — Infoimóveis style */}
-      <div className="relative w-full h-[280px] sm:h-[350px] md:h-[420px] lg:h-[480px] bg-[#111] group/gallery">
+      <div className="relative w-full h-[280px] sm:h-[350px] md:h-[420px] lg:h-[480px] bg-white group/gallery">
         
         {/* Scrollable filmstrip container */}
         <div 
@@ -216,23 +216,15 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
                     src={item.displayUrl}
                     alt={`${titulo} - Imagem ${idx + 1}`}
                     fill
-                    className="object-cover transition-transform duration-500 group-hover/slide:scale-110"
+                    className="object-cover"
                     priority={idx < 3}
                     unoptimized={true}
                   />
-                  {/* Magnify Icon Overlay */}
-                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover/slide:opacity-100 transition-opacity flex items-center justify-center z-10">
-                    <div className="bg-white/20 backdrop-blur-md rounded-full p-4 border border-white/30 text-white shadow-2xl">
-                      <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6" />
-                      </svg>
-                    </div>
-                  </div>
                 </>
               )}
 
               {/* Per-slide counter badge (top-right) */}
-              <span className="absolute right-2 top-2 rounded-md bg-black/60 px-3 py-1 text-xs font-bold text-white z-20 pointer-events-none backdrop-blur-sm shadow-sm group-hover/slide:bg-primary transition-colors">
+              <span className="absolute right-2 top-2 rounded-md bg-black/60 px-3 py-1 text-xs font-bold text-white z-20 pointer-events-none backdrop-blur-sm shadow-sm">
                 {idx + 1} / {total}
               </span>
 
