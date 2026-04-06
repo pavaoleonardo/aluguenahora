@@ -56,9 +56,44 @@ module.exports = (plugin: any) => {
       creci: { type: 'string' },
       telefone: { type: 'string' },
       celular: { type: 'string' },
+      nome_completo: { type: 'string' },
     };
     
     console.log('✅ [Strapi-Server] Unified User Schema: merged core fields with custom fields.');
+  }
+
+  // 4. Inject a middleware to handle registration custom fields without 400 Bad Request errors
+  if (plugin.routes['content-api']) {
+    plugin.routes['content-api'].routes.forEach((route: any) => {
+      if (route.method === 'POST' && route.path === '/auth/local/register') {
+        const originalMiddleware = route.config?.middlewares || [];
+        route.config.middlewares = [
+          ...originalMiddleware,
+          async (ctx: any, next: any) => {
+            // Before validation: Move custom fields to state and remove from body
+            if (ctx.request.body) {
+              const body = ctx.request.body;
+              ctx.state.customRegistration = {
+                telefone: body.telefone,
+                celular: body.celular,
+                creci: body.creci,
+                nome_imobiliaria: body.nome_imobiliaria,
+                nome_completo: body.nome_completo,
+              };
+              
+              // Clean body for validation
+              delete body.telefone;
+              delete body.celular;
+              delete body.creci;
+              delete body.nome_imobiliaria;
+              delete body.nome_completo;
+              delete body.role; // Don't let users set their own role
+            }
+            return next();
+          }
+        ];
+      }
+    });
   }
 
   return plugin;

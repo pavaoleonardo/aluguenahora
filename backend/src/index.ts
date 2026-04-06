@@ -144,10 +144,19 @@ export default {
       models: ['plugin::users-permissions.user'],
       async beforeCreate(event) {
         const { data } = event.params;
-        const ctx = strapi.requestContext.get();
-        if (ctx && ctx.request && ctx.request.body) {
+        const ctx = strapi.requestContext.get() as any;
+        
+        if (ctx && ctx.state && ctx.state.customRegistration) {
+          // If we took them from a middleware (safest for Strapi 5)
+          const custom = ctx.state.customRegistration;
+          if (custom.telefone) data.telefone = custom.telefone;
+          if (custom.celular) data.celular = custom.celular;
+          if (custom.creci) data.creci = custom.creci;
+          if (custom.nome_imobiliaria) data.nome_imobiliaria = custom.nome_imobiliaria;
+          if (custom.nome_completo) data.nome_completo = custom.nome_completo;
+        } else if (ctx && ctx.request && ctx.request.body) {
           const body = ctx.request.body;
-          // Extract custom fields from registration body
+          // Extract custom fields from registration body (legacy fall-back)
           if (body.telefone) data.telefone = body.telefone;
           if (body.celular) data.celular = body.celular;
           if (body.creci) data.creci = body.creci;
