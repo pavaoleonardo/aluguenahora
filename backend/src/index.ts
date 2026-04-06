@@ -154,6 +154,7 @@ export default {
           if (custom.creci) data.creci = custom.creci;
           if (custom.nome_imobiliaria) data.nome_imobiliaria = custom.nome_imobiliaria;
           if (custom.nome_completo) data.nome_completo = custom.nome_completo;
+          if (custom.tipo_usuario) data.tipo_usuario = custom.tipo_usuario;
         } else if (ctx && ctx.request && ctx.request.body) {
           const body = ctx.request.body;
           // Extract custom fields from registration body (legacy fall-back)
@@ -162,6 +163,7 @@ export default {
           if (body.creci) data.creci = body.creci;
           if (body.nome_imobiliaria) data.nome_imobiliaria = body.nome_imobiliaria;
           if (body.nome_completo) data.nome_completo = body.nome_completo;
+          if (body.tipo_usuario) data.tipo_usuario = body.tipo_usuario;
         }
       },
     });
@@ -207,7 +209,8 @@ export default {
               { name: 'celular', type: 'string' },
               { name: 'creci', type: 'string' },
               { name: 'nome_imobiliaria', type: 'string' },
-              { name: 'nome_completo', type: 'string' }
+              { name: 'nome_completo', type: 'string' },
+              { name: 'tipo_usuario', type: 'string' }
             ];
 
             for (const field of customFields) {

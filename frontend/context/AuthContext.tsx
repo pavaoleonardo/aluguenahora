@@ -5,9 +5,15 @@ import { useRouter } from 'next/navigation'
 
 interface User {
   id: number
+  documentId?: string
   username: string
   email: string
   nome_completo?: string
+  tipo_usuario?: 'corretor' | 'proprietario'
+  creci?: string
+  nome_imobiliaria?: string
+  telefone?: string
+  celular?: string
 }
 
 interface AuthContextType {

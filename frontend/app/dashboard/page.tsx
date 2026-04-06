@@ -82,16 +82,28 @@ export default function DashboardPage() {
   return (
     <div className="bg-white min-h-full py-10">
       <header>
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className="text-3xl font-bold leading-tight tracking-tight text-gray-900">
-            Meus Imóveis
-          </h1>
-          <Link
-            href="/dashboard/novo-imovel"
-            className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-          >
-            Adicionar Novo Imóvel
-          </Link>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between py-6 gap-4">
+            <div>
+              <h1 className="text-3xl font-bold leading-tight tracking-tight text-gray-900">
+                Olá{user?.nome_completo ? `, ${user.nome_completo.split(' ')[0]}` : ''}! 👋
+              </h1>
+              <p className="mt-1 text-sm text-gray-500 font-medium">
+                {user?.tipo_usuario === 'corretor' 
+                  ? `Painel do Corretor ${user?.creci ? `(CRECI: ${user.creci})` : ''}`
+                  : 'Painel do Proprietário'}
+              </p>
+            </div>
+            <Link
+              href="/dashboard/novo-imovel"
+              className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-primary-hover transition-all duration-200"
+            >
+              <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Adicionar Novo Imóvel
+            </Link>
+          </div>
         </div>
       </header>
       <main>

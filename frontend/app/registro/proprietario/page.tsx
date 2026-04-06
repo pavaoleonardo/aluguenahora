@@ -77,6 +77,7 @@ export default function RegisterProprietarioPage() {
           nome_completo: formData.nomeCompleto,
           telefone: formData.telefone,
           celular: formData.celular,
+          tipo_usuario: 'proprietario',
           role: 'Authenticated'
         }),
       })
