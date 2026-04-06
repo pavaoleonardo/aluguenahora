@@ -50,7 +50,7 @@ const geocodeAddress = async (endereco, bairro, cidade) => {
     return null;
 };
 exports.default = {
-    register({ strapi }) {
+    async register({ strapi }) {
         // Register custom field
         strapi.customFields.register({
             name: 'bairro-regiao',
@@ -82,6 +82,168 @@ exports.default = {
         */
     },
     bootstrap({ strapi }) {
+        // 1. Force the Users-Permissions "Shipper email" to match Resend's strict domain rules so 400 Bad Request errors stop
+        (async () => {
+            try {
+                const pluginStore = strapi.store({
+                    environment: '',
+                    type: 'plugin',
+                    name: 'users-permissions',
+                });
+                const templateSettings = await pluginStore.get({ key: 'email' });
+                if (templateSettings && templateSettings.email_confirmation) {
+                    // Strapi natively hardcodes 'no-reply@strapi.io', which actively crashes Resend. Override this to the verified Sender.
+                    templateSettings.email_confirmation.options.from.email = 'noreply@mail.aluguenahora.com.br';
+                    templateSettings.email_confirmation.options.from.name = 'Alugue na Hora';
+                    templateSettings.email_confirmation.options.response_email = 'noreply@mail.aluguenahora.com.br';
+                    templateSettings.reset_password.options.from.email = 'noreply@mail.aluguenahora.com.br';
+                    templateSettings.reset_password.options.from.name = 'Alugue na Hora';
+                    templateSettings.reset_password.options.response_email = 'noreply@mail.aluguenahora.com.br';
+                    await pluginStore.set({ key: 'email', value: templateSettings });
+                    console.log('✅ [Bootstrap] Re-aligned Users-Permissions email shipper domains for Resend SMTP compatibility.');
+                }
+                // Configure advanced settings for correct redirections
+                const advancedSettings = await pluginStore.get({ key: 'advanced' });
+                if (advancedSettings) {
+                    advancedSettings.email_confirmation_redirection = 'https://aluguenahora.com.br/login?confirmed=true';
+                    await pluginStore.set({ key: 'advanced', value: advancedSettings });
+                    console.log('✅ [Bootstrap] Set email confirmation redirection back to frontend.');
+                }
+                // Grant 'Authenticated' role permission to update their own user details (needed for your frontend registration 2nd step)
+                const authenticatedRole = await strapi.db.query('plugin::users-permissions.role').findOne({
+                    where: { type: 'authenticated' }
+                });
+                if (authenticatedRole) {
+                    await strapi.db.query('plugin::users-permissions.permission').updateMany({
+                        where: {
+                            role: authenticatedRole.id,
+                            action: 'plugin::users-permissions.user.update'
+                        },
+                        data: { enabled: true }
+                    });
+                    console.log('✅ [Bootstrap] Granted Authenticated role permission to update profile fields.');
+                }
+            }
+            catch (err) {
+                console.log('[Bootstrap] Error during plugin configuration:', err.message);
+            }
+        })();
+        // 2. Lifecycle hook for User registration (capturing custom fields)
+        strapi.db.lifecycles.subscribe({
+            models: ['plugin::users-permissions.user'],
+            async beforeCreate(event) {
+                const { data } = event.params;
+                const ctx = strapi.requestContext.get();
+                if (ctx && ctx.request && ctx.request.body) {
+                    const body = ctx.request.body;
+                    // Extract custom fields from registration body
+                    if (body.telefone)
+                        data.telefone = body.telefone;
+                    if (body.celular)
+                        data.celular = body.celular;
+                    if (body.creci)
+                        data.creci = body.creci;
+                    if (body.nome_imobiliaria)
+                        data.nome_imobiliaria = body.nome_imobiliaria;
+                    if (body.nome_completo)
+                        data.nome_completo = body.nome_completo;
+                }
+            },
+        });
+        // 3. Auto-recovery for corrupted or missing up_users table
+        (async () => {
+            try {
+                if (strapi.db && strapi.db.connection) {
+                    const hasTable = await strapi.db.connection.schema.hasTable('up_users');
+                    if (!hasTable) {
+                        console.log('🚨 [Bootstrap] up_users table is missing! Natively reconstructing base schema...');
+                        await strapi.db.connection.schema.createTable('up_users', (table) => {
+                            table.increments('id').primary();
+                            table.string('username', 255);
+                            table.string('email', 255);
+                            table.string('provider', 255);
+                            table.string('password', 255);
+                            table.string('reset_password_token', 255);
+                            table.string('confirmation_token', 255);
+                            table.boolean('confirmed').defaultTo(false);
+                            table.boolean('blocked').defaultTo(false);
+                            table.integer('role_id'); // Relation to up_roles
+                            table.datetime('created_at').defaultTo(strapi.db.connection.fn.now());
+                            table.datetime('updated_at').defaultTo(strapi.db.connection.fn.now());
+                            table.integer('created_by_id');
+                            table.integer('updated_by_id');
+                            table.string('document_id', 255);
+                            table.string('published_at', 255);
+                            table.string('locale', 255);
+                            // Our custom fields
+                            table.string('telefone', 255);
+                            table.string('celular', 255);
+                            table.string('creci', 255);
+                            table.string('nome_imobiliaria', 255);
+                            table.string('nome_completo', 255);
+                        });
+                        console.log('✅ [Bootstrap] up_users table successfully reconstructed with custom fields.');
+                    }
+                    else {
+                        // Apply safe custom columns if table exists but is missing our custom fields
+                        const customFields = [
+                            { name: 'telefone', type: 'string' },
+                            { name: 'celular', type: 'string' },
+                            { name: 'creci', type: 'string' },
+                            { name: 'nome_imobiliaria', type: 'string' },
+                            { name: 'nome_completo', type: 'string' }
+                        ];
+                        for (const field of customFields) {
+                            const hasField = await strapi.db.connection.schema.hasColumn('up_users', field.name);
+                            if (!hasField) {
+                                await strapi.db.connection.schema.alterTable('up_users', (table) => {
+                                    table.string(field.name, 255);
+                                });
+                                console.log(`[Bootstrap] Added missing column "${field.name}" to up_users.`);
+                            }
+                        }
+                        // Fix: Strapi i18n plugin demands "locale" column but might be missing on manual db reconstruction
+                        const hasLocale = await strapi.db.connection.schema.hasColumn('up_users', 'locale');
+                        if (!hasLocale) {
+                            await strapi.db.connection.schema.alterTable('up_users', (table) => {
+                                table.string('locale', 255);
+                            });
+                            console.log('[Bootstrap] Added explicitly missing locale column to up_users.');
+                        }
+                        // Fix: Strapi 5 uses "role" direct column in some queries for users-permissions limits and authentications
+                        const hasRole = await strapi.db.connection.schema.hasColumn('up_users', 'role');
+                        if (!hasRole) {
+                            await strapi.db.connection.schema.alterTable('up_users', (table) => {
+                                table.integer('role');
+                            });
+                            console.log('[Bootstrap] Added explicitly missing role column to up_users.');
+                        }
+                        // Safety: Strapi 5 Admin Panel crashes if users are missing a valid documentId or locale.
+                        // We force-populate them here if they were missed during manual DB creation.
+                        const usersMissingDocs = await strapi.db.connection('up_users')
+                            .whereNull('document_id')
+                            .orWhereNull('locale');
+                        if (usersMissingDocs.length > 0) {
+                            console.log(`🚨 [Bootstrap] Found ${usersMissingDocs.length} users with missing documentId/locale. Healing data for Admin UI stability...`);
+                            const crypto = require('crypto');
+                            for (const u of usersMissingDocs) {
+                                await strapi.db.connection('up_users')
+                                    .where({ id: u.id })
+                                    .update({
+                                    document_id: u.document_id || crypto.randomBytes(12).toString('hex'),
+                                    locale: u.locale || 'pt-BR',
+                                    published_at: u.published_at || new Date().toISOString()
+                                });
+                            }
+                            console.log('✅ [Bootstrap] Healed malformed users. Admin UI should be stable now.');
+                        }
+                    }
+                }
+            }
+            catch (err) {
+                console.warn('[Bootstrap] Auto-recovery logic error:', err.message);
+            }
+        })();
         // Seed news logic
         const seedNews = async () => {
             try {

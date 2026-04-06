@@ -3,11 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = ({ env }) => ({
     host: env('HOST', '0.0.0.0'),
     port: env.int('PORT', 1337),
-    url: env('RENDER_EXTERNAL_URL'),
+    url: env('PUBLIC_URL', 'https://api.aluguenahora.com.br'),
     app: {
         keys: env.array('APP_KEYS'),
     },
     admin: {
         url: '/admin',
+        auth: {
+            secret: env('ADMIN_JWT_SECRET'),
+        },
     },
 });

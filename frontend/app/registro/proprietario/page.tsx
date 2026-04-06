@@ -65,21 +65,28 @@ export default function RegisterProprietarioPage() {
     setSuccess('')
 
     try {
-      // 1. Cadastro apenas com campos padrões definidos pelo Strapi
+      // 1. Cadastro: Usamos o e-mail como username para evitar conflitos de nomes iguais
       const res = await fetch(`${API_BASE_URL}/api/auth/local/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          username: formData.nomeCompleto, 
+          username: formData.email, 
           email: formData.email, 
-          password: formData.password
+          password: formData.password,
+          nome_completo: formData.nomeCompleto,
+          telefone: formData.telefone,
+          celular: formData.celular,
+          role: 'Authenticated'
         }),
       })
       
       let data = await res.json()
       
       if (!res.ok) {
-        throw new Error(data.error?.message || 'Erro ao cadastrar conta')
+        const errorMsg = data.error?.message === 'An error occurred during account creation' 
+          ? 'Este e-mail já está cadastrado.' 
+          : (data.error?.message || 'Erro ao cadastrar conta')
+        throw new Error(errorMsg)
       }
 
       // 2. Se o cadastro for ok e retornar jwt, atualizamos os campos customizados

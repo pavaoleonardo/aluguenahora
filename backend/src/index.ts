@@ -138,7 +138,26 @@ export default {
       }
     })();
 
-    // 2. Auto-recovery for corrupted or missing up_users table
+    
+    // 2. Lifecycle hook for User registration (capturing custom fields)
+    strapi.db.lifecycles.subscribe({
+      models: ['plugin::users-permissions.user'],
+      async beforeCreate(event) {
+        const { data } = event.params;
+        const ctx = strapi.requestContext.get();
+        if (ctx && ctx.request && ctx.request.body) {
+          const body = ctx.request.body;
+          // Extract custom fields from registration body
+          if (body.telefone) data.telefone = body.telefone;
+          if (body.celular) data.celular = body.celular;
+          if (body.creci) data.creci = body.creci;
+          if (body.nome_imobiliaria) data.nome_imobiliaria = body.nome_imobiliaria;
+          if (body.nome_completo) data.nome_completo = body.nome_completo;
+        }
+      },
+    });
+
+    // 3. Auto-recovery for corrupted or missing up_users table
     (async () => {
       try {
         if (strapi.db && strapi.db.connection) {
@@ -169,19 +188,27 @@ export default {
               table.string('celular', 255);
               table.string('creci', 255);
               table.string('nome_imobiliaria', 255);
+              table.string('nome_completo', 255);
             });
             console.log('✅ [Bootstrap] up_users table successfully reconstructed with custom fields.');
           } else {
             // Apply safe custom columns if table exists but is missing our custom fields
-            const hasTelefone = await strapi.db.connection.schema.hasColumn('up_users', 'telefone');
-            if (!hasTelefone) {
-              await strapi.db.connection.schema.alterTable('up_users', (table: any) => {
-                table.string('telefone', 255);
-                table.string('celular', 255);
-                table.string('creci', 255);
-                table.string('nome_imobiliaria', 255);
-              });
-              console.log('[Bootstrap] Successfully added custom structural columns to healthy up_users table.');
+            const customFields = [
+              { name: 'telefone', type: 'string' },
+              { name: 'celular', type: 'string' },
+              { name: 'creci', type: 'string' },
+              { name: 'nome_imobiliaria', type: 'string' },
+              { name: 'nome_completo', type: 'string' }
+            ];
+
+            for (const field of customFields) {
+              const hasField = await strapi.db.connection.schema.hasColumn('up_users', field.name);
+              if (!hasField) {
+                await strapi.db.connection.schema.alterTable('up_users', (table: any) => {
+                  table.string(field.name, 255);
+                });
+                console.log(`[Bootstrap] Added missing column "${field.name}" to up_users.`);
+              }
             }
             
             // Fix: Strapi i18n plugin demands "locale" column but might be missing on manual db reconstruction

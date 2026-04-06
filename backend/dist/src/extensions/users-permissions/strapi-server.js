@@ -27,5 +27,29 @@ module.exports = (plugin) => {
             },
         };
     };
+    // 3. Extend the user content type with custom fields for persistence
+    // We use a more robust merging strategy for Strapi 5 to ensure Username/Email are never lost
+    if (plugin.contentTypes && plugin.contentTypes.user) {
+        const existingAttributes = plugin.contentTypes.user.schema.attributes || {};
+        // Check if core fields are present. If for some reason they are missing during boot, we force them back.
+        const coreFields = {
+            username: { type: 'string', minLength: 3, unique: true, configurable: false, required: true },
+            email: { type: 'email', minLength: 3, configurable: false, required: true },
+            password: { type: 'password', minLength: 6, configurable: false, private: true },
+            provider: { type: 'string', configurable: false },
+            confirmed: { type: 'boolean', default: false, configurable: false },
+            blocked: { type: 'boolean', default: false, configurable: false },
+            role: { type: 'relation', relation: 'manyToOne', target: 'plugin::users-permissions.role', inverse: 'users', configurable: false },
+        };
+        plugin.contentTypes.user.schema.attributes = {
+            ...coreFields,
+            ...existingAttributes, // Keep whatever we already had
+            nome_imobiliaria: { type: 'string' },
+            creci: { type: 'string' },
+            telefone: { type: 'string' },
+            celular: { type: 'string' },
+        };
+        console.log('✅ [Strapi-Server] Unified User Schema: merged core fields with custom fields.');
+    }
     return plugin;
 };
