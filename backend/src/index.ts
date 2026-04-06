@@ -238,14 +238,16 @@ export default {
                console.log('[Bootstrap] Added explicitly missing role column to up_users.');
             }
 
-            // Safety: Strapi 5 Admin Panel crashes if users are missing a valid documentId or locale.
-            // We force-populate them here if they were missed during manual DB creation.
+            // Safety: Strapi 5 Admin Panel crashes or fails to link relations if records 
+            // are missing a valid documentId or locale (Document Service v5 requirement).
+            
+            // 1. Heal Users
             const usersMissingDocs = await strapi.db.connection('up_users')
               .whereNull('document_id')
               .orWhereNull('locale');
 
             if (usersMissingDocs.length > 0) {
-              console.log(`🚨 [Bootstrap] Found ${usersMissingDocs.length} users with missing documentId/locale. Healing data for Admin UI stability...`);
+              console.log(`🚨 [Bootstrap] Found ${usersMissingDocs.length} users with missing documentId/locale. Healing data...`);
               const crypto = require('crypto');
               for (const u of usersMissingDocs) {
                 await strapi.db.connection('up_users')
@@ -256,7 +258,28 @@ export default {
                     published_at: u.published_at || new Date().toISOString()
                   });
               }
-              console.log('✅ [Bootstrap] Healed malformed users. Admin UI should be stable now.');
+              console.log('✅ [Bootstrap] Healed users metadata.');
+            }
+
+            // 2. Heal Imoveis (Fixes the relation "locale null" error)
+            const imoveisMissingDocs = await strapi.db.connection('imoveis')
+              .whereNull('document_id')
+              .orWhereNull('locale');
+
+            if (imoveisMissingDocs.length > 0) {
+              console.log(`🚨 [Bootstrap] Found ${imoveisMissingDocs.length} properties with missing metadata. Healing for Admin UI stability...`);
+              const crypto = require('crypto');
+              for (const item of imoveisMissingDocs) {
+                // We use a unique ID for document_id but maintain the same locale context
+                await strapi.db.connection('imoveis')
+                  .where({ id: item.id })
+                  .update({ 
+                    document_id: item.document_id || crypto.randomBytes(12).toString('hex'),
+                    locale: item.locale || 'pt-BR',
+                    published_at: item.published_at || new Date().toISOString()
+                  });
+              }
+              console.log('✅ [Bootstrap] Healed properties metadata. Relations should work now.');
             }
           }
         }
