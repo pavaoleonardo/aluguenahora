@@ -158,16 +158,12 @@ export default {
             ];
             
             for (const action of actions) {
-              await strapi.db.query('plugin::users-permissions.permission').upsert({
+              await strapi.db.query('plugin::users-permissions.permission').updateMany({
                 where: {
                   role: publicRole.id,
                   action: action,
                 },
-                data: { 
-                  enabled: true,
-                  role: publicRole.id,
-                  action: action
-                },
+                data: { enabled: true },
               });
             }
             console.log('✅ [Bootstrap] Public permissions unified.');
