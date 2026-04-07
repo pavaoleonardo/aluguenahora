@@ -1,13 +1,22 @@
 export default (plugin: any) => {
   const originalRegister = plugin.controllers.auth.register;
 
+  // 1. Override the route configuration to disable the strict body validator
+  const contentApiRoutes = plugin.routes['content-api'].routes;
+  const registerRoute = contentApiRoutes.find((route: any) => route.path === '/auth/local/register' && route.method === 'POST');
+  
+  if (registerRoute) {
+    // Remove the strict validator so custom fields can pass through to our controller
+    if (registerRoute.config) {
+      delete registerRoute.config.validate;
+    }
+  }
+
+  // 2. Override the controller to handle custom data safely
   plugin.controllers.auth.register = async (ctx: any) => {
     console.log('--- Registration Attempt ---');
-    console.log('Body:', JSON.stringify(ctx.request.body, null, 2));
-
     if (!ctx.request.body) return originalRegister(ctx);
 
-    // We intercept the request body to extract custom fields
     const { 
       telefone, 
       celular, 
@@ -17,32 +26,37 @@ export default (plugin: any) => {
       tipo_usuario 
     } = ctx.request.body;
 
-    // Stick them in state so the lifecycle hook can grab them safely
-    ctx.state.customRegistration = {
-      telefone,
-      celular,
-      creci,
-      nome_imobiliaria,
-      nome_completo,
-      tipo_usuario
+    // Capture custom fields for later
+    const customFields = { 
+      telefone, 
+      celular, 
+      creci, 
+      nome_imobiliaria, 
+      nome_completo, 
+      tipo_usuario 
     };
 
-    // Strip these fields from the body so the original controller doesn't complain/filter
-    // This avoids the 400 Bad Request if it's strictly validating the DTO
-    const originalBody = { ...ctx.request.body };
+    // Remove them from the body to bypass core Strapi validation
     delete ctx.request.body.telefone;
     delete ctx.request.body.celular;
     delete ctx.request.body.creci;
     delete ctx.request.body.nome_imobiliaria;
     delete ctx.request.body.nome_completo;
     delete ctx.request.body.tipo_usuario;
-    delete ctx.request.body.role; // Also strip role just in case
+    delete ctx.request.body.role; 
 
     try {
-      return await originalRegister(ctx);
+      // Execute original register logic
+      await originalRegister(ctx);
+
+      // If successful, update the newly created user with our custom fields
+      if (ctx.body && ctx.body.user && ctx.body.user.id) {
+        await strapi.entityService.update('plugin::users-permissions.user', ctx.body.user.id, {
+          data: customFields
+        });
+      }
     } catch (err) {
-      // If it fails, restore body for debugging if needed
-      ctx.request.body = originalBody;
+      console.error('Registration Hook Error:', err);
       throw err;
     }
   };
