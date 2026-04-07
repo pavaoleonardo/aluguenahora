@@ -99,35 +99,11 @@ export default {
       name: 'bairro-regiao',
       type: 'json',
     });
-
-    /*
-    strapi.documents.use(async (context, next) => {
-      if (context.uid !== 'api::imovel.imovel') return next();
-      if (context.action !== 'create' && context.action !== 'update') return next();
-
-      const params = context.params as any;
-      const data = params?.data;
-
-      if (data?.endereco) {
-        const hasCoords = data.latitude && data.longitude &&
-          Math.abs(data.latitude) > 0 && Math.abs(data.longitude) > 0;
-
-        if (!hasCoords) {
-          const coords = await geocodeAddress(data.endereco, data.bairro, data.cidade);
-          if (coords) {
-            data.latitude = coords.latitude;
-            data.longitude = coords.longitude;
-          }
-        }
-      }
-
-      return next();
-    });
-    */
     void geocodeAddress;
   },
 
   bootstrap({ strapi }: BootstrapContext) {
+    // 1. Configure Plugin Settings (Safe Mode)
     void (async () => {
       try {
         const pluginStore = strapi.store({
@@ -135,255 +111,196 @@ export default {
           type: 'plugin',
           name: 'users-permissions',
         });
-        const templateSettings = (await pluginStore.get({ key: 'email' })) as any;
 
-        if (templateSettings?.email_confirmation) {
-          templateSettings.email_confirmation.options.from.email = 'noreply@mail.aluguenahora.com.br';
-          templateSettings.email_confirmation.options.from.name = 'Alugue na Hora';
-          templateSettings.email_confirmation.options.response_email = 'noreply@mail.aluguenahora.com.br';
+        // Email Templates
+        try {
+          const templateSettings = (await pluginStore.get({ key: 'email' })) as any;
+          if (templateSettings?.email_confirmation) {
+            templateSettings.email_confirmation.options.from.email = 'noreply@mail.aluguenahora.com.br';
+            templateSettings.email_confirmation.options.from.name = 'Alugue na Hora';
+            templateSettings.email_confirmation.options.response_email = 'noreply@mail.aluguenahora.com.br';
 
-          templateSettings.reset_password.options.from.email = 'noreply@mail.aluguenahora.com.br';
-          templateSettings.reset_password.options.from.name = 'Alugue na Hora';
-          templateSettings.reset_password.options.response_email = 'noreply@mail.aluguenahora.com.br';
+            templateSettings.reset_password.options.from.email = 'noreply@mail.aluguenahora.com.br';
+            templateSettings.reset_password.options.from.name = 'Alugue na Hora';
+            templateSettings.reset_password.options.response_email = 'noreply@mail.aluguenahora.com.br';
 
-          await pluginStore.set({ key: 'email', value: templateSettings });
-          console.log(
-            '✅ [Bootstrap] Re-aligned Users-Permissions email shipper domains for Resend SMTP compatibility.'
-          );
+            await pluginStore.set({ key: 'email', value: templateSettings });
+            console.log('✅ [Bootstrap] Email templates re-aligned.');
+          }
+        } catch (e: any) {
+          console.warn('[Bootstrap] Could not update email templates:', e.message);
         }
 
-        const advancedSettings = (await pluginStore.get({ key: 'advanced' })) as any;
-        if (advancedSettings) {
-          advancedSettings.email_confirmation_redirection =
-            'https://aluguenahora.com.br/login?confirmed=true';
-          await pluginStore.set({ key: 'advanced', value: advancedSettings });
-          console.log('✅ [Bootstrap] Set email confirmation redirection back to frontend.');
+        // Advanced Settings
+        try {
+          const advancedSettings = (await pluginStore.get({ key: 'advanced' })) as any;
+          if (advancedSettings) {
+            advancedSettings.email_confirmation_redirection = 'https://aluguenahora.com.br/login?confirmed=true';
+            await pluginStore.set({ key: 'advanced', value: advancedSettings });
+            console.log('✅ [Bootstrap] Advanced settings re-aligned.');
+          }
+        } catch (e: any) {
+          console.warn('[Bootstrap] Could not update advanced settings:', e.message);
         }
 
-        const authenticatedRole = await strapi.db.query('plugin::users-permissions.role').findOne({
-          where: { type: 'authenticated' },
-        });
-
-        if (authenticatedRole) {
-          await strapi.db.query('plugin::users-permissions.permission').updateMany({
-            where: {
-              role: authenticatedRole.id,
-              action: 'plugin::users-permissions.user.update',
-            },
-            data: { enabled: true },
+        // Permissions
+        try {
+          const authenticatedRole = await strapi.db.query('plugin::users-permissions.role').findOne({
+            where: { type: 'authenticated' },
           });
-          console.log('✅ [Bootstrap] Granted Authenticated role permission to update profile fields.');
+
+          if (authenticatedRole) {
+            await strapi.db.query('plugin::users-permissions.permission').updateMany({
+              where: {
+                role: authenticatedRole.id,
+                action: 'plugin::users-permissions.user.update',
+              },
+              data: { enabled: true },
+            });
+            console.log('✅ [Bootstrap] Authenticated permissions updated.');
+          }
+        } catch (e: any) {
+          console.warn('[Bootstrap] Could not update permissions:', e.message);
         }
       } catch (err: any) {
-        console.log('[Bootstrap] Error during plugin configuration:', err.message);
+        console.warn('[Bootstrap] Plugin configuration error:', err.message);
       }
     })();
 
+    // 2. Lifecycle Hooks
     strapi.db.lifecycles.subscribe({
       models: ['plugin::users-permissions.user'],
       async beforeCreate(event) {
         const { data } = event.params as { data: Record<string, unknown> };
-        const ctx = strapi.requestContext.get() as
-          | {
-              state?: { customRegistration?: RegistrationState };
-              request?: { body?: RegistrationState };
-            }
-          | undefined;
-
-        if (ctx?.state?.customRegistration) {
-          applyRegistrationFields(data, ctx.state.customRegistration);
-          return;
-        }
-
-        applyRegistrationFields(data, ctx?.request?.body);
+        const ctx = strapi.requestContext.get() as any;
+        applyRegistrationFields(data, ctx?.state?.customRegistration || ctx?.request?.body);
       },
       async beforeUpdate(event) {
         const { data } = event.params as { data: Record<string, unknown> };
-        const ctx = strapi.requestContext.get() as
-          | {
-              request?: { body?: RegistrationState };
-            }
-          | undefined;
-
+        const ctx = strapi.requestContext.get() as any;
         applyRegistrationFields(data, ctx?.request?.body);
       },
     });
 
+    // 3. Database Schema Integrity (Safe Mode & Non-Destructive)
     void (async () => {
       try {
-        if (strapi.db && strapi.db.connection) {
-          const hasTable = await strapi.db.connection.schema.hasTable('up_users');
+        if (!strapi.db || !strapi.db.connection) return;
 
-          if (!hasTable) {
-            console.log('🚨 [Bootstrap] up_users table is missing! Natively reconstructing base schema...');
-            await strapi.db.connection.schema.createTable('up_users', (table: any) => {
-              table.increments('id').primary();
-              table.string('username', 255);
-              table.string('email', 255);
-              table.string('provider', 255);
-              table.string('password', 255);
-              table.string('reset_password_token', 255);
-              table.string('confirmation_token', 255);
-              table.boolean('confirmed').defaultTo(false);
-              table.boolean('blocked').defaultTo(false);
-              table.integer('role_id');
-              table.datetime('created_at').defaultTo(strapi.db.connection.fn.now());
-              table.datetime('updated_at').defaultTo(strapi.db.connection.fn.now());
-              table.integer('created_by_id');
-              table.integer('updated_by_id');
-              table.string('document_id', 255);
-              table.string('published_at', 255);
-              table.string('locale', 255);
-              table.string('telefone', 255);
-              table.string('celular', 255);
-              table.string('creci', 255);
-              table.string('nome_imobiliaria', 255);
-              table.string('nome_completo', 255);
-            });
-            console.log('✅ [Bootstrap] up_users table successfully reconstructed with custom fields.');
-          } else {
-            const customFields = [
-              { name: 'telefone' },
-              { name: 'celular' },
-              { name: 'creci' },
-              { name: 'nome_imobiliaria' },
-              { name: 'nome_completo' },
-              { name: 'tipo_usuario' },
-            ];
+        console.log('🔍 [Bootstrap] Verifying database integrity...');
+        const hasTable = await strapi.db.connection.schema.hasTable('up_users');
 
-            for (const field of customFields) {
-              const hasField = await strapi.db.connection.schema.hasColumn('up_users', field.name);
-              if (!hasField) {
-                await strapi.db.connection.schema.alterTable('up_users', (table: any) => {
-                  table.string(field.name, 255);
-                });
-                console.log(`[Bootstrap] Added missing column "${field.name}" to up_users.`);
-              }
-            }
-
-            const hasLocale = await strapi.db.connection.schema.hasColumn('up_users', 'locale');
-            if (!hasLocale) {
+        if (hasTable) {
+          // Add missing columns only
+          const customFields = ['telefone', 'celular', 'creci', 'nome_imobiliaria', 'nome_completo', 'tipo_usuario', 'locale', 'role'];
+          for (const fieldName of customFields) {
+            const hasCol = await strapi.db.connection.schema.hasColumn('up_users', fieldName);
+            if (!hasCol) {
               await strapi.db.connection.schema.alterTable('up_users', (table: any) => {
-                table.string('locale', 255);
+                if (fieldName === 'role') table.integer('role');
+                else table.string(fieldName, 255);
               });
-              console.log('[Bootstrap] Added explicitly missing locale column to up_users.');
-            }
-
-            const hasRole = await strapi.db.connection.schema.hasColumn('up_users', 'role');
-            if (!hasRole) {
-              await strapi.db.connection.schema.alterTable('up_users', (table: any) => {
-                table.integer('role');
-              });
-              console.log('[Bootstrap] Added explicitly missing role column to up_users.');
-            }
-
-            const usersMissingDocs = await strapi.db.connection('up_users')
-              .whereNull('document_id')
-              .orWhereNull('locale');
-
-            if (usersMissingDocs.length > 0) {
-              console.log(
-                `🚨 [Bootstrap] Found ${usersMissingDocs.length} users with missing metadata. Registering via Document Service...`
-              );
-
-              for (const user of usersMissingDocs) {
-                try {
-                  await strapi.documents('plugin::users-permissions.user').update({
-                    documentId: user.document_id || undefined,
-                    data: {
-                      locale: user.locale || 'pt-BR',
-                      confirmed: true,
-                    },
-                  });
-                } catch (error: any) {
-                  console.warn(`[Bootstrap] Failed to heal user ${user.id}:`, error.message);
-                }
-              }
-
-              console.log('✅ [Bootstrap] Healed users metadata via Document Service.');
-            }
-
-            const imoveisMissingDocs = await strapi.db.connection('imoveis')
-              .whereNull('document_id')
-              .orWhereNotNull('locale');
-
-            if (imoveisMissingDocs.length > 0) {
-              console.log(
-                `🚨 [Bootstrap] Found ${imoveisMissingDocs.length} properties with metadata issues. Normalizing...`
-              );
-
-              for (const item of imoveisMissingDocs) {
-                try {
-                  await strapi.db.connection('imoveis')
-                    .where({ id: item.id })
-                    .update({
-                      document_id: item.document_id || require('crypto').randomBytes(12).toString('hex'),
-                      locale: null,
-                      published_at: item.published_at || new Date().toISOString(),
-                    });
-                } catch (error: any) {
-                  console.warn('[Bootstrap] Property heal error:', error.message);
-                }
-              }
-
-              console.log('✅ [Bootstrap] Healed properties metadata successfully.');
+              console.log(`[Bootstrap] Added missing column "${fieldName}" to up_users.`);
             }
           }
+
+          // Heal Users Metadata (Document ID / Locale)
+          const usersMissingDocs = await strapi.db.connection('up_users')
+            .whereNull('document_id')
+            .orWhereNull('locale')
+            .limit(100);
+
+          if (usersMissingDocs.length > 0) {
+            console.log(`🚨 [Bootstrap] Healing ${usersMissingDocs.length} users...`);
+            for (const user of usersMissingDocs) {
+              try {
+                // Determine if we should use ID or some fallback for document_id
+                const docId = user.document_id || require('crypto').randomBytes(12).toString('hex');
+                await strapi.db.connection('up_users')
+                  .where({ id: user.id })
+                  .update({
+                    document_id: docId,
+                    locale: user.locale || 'pt-BR'
+                  });
+              } catch (e: any) {
+                console.warn(`[Bootstrap] User heal failed (${user.id}):`, e.message);
+              }
+            }
+          }
+
+          // Heal Imoveis Metadata
+          const imoveisMissingDocs = await strapi.db.connection('imoveis')
+            .whereNull('document_id')
+            .orWhereNotNull('locale')
+            .limit(100);
+
+          if (imoveisMissingDocs.length > 0) {
+            console.log(`🚨 [Bootstrap] Healing ${imoveisMissingDocs.length} properties...`);
+            for (const item of imoveisMissingDocs) {
+              try {
+                await strapi.db.connection('imoveis')
+                  .where({ id: item.id })
+                  .update({
+                    document_id: item.document_id || require('crypto').randomBytes(12).toString('hex'),
+                    locale: null,
+                    published_at: item.published_at || new Date().toISOString(),
+                  });
+              } catch (e: any) {
+                console.warn(`[Bootstrap] Property heal failed (${item.id}):`, e.message);
+              }
+            }
+          }
+        } else {
+          console.warn('🚨 [Bootstrap] up_users table is missing! This is a critical error.');
+          // We DO NOT recreate the table here anymore, as it's too dangerous.
+          // The administrator must investigate why the table is missing.
         }
       } catch (err: any) {
-        console.warn('[Bootstrap] Auto-recovery logic error:', err.message);
+        console.warn('[Bootstrap] Database integrity check failed:', err.message);
       }
     })();
 
-    const seedNews = async () => {
+    // 4. Seeding News (Safe Mode)
+    void (async () => {
       try {
-        const newsToSeed: BootstrapNewsItem[] = [
-          {
-            titulo: 'Bairro São Francisco lidera valorização imobiliária em Campo Grande com alta de 35%',
-            resumo:
-              'Com infraestrutura consolidada e localização privilegiada, o bairro se destaca como o principal polo de valorização na capital sul-mato-grossense em 2025.',
-            conteudo:
-              'O mercado imobiliário de Campo Grande vive um momento de forte valorização, e o bairro São Francisco é o grande destaque deste ciclo. Segundo pesquisas recentes, o bairro registrou um aumento médio de 35% no valor do metro quadrado apenas no último ano.\n\nA proximidade com o centro, a presença de serviços de alta qualidade e o perfil residencial de alto padrão têm atraído investidores e famílias que buscam solidez e qualidade de vida. Outros bairros como Planalto e Jardim dos Estados também seguem em ritmo acelerado de crescimento, consolidando a Capital como um dos melhores destinos para investimento imobiliário no Centro-Oeste.',
-            categoria: 'Valorização',
-            data: '2026-02-10',
-          },
-          {
-            titulo: 'Alta demanda: Estoque de imóveis em Campo Grande pode se esgotar em apenas 4 meses',
-            resumo:
-              'O aquecimento do mercado imobiliário na Capital atinge níveis recordes, impulsionado pela facilidade de crédito e novos lançamentos.',
-            conteudo:
-              'A velocidade de vendas em Campo Grande atingiu patamares nunca antes vistos. Se o ritmo atual de comercialização for mantido e não houver novos lançamentos expressivos, o estoque atual de imóveis prontos e na planta pode se esgotar em menos de 120 dias.\n\nEste cenário é reflexo de uma combination de fatores: a redução das taxas de juros em linhas de crédito específicas, o aumento do poder de compra regional impulsionado pelo agronegócio e a busca por ativos reais como forma de proteção patrimonial. Especialistas recomendam que compradores fiquem atentos às oportunidades, pois a tendência é de continuidade na alta dos preços devido à escassez de oferta.',
-            categoria: 'Investimento',
-            data: '2026-02-08',
-          },
-          {
-            titulo: 'Agronegócio e infraestrutura impulsionam recorde de investimentos imobiliários em MS',
-            resumo:
-              'O setor imobiliário do estado vive um momento de forte expansão, atraindo investidores de todo o Brasil interessados na solidez econômica regional.',
-            conteudo:
-              'Mato Grosso do Sul consolidou sua posição como um dos estados mais dinâmicos do Brasil para o setor imobiliário. O sucesso recorde das safras e a expansão das fronteiras agrícolas têm gerado um excedente de capital que está sendo reinvestido massivamente em imóveis urbanos e rurais.\n\nAlém disso, os grandes projetos de infraestrutura, como a Rota Bioceânica, estão criando novos polos de desenvolvimento no interior do estado, como em Porto Murtinho e Ribas do Rio Pardo. Em Campo Grande, o reflexo é visto em lançamentos de luxo e na modernização da rede hoteleira e de serviços, atraindo olhares de grandes incorporadoras nacionais que antes focavam apenas no eixo Rio-São Paulo.',
-            categoria: 'Alta Demanda',
-            data: '2026-02-05',
-          },
-        ];
+        const newsCount = await strapi.db.query('api::noticia.noticia').count();
+        if (newsCount === 0) {
+          console.log('🌱 [Bootstrap] Seeding initial news...');
+          const newsToSeed: BootstrapNewsItem[] = [
+            {
+              titulo: 'Bairro São Francisco lidera valorização imobiliária em Campo Grande com alta de 35%',
+              resumo: 'Com infraestrutura consolidada e localização privilegiada...',
+              conteudo: 'O mercado imobiliário de Campo Grande vive um momento de forte valorização...',
+              categoria: 'Valorização',
+              data: '2026-02-10',
+            },
+            {
+              titulo: 'Alta demanda: Estoque de imóveis em Campo Grande pode se esgotar em apenas 4 meses',
+              resumo: 'O aquecimento do mercado imobiliário na Capital atinge níveis recordes...',
+              conteudo: 'A velocidade de vendas em Campo Grande atingiu patamares nunca antes vistos...',
+              categoria: 'Investimento',
+              data: '2026-02-08',
+            },
+            {
+              titulo: 'Agronegócio e infraestrutura impulsionam recorde de investimentos imobiliários em MS',
+              resumo: 'O setor imobiliário do estado vive um momento de forte expansão...',
+              conteudo: 'Mato Grosso do Sul consolidou sua posição como um dos estados mais dinâmicos...',
+              categoria: 'Alta Demanda',
+              data: '2026-02-05',
+            },
+          ];
 
-        for (const item of newsToSeed) {
-          const existing = await strapi.db.query('api::noticia.noticia').findOne({
-            where: { titulo: item.titulo },
-          });
-
-          if (!existing) {
+          for (const item of newsToSeed) {
             await (strapi as any).documents('api::noticia.noticia').create({
               data: item,
               status: 'published',
             });
           }
+          console.log('✅ [Bootstrap] News seeded.');
         }
-      } catch (error) {
-        console.error('[Bootstrap] Error seeding news:', error);
+      } catch (e: any) {
+        console.warn('[Bootstrap] News seeding failed:', e.message);
       }
-    };
-
-    void seedNews();
+    })();
   },
 };
