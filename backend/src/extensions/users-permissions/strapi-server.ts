@@ -63,6 +63,7 @@ export default (plugin: any) => {
       telefone: { type: 'string' },
       celular: { type: 'string' },
       nome_completo: { type: 'string' },
+      tipo_usuario: { type: 'enumeration', enum: ['corretor', 'proprietario'], default: 'proprietario' },
     };
     
     console.log('✅ [Strapi-Server] User Schema extended with custom fields and display settings.');
@@ -84,6 +85,7 @@ export default (plugin: any) => {
                 creci: body.creci,
                 nome_imobiliaria: body.nome_imobiliaria,
                 nome_completo: body.nome_completo,
+                tipo_usuario: body.tipo_usuario,
               };
               
               // Clean body for validation
@@ -92,6 +94,7 @@ export default (plugin: any) => {
               delete body.creci;
               delete body.nome_imobiliaria;
               delete body.nome_completo;
+              delete body.tipo_usuario;
               delete body.role; // Don't let users set their own role
             }
             return next();
