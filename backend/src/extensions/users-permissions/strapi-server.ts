@@ -3,6 +3,8 @@ export default (plugin: any) => {
   const originalRegister = plugin.controllers.auth.register;
 
   plugin.controllers.auth.register = async (ctx: any) => {
+    if (!ctx.request.body) return originalRegister(ctx);
+
     // We intercept the request body to extract custom fields
     const { 
       telefone, 
