@@ -83,8 +83,7 @@ export default function RegisterCorretorPage() {
           celular: formData.celular,
           creci: formData.creci,
           nome_imobiliaria: formData.nomeImobiliaria,
-          tipo_usuario: 'corretor',
-          role: 'Authenticated'
+          tipo_usuario: 'corretor'
         }),
       })
       

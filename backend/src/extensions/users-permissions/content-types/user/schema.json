@@ -63,6 +63,28 @@
       "target": "plugin::users-permissions.role",
       "inverse": "users",
       "configurable": false
+    },
+    "nome_completo": {
+      "type": "string"
+    },
+    "telefone": {
+      "type": "string"
+    },
+    "celular": {
+      "type": "string"
+    },
+    "tipo_usuario": {
+      "type": "enumeration",
+      "enum": [
+        "proprietario",
+        "corretor"
+      ]
+    },
+    "creci": {
+      "type": "string"
+    },
+    "nome_imobiliaria": {
+      "type": "string"
     }
   }
 }
