@@ -134,9 +134,25 @@ exports.default = {
             async beforeCreate(event) {
                 const { data } = event.params;
                 const ctx = strapi.requestContext.get();
-                if (ctx && ctx.request && ctx.request.body) {
+                if (ctx && ctx.state && ctx.state.customRegistration) {
+                    // If we took them from a middleware (safest for Strapi 5)
+                    const custom = ctx.state.customRegistration;
+                    if (custom.telefone)
+                        data.telefone = custom.telefone;
+                    if (custom.celular)
+                        data.celular = custom.celular;
+                    if (custom.creci)
+                        data.creci = custom.creci;
+                    if (custom.nome_imobiliaria)
+                        data.nome_imobiliaria = custom.nome_imobiliaria;
+                    if (custom.nome_completo)
+                        data.nome_completo = custom.nome_completo;
+                    if (custom.tipo_usuario)
+                        data.tipo_usuario = custom.tipo_usuario;
+                }
+                else if (ctx && ctx.request && ctx.request.body) {
                     const body = ctx.request.body;
-                    // Extract custom fields from registration body
+                    // Extract custom fields from registration body (legacy fall-back)
                     if (body.telefone)
                         data.telefone = body.telefone;
                     if (body.celular)
@@ -147,6 +163,28 @@ exports.default = {
                         data.nome_imobiliaria = body.nome_imobiliaria;
                     if (body.nome_completo)
                         data.nome_completo = body.nome_completo;
+                    if (body.tipo_usuario)
+                        data.tipo_usuario = body.tipo_usuario;
+                }
+            },
+            async beforeUpdate(event) {
+                const { data } = event.params;
+                const ctx = strapi.requestContext.get();
+                if (ctx && ctx.request && ctx.request.body) {
+                    const body = ctx.request.body;
+                    // Ensure custom fields are preserved during profile updates
+                    if (body.tipo_usuario)
+                        data.tipo_usuario = body.tipo_usuario;
+                    if (body.nome_completo)
+                        data.nome_completo = body.nome_completo;
+                    if (body.telefone)
+                        data.telefone = body.telefone;
+                    if (body.celular)
+                        data.celular = body.celular;
+                    if (body.creci)
+                        data.creci = body.creci;
+                    if (body.nome_imobiliaria)
+                        data.nome_imobiliaria = body.nome_imobiliaria;
                 }
             },
         });
@@ -191,7 +229,8 @@ exports.default = {
                             { name: 'celular', type: 'string' },
                             { name: 'creci', type: 'string' },
                             { name: 'nome_imobiliaria', type: 'string' },
-                            { name: 'nome_completo', type: 'string' }
+                            { name: 'nome_completo', type: 'string' },
+                            { name: 'tipo_usuario', type: 'string' }
                         ];
                         for (const field of customFields) {
                             const hasField = await strapi.db.connection.schema.hasColumn('up_users', field.name);
@@ -218,24 +257,49 @@ exports.default = {
                             });
                             console.log('[Bootstrap] Added explicitly missing role column to up_users.');
                         }
-                        // Safety: Strapi 5 Admin Panel crashes if users are missing a valid documentId or locale.
-                        // We force-populate them here if they were missed during manual DB creation.
+                        // Safety: Strapi 5 Admin Panel crashes or fails to link relations if records 
+                        // are missing a valid documentId or locale (Document Service v5 requirement).
+                        // 1. Heal Users using Document Service (Must be document-aware in Strapi 5)
                         const usersMissingDocs = await strapi.db.connection('up_users')
                             .whereNull('document_id')
                             .orWhereNull('locale');
                         if (usersMissingDocs.length > 0) {
-                            console.log(`🚨 [Bootstrap] Found ${usersMissingDocs.length} users with missing documentId/locale. Healing data for Admin UI stability...`);
-                            const crypto = require('crypto');
+                            console.log(`🚨 [Bootstrap] Found ${usersMissingDocs.length} users with missing metadata. Registering via Document Service...`);
                             for (const u of usersMissingDocs) {
-                                await strapi.db.connection('up_users')
-                                    .where({ id: u.id })
-                                    .update({
-                                    document_id: u.document_id || crypto.randomBytes(12).toString('hex'),
-                                    locale: u.locale || 'pt-BR',
-                                    published_at: u.published_at || new Date().toISOString()
-                                });
+                                try {
+                                    await strapi.documents('plugin::users-permissions.user').update({
+                                        documentId: u.document_id || undefined,
+                                        data: {
+                                            locale: u.locale || 'pt-BR',
+                                            confirmed: true
+                                        },
+                                    });
+                                }
+                                catch (e) {
+                                    console.warn(`[Bootstrap] Failed to heal user ${u.id}:`, e.message);
+                                }
                             }
-                            console.log('✅ [Bootstrap] Healed malformed users. Admin UI should be stable now.');
+                            console.log('✅ [Bootstrap] Healed users metadata via Document Service.');
+                        }
+                        // 2. Heal Imoveis (Fixes the relation "locale null" error by registering in Doc Service)
+                        const imoveisMissingDocs = await strapi.db.connection('imoveis')
+                            .whereNull('document_id')
+                            .orWhereNotNull('locale'); // Fix for accidentally assigned locales from previous runs
+                        if (imoveisMissingDocs.length > 0) {
+                            console.log(`🚨 [Bootstrap] Found ${imoveisMissingDocs.length} properties with metadata issues. Normalizing...`);
+                            for (const item of imoveisMissingDocs) {
+                                try {
+                                    await strapi.db.connection('imoveis').where({ id: item.id }).update({
+                                        document_id: item.document_id || require('crypto').randomBytes(12).toString('hex'),
+                                        locale: null, // REQUIRED: Keep null for non-localized types
+                                        published_at: item.published_at || new Date().toISOString()
+                                    });
+                                }
+                                catch (e) {
+                                    console.warn('[Bootstrap] Property heal error:', e.message);
+                                }
+                            }
+                            console.log('✅ [Bootstrap] Healed properties metadata successfully.');
                         }
                     }
                 }

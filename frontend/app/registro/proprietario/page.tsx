@@ -103,7 +103,8 @@ export default function RegisterProprietarioPage() {
             },
             body: JSON.stringify({ 
               telefone: formData.telefone,
-              celular: formData.celular
+              celular: formData.celular,
+              tipo_usuario: 'proprietario'
             }),
           });
           

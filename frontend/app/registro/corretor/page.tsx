@@ -113,7 +113,8 @@ export default function RegisterCorretorPage() {
               nome_imobiliaria: formData.nomeImobiliaria,
               creci: formData.creci,
               telefone: formData.telefone,
-              celular: formData.celular
+              celular: formData.celular,
+              tipo_usuario: 'corretor'
             }),
           });
           

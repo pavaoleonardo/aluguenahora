@@ -166,6 +166,21 @@ export default {
           if (body.tipo_usuario) data.tipo_usuario = body.tipo_usuario;
         }
       },
+      async beforeUpdate(event) {
+        const { data } = event.params;
+        const ctx = strapi.requestContext.get() as any;
+        
+        if (ctx && ctx.request && ctx.request.body) {
+          const body = ctx.request.body;
+          // Ensure custom fields are preserved during profile updates
+          if (body.tipo_usuario) data.tipo_usuario = body.tipo_usuario;
+          if (body.nome_completo) data.nome_completo = body.nome_completo;
+          if (body.telefone) data.telefone = body.telefone;
+          if (body.celular) data.celular = body.celular;
+          if (body.creci) data.creci = body.creci;
+          if (body.nome_imobiliaria) data.nome_imobiliaria = body.nome_imobiliaria;
+        }
+      },
     });
 
     // 3. Auto-recovery for corrupted or missing up_users table

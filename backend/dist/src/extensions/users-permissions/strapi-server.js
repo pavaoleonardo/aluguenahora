@@ -1,4 +1,6 @@
-module.exports = (plugin) => {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = (plugin) => {
     // 1. Override the role service factor to fix the count query for Strapi 5
     const originalRoleServiceFactory = plugin.services.role;
     plugin.services.role = ({ strapi }) => {
@@ -41,15 +43,54 @@ module.exports = (plugin) => {
             blocked: { type: 'boolean', default: false, configurable: false },
             role: { type: 'relation', relation: 'manyToOne', target: 'plugin::users-permissions.role', inverse: 'users', configurable: false },
         };
+        // Set metadata for better Admin UI experience (Main field for relations)
+        plugin.contentTypes.user.schema.info = {
+            ...plugin.contentTypes.user.schema.info,
+            mainField: 'username',
+            displayName: 'Usuário'
+        };
         plugin.contentTypes.user.schema.attributes = {
-            ...coreFields,
-            ...existingAttributes, // Keep whatever we already had
+            ...existingAttributes,
             nome_imobiliaria: { type: 'string' },
             creci: { type: 'string' },
             telefone: { type: 'string' },
             celular: { type: 'string' },
+            nome_completo: { type: 'string' },
         };
-        console.log('✅ [Strapi-Server] Unified User Schema: merged core fields with custom fields.');
+        console.log('✅ [Strapi-Server] User Schema extended with custom fields and display settings.');
+    }
+    // 4. Inject a middleware to handle registration custom fields without 400 Bad Request errors
+    if (plugin.routes['content-api']) {
+        plugin.routes['content-api'].routes.forEach((route) => {
+            var _a;
+            if (route.method === 'POST' && route.path === '/auth/local/register') {
+                const originalMiddleware = ((_a = route.config) === null || _a === void 0 ? void 0 : _a.middlewares) || [];
+                route.config.middlewares = [
+                    async (ctx, next) => {
+                        // Before validation: Move custom fields to state and remove from body
+                        if (ctx.request.body) {
+                            const body = ctx.request.body;
+                            ctx.state.customRegistration = {
+                                telefone: body.telefone,
+                                celular: body.celular,
+                                creci: body.creci,
+                                nome_imobiliaria: body.nome_imobiliaria,
+                                nome_completo: body.nome_completo,
+                            };
+                            // Clean body for validation
+                            delete body.telefone;
+                            delete body.celular;
+                            delete body.creci;
+                            delete body.nome_imobiliaria;
+                            delete body.nome_completo;
+                            delete body.role; // Don't let users set their own role
+                        }
+                        return next();
+                    },
+                    ...originalMiddleware
+                ];
+            }
+        });
     }
     return plugin;
 };

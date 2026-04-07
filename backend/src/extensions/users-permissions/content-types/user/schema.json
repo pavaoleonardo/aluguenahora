@@ -1,0 +1,27 @@
+{
+  "attributes": {
+    "tipo_usuario": {
+      "type": "enumeration",
+      "enum": [
+        "corretor",
+        "proprietario"
+      ],
+      "default": "proprietario"
+    },
+    "nome_completo": {
+      "type": "string"
+    },
+    "creci": {
+      "type": "string"
+    },
+    "nome_imobiliaria": {
+      "type": "string"
+    },
+    "telefone": {
+      "type": "string"
+    },
+    "celular": {
+      "type": "string"
+    }
+  }
+}
