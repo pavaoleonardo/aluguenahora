@@ -228,32 +228,86 @@ export default {
               { name: 'tipo_usuario', type: 'string' }
             ];
 
+            const baseFields = [
+              { name: 'id', type: 'increments', isId: true },
+              { name: 'username', type: 'string' },
+              { name: 'email', type: 'string' },
+              { name: 'provider', type: 'string' },
+              { name: 'password', type: 'string' },
+              { name: 'confirmed', type: 'boolean', default: false },
+              { name: 'blocked', type: 'boolean', default: false },
+              { name: 'role_id', type: 'integer' },
+              { name: 'role', type: 'integer' },
+              { name: 'document_id', type: 'string' },
+              { name: 'published_at', type: 'string' },
+              { name: 'locale', type: 'string' },
+              { name: 'reset_password_token', type: 'string' },
+              { name: 'confirmation_token', type: 'string' },
+              { name: 'created_by_id', type: 'integer' },
+              { name: 'updated_by_id', type: 'integer' },
+              { name: 'created_at', type: 'datetime', default: 'now' },
+              { name: 'updated_at', type: 'datetime', default: 'now' }
+            ];
+
+            // 1. Check/Add ID first
+            const hasId = await strapi.db.connection.schema.hasColumn('up_users', 'id');
+            if (!hasId) {
+               console.log('🚨 [Bootstrap] CRITICAL: up_users table is missing ID column! Re-creating it now...');
+               await strapi.db.connection.schema.dropTableIfExists('up_users');
+               
+               // Recreate fully right now
+               await strapi.db.connection.schema.createTable('up_users', (table: any) => {
+                 table.increments('id').primary();
+                 table.string('username', 255);
+                 table.string('email', 255);
+                 table.string('provider', 255);
+                 table.string('password', 255);
+                 table.string('reset_password_token', 255);
+                 table.string('confirmation_token', 255);
+                 table.boolean('confirmed').defaultTo(false);
+                 table.boolean('blocked').defaultTo(false);
+                 table.integer('role_id');
+                 table.integer('role');
+                 table.datetime('created_at').defaultTo(strapi.db.connection.fn.now());
+                 table.datetime('updated_at').defaultTo(strapi.db.connection.fn.now());
+                 table.string('document_id', 255);
+                 table.string('published_at', 255);
+                 table.string('locale', 255);
+                 table.string('telefone', 255);
+                 table.string('celular', 255);
+                 table.string('creci', 255);
+                 table.string('nome_imobiliaria', 255);
+                 table.string('nome_completo', 255);
+                 table.string('tipo_usuario', 255);
+               });
+               console.log('✅ [Bootstrap] up_users table fully successfully reconstructed.');
+               return; // Skip the rest of this check as the table is now fresh
+            }
+
+            // 2. Add missing base columns
+            for (const field of baseFields) {
+              if (field.isId) continue;
+              const hasField = await strapi.db.connection.schema.hasColumn('up_users', field.name);
+              if (!hasField) {
+                await strapi.db.connection.schema.alterTable('up_users', (table: any) => {
+                  if (field.type === 'string') table.string(field.name, 255);
+                  if (field.type === 'boolean') table.boolean(field.name).defaultTo(field.default);
+                  if (field.type === 'integer') table.integer(field.name);
+                  if (field.type === 'datetime') table.datetime(field.name).defaultTo(field.default === 'now' ? strapi.db.connection.fn.now() : null);
+                });
+                console.log(`[Bootstrap] Added missing standard column "${field.name}" to up_users.`);
+              }
+            }
+
+            // 3. Add missing custom columns
             for (const field of customFields) {
               const hasField = await strapi.db.connection.schema.hasColumn('up_users', field.name);
               if (!hasField) {
                 await strapi.db.connection.schema.alterTable('up_users', (table: any) => {
                   table.string(field.name, 255);
                 });
-                console.log(`[Bootstrap] Added missing column "${field.name}" to up_users.`);
+                console.log(`[Bootstrap] Added missing custom column "${field.name}" to up_users.`);
               }
-            }
-            
-            // Fix: Strapi i18n plugin demands "locale" column but might be missing on manual db reconstruction
-            const hasLocale = await strapi.db.connection.schema.hasColumn('up_users', 'locale');
-            if (!hasLocale) {
-               await strapi.db.connection.schema.alterTable('up_users', (table: any) => {
-                 table.string('locale', 255);
-               });
-               console.log('[Bootstrap] Added explicitly missing locale column to up_users.');
-            }
-            
-            // Fix: Strapi 5 uses "role" direct column in some queries for users-permissions limits and authentications
-            const hasRole = await strapi.db.connection.schema.hasColumn('up_users', 'role');
-            if (!hasRole) {
-               await strapi.db.connection.schema.alterTable('up_users', (table: any) => {
-                 table.integer('role');
-               });
-               console.log('[Bootstrap] Added explicitly missing role column to up_users.');
             }
 
             // Safety: Strapi 5 Admin Panel crashes or fails to link relations if records 

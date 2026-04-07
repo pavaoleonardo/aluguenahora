@@ -33,40 +33,31 @@ export default (plugin: any) => {
   };
 
 
-  // 3. Extend the user content type with custom fields for persistence
-  // We use a more robust merging strategy for Strapi 5 to ensure Username/Email are never lost
+  // 3. Extend the user content type with custom fields AND ensure core fields are visible
   if (plugin.contentTypes && plugin.contentTypes.user) {
-    const existingAttributes = plugin.contentTypes.user.schema.attributes || {};
-    
-    // Check if core fields are present. If for some reason they are missing during boot, we force them back.
     const coreFields = {
       username: { type: 'string', minLength: 3, unique: true, configurable: false, required: true },
       email: { type: 'email', minLength: 3, configurable: false, required: true },
-      password: { type: 'password', minLength: 6, configurable: false, private: true },
       provider: { type: 'string', configurable: false },
+      password: { type: 'password', minLength: 6, configurable: false, private: true },
+      resetPasswordToken: { type: 'string', configurable: false, private: true },
+      confirmationToken: { type: 'string', configurable: false, private: true },
       confirmed: { type: 'boolean', default: false, configurable: false },
       blocked: { type: 'boolean', default: false, configurable: false },
       role: { type: 'relation', relation: 'manyToOne', target: 'plugin::users-permissions.role', inverse: 'users', configurable: false },
     };
 
-    // Set metadata for better Admin UI experience (Main field for relations)
-    plugin.contentTypes.user.schema.info = {
-      ...plugin.contentTypes.user.schema.info,
-      mainField: 'username',
-      displayName: 'Usuário'
-    };
-
     plugin.contentTypes.user.schema.attributes = {
-      ...existingAttributes,
-      nome_imobiliaria: { type: 'string' },
-      creci: { type: 'string' },
+      ...coreFields,
+      nome_completo: { type: 'string' },
       telefone: { type: 'string' },
       celular: { type: 'string' },
-      nome_completo: { type: 'string' },
+      creci: { type: 'string' },
+      nome_imobiliaria: { type: 'string' },
       tipo_usuario: { type: 'string' },
     };
     
-    console.log('✅ [Strapi-Server] User Schema extended with custom fields and display settings.');
+    console.log('✅ [Strapi-Server] User Schema patched with core and custom fields.');
   }
 
   // 4. Inject a middleware to handle registration custom fields without 400 Bad Request errors
@@ -79,6 +70,8 @@ export default (plugin: any) => {
             // Before validation: Move custom fields to state and remove from body
             if (ctx.request.body) {
               const body = ctx.request.body;
+              console.log('➡️ [Register] Incoming request for:', body.email || body.username);
+              
               ctx.state.customRegistration = {
                 telefone: body.telefone,
                 celular: body.celular,
@@ -88,16 +81,26 @@ export default (plugin: any) => {
                 tipo_usuario: body.tipo_usuario,
               };
               
-              // Clean body for validation
+              // Clean body for validation (Strapi 5 is strict)
               delete body.telefone;
               delete body.celular;
               delete body.creci;
               delete body.nome_imobiliaria;
               delete body.nome_completo;
               delete body.tipo_usuario;
-              delete body.role; // Don't let users set their own role
+              delete body.role; // Security: Don't let users set their own role
             }
-            return next();
+
+            try {
+              await next();
+              
+              if (ctx.status === 400) {
+                console.warn('⚠️ [Register] 400 Bad Request details:', JSON.stringify(ctx.body?.error || ctx.body));
+              }
+            } catch (err: any) {
+              console.error('❌ [Register] Critical Error during next():', err.message);
+              throw err;
+            }
           },
           ...originalMiddleware
         ];
