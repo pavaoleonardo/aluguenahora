@@ -1,5 +1,5 @@
 export default ({ env }) => ({
-  host: env('HOST', '0.0.0.0'),
+  host: env('HOST', '127.0.0.1'),
   port: env.int('PORT', 1337),
   url: env('PUBLIC_URL', 'https://api.aluguenahora.com.br'),
   app: {
