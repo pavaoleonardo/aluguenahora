@@ -143,24 +143,37 @@ export default {
           console.warn('[Bootstrap] Could not update advanced settings:', e.message);
         }
 
-        // Permissions
+        // Public Permissions
         try {
-          const authenticatedRole = await strapi.db.query('plugin::users-permissions.role').findOne({
-            where: { type: 'authenticated' },
+          const publicRole = await strapi.db.query('plugin::users-permissions.role').findOne({
+            where: { type: 'public' },
           });
 
-          if (authenticatedRole) {
-            await strapi.db.query('plugin::users-permissions.permission').updateMany({
-              where: {
-                role: authenticatedRole.id,
-                action: 'plugin::users-permissions.user.update',
-              },
-              data: { enabled: true },
-            });
-            console.log('✅ [Bootstrap] Authenticated permissions updated.');
+          if (publicRole) {
+            const actions = [
+              'api::imovel.imovel.find',
+              'api::imovel.imovel.findOne',
+              'api::noticia.noticia.find',
+              'api::noticia.noticia.findOne'
+            ];
+            
+            for (const action of actions) {
+              await strapi.db.query('plugin::users-permissions.permission').upsert({
+                where: {
+                  role: publicRole.id,
+                  action: action,
+                },
+                data: { 
+                  enabled: true,
+                  role: publicRole.id,
+                  action: action
+                },
+              });
+            }
+            console.log('✅ [Bootstrap] Public permissions unified.');
           }
         } catch (e: any) {
-          console.warn('[Bootstrap] Could not update permissions:', e.message);
+          console.warn('[Bootstrap] Could not update public permissions:', e.message);
         }
       } catch (err: any) {
         console.warn('[Bootstrap] Plugin configuration error:', err.message);

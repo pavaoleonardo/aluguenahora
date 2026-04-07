@@ -15,7 +15,7 @@ echo "🚀 Starting deployment to Hostinger VPS ($TARGET_IP) for target: $TARGET
 
 if [ "$TARGET" = "backend" ] || [ "$TARGET" = "all" ]; then
   echo "⚙️ Deploying Backend..."
-  $SSH_CMD "cd $BASE_DIR && git pull origin main && cd backend && rm -rf .cache dist && npm install && npm run build && cd .. && pm2 startOrRestart ecosystem.config.js --only aluguenahora-backend --update-env"
+  $SSH_CMD "cd $BASE_DIR && git reset --hard && git pull origin main && cd backend && rm -rf .cache dist && npm install && npm run build && cd .. && pm2 startOrRestart ecosystem.config.js --only aluguenahora-backend --update-env"
   if [ $? -eq 0 ]; then
     echo "✅ Backend deployed successfully!"
   else
@@ -26,7 +26,7 @@ fi
 
 if [ "$TARGET" = "frontend" ] || [ "$TARGET" = "all" ]; then
   echo "📦 Deploying Frontend..."
-  $SSH_CMD "cd $BASE_DIR && git pull origin main && cd frontend && npm install && npm run build && cd .. && pm2 startOrRestart ecosystem.config.js --only aluguenahora-frontend --update-env"
+  $SSH_CMD "cd $BASE_DIR && git reset --hard && git pull origin main && cd frontend && npm install && npm run build && cd .. && pm2 startOrRestart ecosystem.config.js --only aluguenahora-frontend --update-env"
   if [ $? -eq 0 ]; then
     echo "✅ Frontend deployed successfully!"
   else
