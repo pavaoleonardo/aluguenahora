@@ -6,28 +6,22 @@ export default {
   },
 
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
-    // 1. Basic SMTP Fix & Registration Bypass
+    console.log('🏗️ [Recovery] Initializing Strapi in Safe Mode...');
+    
     try {
       const pluginStore = strapi.store({ type: 'plugin', name: 'users-permissions' });
       
-      const templateSettings = await pluginStore.get({ key: 'email' }) as any;
-      if (templateSettings?.email_confirmation) {
-        templateSettings.email_confirmation.options.from.email = 'noreply@mail.aluguenahora.com.br';
-        templateSettings.email_confirmation.options.from.name = 'Alugue na Hora';
-        await pluginStore.set({ key: 'email', value: templateSettings });
-      }
-
       const advancedSettings = await pluginStore.get({ key: 'advanced' }) as any;
       if (advancedSettings) {
-        advancedSettings.email_confirmation = false; // Emergency bypass
+        advancedSettings.email_confirmation = false;
         await pluginStore.set({ key: 'advanced', value: advancedSettings });
-        console.log('✅ [Recovery] Registration bypass enabled.');
+        console.log('✅ [Recovery] Registration bypass active.');
       }
     } catch (err) {
-      console.warn('[Recovery] Bootstrap settings warning:', err.message);
+      console.warn('[Recovery] Bootstrap error (skipping):', err.message);
     }
 
-    // 2. Minimal Lifecycle Hook for Custom Fields
+    // Minimal Lifecycle Hook
     strapi.db.lifecycles.subscribe({
       models: ['plugin::users-permissions.user'],
       async beforeCreate(event) {
@@ -45,6 +39,6 @@ export default {
       }
     });
 
-    console.log('🚀 [Recovery] Server stabilized and listening.');
+    console.log('🚀 [Recovery] Server active on port 1337');
   },
 };
