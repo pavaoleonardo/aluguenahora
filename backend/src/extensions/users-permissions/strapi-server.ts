@@ -63,7 +63,7 @@ export default (plugin: any) => {
       telefone: { type: 'string' },
       celular: { type: 'string' },
       nome_completo: { type: 'string' },
-      tipo_usuario: { type: 'enumeration', enum: ['corretor', 'proprietario'], default: 'proprietario' },
+      tipo_usuario: { type: 'string' },
     };
     
     console.log('✅ [Strapi-Server] User Schema extended with custom fields and display settings.');
