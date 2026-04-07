@@ -70,7 +70,12 @@ export default (plugin: any) => {
             // Before validation: Move custom fields to state and remove from body
             if (ctx.request.body) {
               const body = ctx.request.body;
-              console.log('➡️ [Register] Incoming request for:', body.email || body.username);
+              console.log('➡️ [Register] Payload:', {
+                email: body.email,
+                username: body.username,
+                hasPassword: !!body.password,
+                customFields: Object.keys(body).filter(k => !['email', 'username', 'password'].includes(k))
+              });
               
               ctx.state.customRegistration = {
                 telefone: body.telefone,

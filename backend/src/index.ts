@@ -114,8 +114,12 @@ export default {
         const advancedSettings = await pluginStore.get({ key: 'advanced' }) as any;
         if (advancedSettings) {
           advancedSettings.email_confirmation_redirection = 'https://aluguenahora.com.br/login?confirmed=true';
+          
+          // EMERGENCY BYPASS: Force email confirmation OFF to restore user registration immediately
+          advancedSettings.email_confirmation = false;
+          
           await pluginStore.set({ key: 'advanced', value: advancedSettings });
-          console.log('✅ [Bootstrap] Set email confirmation redirection back to frontend.');
+          console.log('✅ [Bootstrap] Emergency Bypass: Email confirmation disabled to restore account creation.');
         }
 
         // Grant 'Authenticated' role permission to update their own user details (needed for your frontend registration 2nd step)
@@ -124,14 +128,23 @@ export default {
         });
         
         if (authenticatedRole) {
-           await strapi.db.query('plugin::users-permissions.permission').updateMany({
+           // We use a more direct way to ensure the data object is never empty
+           const permissions = await strapi.db.query('plugin::users-permissions.permission').findMany({
              where: { 
                role: authenticatedRole.id,
                action: 'plugin::users-permissions.user.update'
-             },
-             data: { enabled: true }
+             }
            });
-           console.log('✅ [Bootstrap] Granted Authenticated role permission to update profile fields.');
+
+           if (permissions.length > 0) {
+             await strapi.db.query('plugin::users-permissions.permission').updateMany({
+               where: { id: { $in: permissions.map((p: any) => p.id) } },
+               data: { enabled: true }
+             });
+             console.log(`✅ [Bootstrap] Granted Authenticated role permission to update profile fields (${permissions.length} records updated).`);
+           } else {
+             console.log('⚠️ [Bootstrap] No update permission record found to enable for Authenticated role.');
+           }
         }
       } catch (err: any) {
         console.log('[Bootstrap] Error during plugin configuration:', err.message);
