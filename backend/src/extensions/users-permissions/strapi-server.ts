@@ -49,10 +49,10 @@ export default (plugin: any) => {
       // Execute original register logic
       await originalRegister(ctx);
 
-      // If successful, update the newly created user with our custom fields
+      // 4. If registration was successful, update the newly created user with our custom fields
       if (ctx.body && ctx.body.user && ctx.body.user.id) {
         await strapi.entityService.update('plugin::users-permissions.user', ctx.body.user.id, {
-          data: customFields
+          data: customFields as any
         });
       }
     } catch (err) {
