@@ -1,17 +1,31 @@
-export default ({ env }) => ({
-  connection: {
-    client: 'postgres',
+export default ({ env }) => {
+  console.log('🏗️ PRD: Config Database Loading...');
+  return {
     connection: {
-      host: env('DATABASE_HOST'),
-      port: env.int('DATABASE_PORT', 5432),
-      database: env('DATABASE_NAME'),
-      user: env('DATABASE_USERNAME'),
-      password: env('DATABASE_PASSWORD'),
-      schema: env('DATABASE_SCHEMA', 'public'),
+      client: 'postgres',
+      connection: {
+        host: env('DATABASE_HOST', '127.0.0.1'),
+        port: env.int('DATABASE_PORT', 5432),
+        database: env('DATABASE_NAME'),
+        user: env('DATABASE_USERNAME'),
+        password: env('DATABASE_PASSWORD'),
+        schema: env('DATABASE_SCHEMA', 'public'),
+        ssl: env.bool('DATABASE_SSL', false),
+      },
+      pool: {
+        min: 2,
+        max: 10,
+        acquireTimeoutMillis: 30000,
+        createTimeoutMillis: 30000,
+        idleTimeoutMillis: 30000,
+        reapIntervalMillis: 1000,
+        createRetryIntervalMillis: 100,
+        propagateCreateError: false,
+      },
+      useNullAsDefault: true,
     },
-    useNullAsDefault: true,
-  },
-  settings: {
-    forceMigration: true,
-  },
-});
+    settings: {
+      forceMigration: true,
+    },
+  };
+};
