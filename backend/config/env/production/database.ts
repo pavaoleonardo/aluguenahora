@@ -17,15 +17,12 @@ export default ({ env }) => {
         max: 10,
         acquireTimeoutMillis: 30000,
         createTimeoutMillis: 30000,
-        idleTimeoutMillis: 30000,
-        reapIntervalMillis: 1000,
-        createRetryIntervalMillis: 100,
-        propagateCreateError: false,
       },
       useNullAsDefault: true,
     },
     settings: {
-      forceMigration: true,
+      // CRITICAL: Set to false to prevent 'must be owner of table' crashes
+      forceMigration: false,
     },
   };
 };
