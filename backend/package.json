@@ -4,9 +4,9 @@
   "private": true,
   "description": "A Strapi application",
   "scripts": {
-    "build": "NODE_OPTIONS=--max-old-space-size=1536 strapi build",
+    "build": "strapi build",
     "develop": "strapi develop",
-    "start": "NODE_OPTIONS=--max-old-space-size=1536 strapi start",
+    "start": "strapi start",
     "strapi": "strapi"
   },
   "dependencies": {
