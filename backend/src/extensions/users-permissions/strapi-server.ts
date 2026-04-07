@@ -1,8 +1,10 @@
-
 export default (plugin: any) => {
   const originalRegister = plugin.controllers.auth.register;
 
   plugin.controllers.auth.register = async (ctx: any) => {
+    console.log('--- Registration Attempt ---');
+    console.log('Body:', JSON.stringify(ctx.request.body, null, 2));
+
     if (!ctx.request.body) return originalRegister(ctx);
 
     // We intercept the request body to extract custom fields
