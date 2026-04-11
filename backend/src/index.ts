@@ -103,6 +103,34 @@ export default {
   },
 
   bootstrap({ strapi }: BootstrapContext) {
+    // 0. Koa Middleware: Strip custom registration fields BEFORE Strapi's Yup validation
+    //    This runs before the router, so the body is clean when Yup validates it.
+    //    The custom fields are stashed on ctx.state.customRegistration for the
+    //    beforeCreate lifecycle hook to pick up and write to the database.
+    const CUSTOM_FIELDS = ['telefone', 'celular', 'creci', 'nome_imobiliaria', 'nome_completo', 'tipo_usuario'];
+
+    strapi.server.use(async (ctx: any, next: () => Promise<void>) => {
+      if (
+        ctx.request.method === 'POST' &&
+        ctx.request.url?.includes('/api/auth/local/register') &&
+        ctx.request.body
+      ) {
+        const stashed: Record<string, unknown> = {};
+        for (const field of CUSTOM_FIELDS) {
+          if (ctx.request.body[field] !== undefined) {
+            stashed[field] = ctx.request.body[field];
+            delete ctx.request.body[field];
+          }
+        }
+        // Also strip 'role' to prevent privilege escalation
+        delete ctx.request.body.role;
+
+        ctx.state.customRegistration = stashed;
+        console.log('🔧 [Middleware] Stripped custom registration fields:', Object.keys(stashed));
+      }
+      await next();
+    });
+
     // 1. Configure Plugin Settings (Safe Mode)
     void (async () => {
       try {
