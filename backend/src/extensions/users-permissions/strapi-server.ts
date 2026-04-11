@@ -6,7 +6,12 @@ export default (plugin: any) => {
   const registerRoute = contentApiRoutes.find((route: any) => route.path === '/auth/local/register' && route.method === 'POST');
   
   if (registerRoute) {
-    // Remove the strict validator so custom fields can pass through to our controller
+    console.log('--- Found register route, disabling strict body validation ---');
+    // In Strapi 5, validation is stored in the 'request' property
+    if (registerRoute.request && registerRoute.request.body) {
+      delete registerRoute.request.body;
+    }
+    // Also clear config.validate just in case of legacy behavior
     if (registerRoute.config) {
       delete registerRoute.config.validate;
     }
