@@ -49,9 +49,9 @@ export default function Navbar() {
             if (item.name === 'Anunciar Imóveis' && !user) {
               return (
                 <Menu as="div" key={item.name} className="relative inline-block text-left">
-                  <MenuButton className="inline-flex items-center text-base font-semibold text-gray-900 hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md">
+                  <MenuButton className="group relative inline-flex items-center text-base font-semibold text-gray-900 transition-all duration-300 hover:text-primary hover:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left">
                     {item.name}
-                    <ChevronDownIcon aria-hidden="true" className="ml-1 -mr-1 size-4 text-gray-400" />
+                    <ChevronDownIcon aria-hidden="true" className="ml-1 -mr-1 size-4 text-gray-400 group-hover:text-primary transition-colors" />
                   </MenuButton>
                   <MenuItems
                     transition
@@ -80,7 +80,7 @@ export default function Navbar() {
               )
             }
             return (
-              <Link key={item.name} href={item.href} className="text-base font-semibold text-gray-900 hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md">
+              <Link key={item.name} href={item.href} className="group relative inline-flex text-base font-semibold text-gray-900 transition-all duration-300 hover:text-primary hover:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-left">
                 {item.name}
               </Link>
             )
