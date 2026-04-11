@@ -21,3 +21,4 @@ backend/*.sh
 backend/*.js
 *.sql
 .agents/skills/deploy-to-hostinger/scripts/
+*.log
