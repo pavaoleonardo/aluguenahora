@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Dialog, DialogPanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
+import { Bars3Icon, XMarkIcon, ChevronDownIcon, UserIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '@/context/AuthContext'
 
 const navigation = [
@@ -110,7 +110,8 @@ export default function Navbar() {
                 <Link href="/registro" className="text-base font-semibold text-gray-900 flex items-center hover:text-primary transition-colors">
                   Cadastrar
                 </Link>
-                <Link href="/login" className="rounded-full bg-primary px-6 py-2 text-base font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors">
+                <Link href="/login" className="flex items-center gap-2 rounded-full bg-primary px-6 py-2 text-base font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors">
+                  <UserIcon className="w-5 h-5" />
                   Entrar
                 </Link>
               </>
@@ -220,8 +221,9 @@ export default function Navbar() {
                       <Link
                         href="/login"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="mt-2 text-center block rounded-lg px-3 py-2.5 text-base font-semibold text-white bg-primary hover:bg-primary-hover transition-colors shadow-sm"
+                        className="mt-2 flex items-center justify-center gap-2 w-full rounded-lg px-3 py-2.5 text-base font-semibold text-white bg-primary hover:bg-primary-hover transition-colors shadow-sm"
                       >
+                        <UserIcon className="w-5 h-5" />
                         Entrar
                       </Link>
                     </>
