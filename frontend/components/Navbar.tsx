@@ -8,8 +8,8 @@ import { Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outli
 import { useAuth } from '@/context/AuthContext'
 
 const navigation = [
-  { name: 'Home', href: '/' },
-  { name: 'Buscar Imóveis', href: '/imoveis' },
+  { name: 'Início', href: '/' },
+  { name: 'Destaques', href: '/#destaques' },
   { name: 'Anunciar Imóveis', href: '/dashboard/novo-imovel' },
   { name: 'Alugue na hora', href: '/sobre' },
 ]
