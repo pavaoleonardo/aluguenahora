@@ -19,7 +19,7 @@ export default async function Home() {
                 src="/hero-bg.png" 
                 alt="Alugue na Hora Background" 
                 fill 
-                className="object-cover object-center sm:object-[center_right] opacity-90" 
+                className="object-cover object-right opacity-90" 
                 priority 
                 unoptimized
             />
