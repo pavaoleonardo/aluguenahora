@@ -132,7 +132,7 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
   return (
     <div className="w-full">
       {/* Navigation Arrows Top Right */}
-      <div className="flex justify-end w-full mb-4 md:flex items-center gap-3 hidden">
+      <div className="flex justify-end w-full mb-4 items-center gap-3">
         <button 
           onClick={() => scroll(-500)}
           className="bg-white hover:bg-gray-50 border border-gray-200 shadow-sm text-primary p-2.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95"
