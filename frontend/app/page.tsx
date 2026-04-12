@@ -26,11 +26,18 @@ export default async function Home() {
             {/* No gradient overlay needed; the QuintoAndar style uses a crisp image behind a solid white card */}
         </div>
         
-        <div className="py-8 sm:py-16 min-h-[calc(100vh-80px)] flex flex-col justify-center relative">
-            <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="pt-24 pb-12 sm:pb-16 lg:pb-24 min-h-[calc(100vh-80px)] flex flex-col justify-end relative">
+            <div className="mx-auto max-w-7xl w-full px-6 lg:px-8 relative z-10">
                 {/* Floating Left Card explicitly matching QuintoAndar dimensions */}
-                <div className="bg-white rounded-[2rem] p-6 sm:p-10 max-w-[520px] shadow-2xl animate-in slide-in-from-left-8 duration-700">
-                    <h1 className="text-[32px] sm:text-[44px] font-extrabold tracking-tight text-slate-900 mb-8 leading-[1.15]">
+                <div className="bg-white rounded-[2rem] p-8 sm:p-10 max-w-[540px] shadow-2xl animate-in slide-in-from-left-8 duration-700">
+                    
+                    {/* QuintoAndar-style Pill Tabs (adds correct vertical height distribution) */}
+                    <div className="flex items-center gap-2 mb-8 bg-gray-50/80 p-1.5 rounded-full inline-flex border border-gray-100">
+                        <span className="bg-white text-slate-900 font-bold px-6 py-2.5 rounded-full shadow-sm text-sm border border-gray-200">Buscar Imóveis</span>
+                        <Link href="/registro/proprietario" className="text-slate-600 font-semibold px-6 py-2.5 rounded-full hover:text-slate-900 transition-colors text-sm">Anunciar Imóveis</Link>
+                    </div>
+
+                    <h1 className="text-[36px] sm:text-[44px] font-extrabold tracking-tight text-slate-900 mb-8 leading-[1.15]">
                         <span className="block">Achei, gostei,</span>
                         <span className="block text-secondary mt-1">aluguei na hora!</span>
                     </h1>
