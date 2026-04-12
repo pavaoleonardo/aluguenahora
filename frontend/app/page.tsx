@@ -16,33 +16,37 @@ export default async function Home() {
         {/* Photo Background */}
         <div className="absolute inset-0 -z-10 bg-white">
             <Image 
-                src="/hero-bg.png" 
+                src="/livingroom.jpg" 
                 alt="Alugue na Hora Background" 
                 fill 
-                className="object-cover object-right" 
+                className="object-cover object-center" 
                 priority 
                 unoptimized
             />
             {/* No gradient overlay needed; the QuintoAndar style uses a crisp image behind a solid white card */}
         </div>
         
-        {/* Classic Horizontal Center Layout, but grouping Title INSIDE the wide card */}
-        <div className="py-16 sm:py-24 lg:py-32 min-h-[500px] lg:min-h-[650px] flex flex-col justify-center relative items-center">
-            <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 relative z-10 w-full flex justify-center">
-                
-                {/* Search Bar Component as the main Horizontal Card containing the Title */}
-                <div className="mt-8 relative z-20 w-full">
-                    <SearchBar 
-                        orientation="horizontal" 
-                        title={
-                            <div className="mx-auto text-center">
-                                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.15]">
-                                    <span className="block text-primary">Achei, gostei,</span>
-                                    <span className="block text-secondary mt-2">aluguei na hora!</span>
-                                </h1>
-                            </div>
-                        }
-                    />
+        {/* Restored to a centered hero approach but wrapping both title and search in the unified card */}
+        <div className="min-h-[650px] flex flex-col justify-center relative w-full items-center overflow-hidden py-16">
+            <div className="w-full relative z-10 flex justify-center px-4">
+                {/* Floating Centered Card */}
+                <div className="bg-white rounded-[2rem] p-8 sm:p-12 max-w-[500px] w-full shadow-2xl animate-in zoom-in-95 duration-700 text-center">
+                    
+                    {/* Pill Tabs Centered */}
+                    <div className="flex items-center justify-center gap-2 mb-8 bg-gray-50/80 p-1.5 rounded-full inline-flex border border-gray-100">
+                        <span className="bg-white text-slate-900 font-bold px-6 py-2.5 rounded-full shadow-sm text-sm border border-gray-200">Buscar Imóveis</span>
+                        <Link href="/registro/proprietario" className="text-slate-600 font-semibold px-6 py-2.5 rounded-full hover:text-slate-900 transition-colors text-sm">Anunciar Imóveis</Link>
+                    </div>
+
+                    <h1 className="text-[36px] sm:text-[40px] font-extrabold tracking-tight text-slate-900 mb-8 leading-[1.15]">
+                        <span className="block text-primary">Achei, gostei,</span>
+                        <span className="block text-secondary mt-1">aluguei na hora!</span>
+                    </h1>
+
+                    {/* Search Bar Component configured vertically */}
+                    <div className="relative z-20 text-left">
+                        <SearchBar orientation="vertical" />
+                    </div>
                 </div>
             </div>
         </div>
