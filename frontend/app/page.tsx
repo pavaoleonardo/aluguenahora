@@ -29,7 +29,7 @@ export default async function Home() {
         
         <div className="pb-12 pt-24 sm:pb-16 lg:pb-24 relative">
             <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
-                <div className="mx-auto max-w-4xl text-center mb-16 px-4 animate-in hover:-translate-y-1 transition-transform duration-500">
+                <div className="mx-auto max-w-4xl text-center mb-12 p-8 sm:p-12 bg-white/70 backdrop-blur-md rounded-[2.5rem] border border-white/60 shadow-2xl animate-in hover:-translate-y-1 transition-transform duration-500">
                     <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-6xl mb-6 drop-shadow-sm">
                         <span className="block text-primary">Achei, gostei,</span>
                         <span className="block text-secondary mt-2">aluguei na hora!</span>

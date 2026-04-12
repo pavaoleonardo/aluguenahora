@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
+import { useEffect, useState, Suspense, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { api } from '@/lib/api'
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 
 type ImovelData = {
   id: number
@@ -33,6 +34,13 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
   const [properties, setProperties] = useState<ImovelData[]>([])
   const [loading, setLoading] = useState(true)
   const searchParams = useSearchParams()
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  const scroll = (offset: number) => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: offset, behavior: 'smooth' })
+    }
+  }
 
   useEffect(() => {
     const filters: any[] = []
@@ -122,7 +130,26 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
   }
 
   return (
-    <div className="mt-12 grid grid-rows-2 grid-flow-col auto-cols-[85vw] sm:auto-cols-[350px] gap-x-6 gap-y-8 overflow-x-auto pb-8 snap-x snap-mandatory hide-scrollbar">
+    <div className="relative w-full">
+      {/* Navigation Arrows Top Right */}
+      <div className="absolute right-0 top-0 hidden md:flex items-center gap-3 z-10">
+        <button 
+          onClick={() => scroll(-500)}
+          className="bg-white hover:bg-gray-50 border border-gray-200 shadow-sm text-primary p-2.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95"
+          aria-label="Scroll left"
+        >
+          <ChevronLeftIcon className="w-5 h-5" />
+        </button>
+        <button 
+          onClick={() => scroll(500)}
+          className="bg-white hover:bg-gray-50 border border-gray-200 shadow-sm text-primary p-2.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95"
+          aria-label="Scroll right"
+        >
+          <ChevronRightIcon className="w-5 h-5" />
+        </button>
+      </div>
+
+      <div ref={scrollRef} className="mt-16 grid grid-rows-2 grid-flow-col auto-cols-[85vw] sm:auto-cols-[350px] gap-x-6 gap-y-8 overflow-x-auto overscroll-x-contain pb-8 snap-x snap-mandatory hide-scrollbar">
       {properties.length > 0 ? (
         properties.map((property) => {
           const bairroLabel =
@@ -206,6 +233,7 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
           <p className="text-gray-500">{emptyMessage}</p>
         </div>
       )}
+    </div>
     </div>
   )
 }
