@@ -130,9 +130,9 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
   }
 
   return (
-    <div className="relative w-full">
+    <div className="w-full">
       {/* Navigation Arrows Top Right */}
-      <div className="absolute right-0 top-0 hidden md:flex items-center gap-3 z-10">
+      <div className="flex justify-end w-full mb-4 md:flex items-center gap-3 hidden">
         <button 
           onClick={() => scroll(-500)}
           className="bg-white hover:bg-gray-50 border border-gray-200 shadow-sm text-primary p-2.5 rounded-full transition-all duration-300 hover:scale-105 active:scale-95"
@@ -149,7 +149,7 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
         </button>
       </div>
 
-      <div ref={scrollRef} className="mt-16 grid grid-rows-2 grid-flow-col auto-cols-[85vw] sm:auto-cols-[350px] gap-x-6 gap-y-8 overflow-x-auto overscroll-x-contain pb-8 snap-x snap-mandatory hide-scrollbar">
+      <div ref={scrollRef} className="mt-2 grid grid-rows-2 grid-flow-col auto-cols-[85vw] sm:auto-cols-[350px] gap-x-6 gap-y-8 overflow-x-auto overscroll-x-contain pb-8 snap-x snap-mandatory hide-scrollbar">
       {properties.length > 0 ? (
         properties.map((property) => {
           const bairroLabel =
