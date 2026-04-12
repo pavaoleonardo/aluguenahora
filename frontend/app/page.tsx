@@ -26,24 +26,30 @@ export default async function Home() {
             {/* No gradient overlay needed; the QuintoAndar style uses a crisp image behind a solid white card */}
         </div>
         
-        <div className="pt-24 pb-12 sm:pb-16 lg:pb-24 min-h-[calc(100vh-80px)] flex flex-col justify-end relative">
-            <div className="mx-auto max-w-7xl w-full px-6 lg:px-8 relative z-10">
-                {/* Floating Left Card explicitly matching QuintoAndar dimensions */}
-                <div className="bg-white rounded-[2rem] p-8 sm:p-10 max-w-[540px] shadow-2xl animate-in slide-in-from-left-8 duration-700">
+        <div className="pt-24 pb-0 lg:pb-12 min-h-[calc(100vh-80px)] flex flex-col justify-end relative">
+            <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 relative z-10 pb-12 sm:pb-16">
+                {/* Floating Left Card explicitly matching QuintoAndar dimensions (Narrow Vertical Rectangle) */}
+                <div className="bg-white rounded-[2rem] p-8 sm:p-10 max-w-[440px] shadow-2xl animate-in slide-in-from-left-8 duration-700">
                     
-                    {/* QuintoAndar-style Pill Tabs (adds correct vertical height distribution) */}
-                    <div className="flex items-center gap-2 mb-8 bg-gray-50/80 p-1.5 rounded-full inline-flex border border-gray-100">
-                        <span className="bg-white text-slate-900 font-bold px-6 py-2.5 rounded-full shadow-sm text-sm border border-gray-200">Buscar Imóveis</span>
-                        <Link href="/registro/proprietario" className="text-slate-600 font-semibold px-6 py-2.5 rounded-full hover:text-slate-900 transition-colors text-sm">Anunciar Imóveis</Link>
+                    {/* QuintoAndar-style Pill Tabs */}
+                    <div className="flex items-center gap-1 mb-8 bg-gray-50 p-1.5 rounded-full w-max border border-gray-100">
+                        <span className="bg-white text-slate-900 font-bold px-5 py-2 rounded-full shadow-sm text-xs">Buscar Imóveis</span>
+                        <Link href="/registro/proprietario" className="text-slate-600 font-semibold px-5 py-2 rounded-full hover:text-slate-900 transition-colors text-xs">Anunciar Imóveis</Link>
                     </div>
 
-                    <h1 className="text-[36px] sm:text-[44px] font-extrabold tracking-tight text-slate-900 mb-8 leading-[1.15]">
+                    <h1 className="text-[36px] sm:text-[40px] font-extrabold tracking-tight text-slate-900 mb-8 leading-[1.1]">
                         <span className="block">Achei, gostei,</span>
                         <span className="block text-secondary mt-1">aluguei na hora!</span>
                     </h1>
                     
+                    {/* QuintoAndar-style Sub-tabs (Alugar | Comprar) to force vertical height */}
+                    <div className="flex gap-6 border-b border-gray-200 mb-6">
+                        <button className="text-primary border-b-2 border-primary pb-3 font-bold text-sm tracking-wide">Alugar</button>
+                        <button className="text-gray-400 pb-3 font-semibold text-sm hover:text-gray-600 transition-colors">Comprar</button>
+                    </div>
+
                     {/* Search Bar Component configured vertically */}
-                    <div className="mt-2 relative z-20">
+                    <div className="relative z-20">
                         <SearchBar orientation="vertical" />
                     </div>
                 </div>
