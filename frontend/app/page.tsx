@@ -19,7 +19,7 @@ export default async function Home() {
                 src="/hero-bg.png" 
                 alt="Alugue na Hora Background" 
                 fill 
-                className="object-cover object-[right_20%] opacity-90" 
+                className="object-cover object-right opacity-90" 
                 priority 
                 unoptimized
             />
@@ -27,7 +27,7 @@ export default async function Home() {
             <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-white/40 to-transparent"></div>
         </div>
         
-        <div className="pb-12 pt-24 sm:pb-16 lg:pb-24 relative">
+        <div className="py-16 sm:py-24 lg:py-32 min-h-[500px] lg:min-h-[650px] flex flex-col justify-center relative">
             <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
                 <div className="mx-auto max-w-4xl text-center mb-16 px-4 animate-in hover:-translate-y-1 transition-transform duration-500">
                     <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-6xl mb-6 drop-shadow-[0_4px_4px_rgba(255,255,255,0.8)]">
