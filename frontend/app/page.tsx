@@ -19,25 +19,24 @@ export default async function Home() {
                 src="/hero-bg.png" 
                 alt="Alugue na Hora Background" 
                 fill 
-                className="object-cover object-right opacity-90" 
+                className="object-cover object-right" 
                 priority 
                 unoptimized
             />
-            {/* Subtle Gradient Overlay to ensure text legibility */}
-            <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-white/40 to-transparent"></div>
+            {/* No gradient overlay needed; the QuintoAndar style uses a crisp image behind a solid white card */}
         </div>
         
-        <div className="py-16 sm:py-24 lg:py-32 min-h-[500px] lg:min-h-[650px] flex flex-col justify-center relative">
-            <div className="mx-auto max-w-7xl w-full px-6 lg:px-8 relative z-10">
-                {/* Floating Left Card similar to QuintoAndar */}
-                <div className="bg-white rounded-3xl p-8 sm:p-10 max-w-lg shadow-2xl animate-in slide-in-from-left-8 duration-700">
-                    <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900 mb-8 leading-tight">
+        <div className="py-8 sm:py-16 min-h-[calc(100vh-80px)] flex flex-col justify-center relative">
+            <div className="mx-auto max-w-7xl w-full px-4 sm:px-6 lg:px-8 relative z-10">
+                {/* Floating Left Card explicitly matching QuintoAndar dimensions */}
+                <div className="bg-white rounded-[2rem] p-6 sm:p-10 max-w-[520px] shadow-2xl animate-in slide-in-from-left-8 duration-700">
+                    <h1 className="text-[32px] sm:text-[44px] font-extrabold tracking-tight text-slate-900 mb-8 leading-[1.15]">
                         <span className="block">Achei, gostei,</span>
                         <span className="block text-secondary mt-1">aluguei na hora!</span>
                     </h1>
                     
                     {/* Search Bar Component configured vertically */}
-                    <div className="mt-6 relative z-20">
+                    <div className="mt-2 relative z-20">
                         <SearchBar orientation="vertical" />
                     </div>
                 </div>
