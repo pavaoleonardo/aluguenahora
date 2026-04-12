@@ -28,20 +28,19 @@ export default async function Home() {
         </div>
         
         <div className="py-16 sm:py-24 lg:py-32 min-h-[500px] lg:min-h-[650px] flex flex-col justify-center relative">
-            <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
-                <div className="mx-auto max-w-4xl text-center mb-16 px-4 animate-in hover:-translate-y-1 transition-transform duration-500">
-                    <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-6xl mb-6 drop-shadow-[0_4px_4px_rgba(255,255,255,0.8)]">
-                        <span className="block text-primary">Achei, gostei,</span>
-                        <span className="block text-secondary mt-2">aluguei na hora!</span>
+            <div className="mx-auto max-w-7xl w-full px-6 lg:px-8 relative z-10">
+                {/* Floating Left Card similar to QuintoAndar */}
+                <div className="bg-white rounded-3xl p-8 sm:p-10 max-w-lg shadow-2xl animate-in slide-in-from-left-8 duration-700">
+                    <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900 mb-8 leading-tight">
+                        <span className="block">Achei, gostei,</span>
+                        <span className="block text-secondary mt-1">aluguei na hora!</span>
                     </h1>
+                    
+                    {/* Search Bar Component configured vertically */}
+                    <div className="mt-6 relative z-20">
+                        <SearchBar orientation="vertical" />
+                    </div>
                 </div>
-                
-                {/* Search Bar Component */}
-                <div className="mt-8 relative z-20">
-                    <SearchBar />
-                </div>
-
-
             </div>
         </div>
         

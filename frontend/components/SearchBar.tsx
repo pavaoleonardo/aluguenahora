@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { MagnifyingGlassIcon, MapPinIcon, HomeIcon, CurrencyDollarIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { todosBairros } from '@/lib/bairrosCampoGrande';
 
-export default function SearchBar() {
+export default function SearchBar({ orientation = 'horizontal' }: { orientation?: 'vertical' | 'horizontal' }) {
   const router = useRouter();
   const [filters, setFilters] = useState({
     bairro: '',
@@ -58,10 +58,10 @@ export default function SearchBar() {
   }, []);
 
   return (
-    <div className="w-full max-w-5xl mx-auto">
+    <div className={`w-full ${orientation === 'horizontal' ? 'max-w-5xl mx-auto' : ''}`}>
       {/* Main Search Bar */}
-      <div className="bg-white rounded-3xl p-6 shadow-2xl ring-1 ring-black/5 mx-2 sm:mx-0 animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+      <div className={`${orientation === 'horizontal' ? 'bg-white rounded-3xl p-6 shadow-2xl ring-1 ring-black/5 mx-2 sm:mx-0' : ''} animate-in fade-in slide-in-from-bottom-4 duration-700`}>
+        <div className={`grid grid-cols-1 ${orientation === 'horizontal' ? 'md:grid-cols-4 items-end' : 'gap-y-4'} gap-6`}>
           
           {/* Purpose (Finalidade) Input - First Item */}
            <div className="relative group">
