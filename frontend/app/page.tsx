@@ -31,24 +31,18 @@ export default async function Home() {
             {/* Wrapper matching devtools info: Margin 32px 0px, Padding 0px 48px */}
             <div className="w-full px-4 md:px-[48px] my-[32px] relative z-10">
                 {/* Floating Left Card explicitly matching QuintoAndar structure */}
-                <div className="bg-white rounded-[2rem] p-8 sm:p-10 max-w-[440px] shadow-2xl animate-in slide-in-from-left-8 duration-700">
+                <div className="bg-white rounded-[2rem] p-8 sm:p-10 max-w-[480px] shadow-2xl animate-in slide-in-from-left-8 duration-700">
                     
                     {/* QuintoAndar-style Pill Tabs */}
-                    <div className="flex items-center gap-1 mb-8 bg-gray-50 p-1.5 rounded-full w-max border border-gray-100">
-                        <span className="bg-white text-slate-900 font-bold px-5 py-2 rounded-full shadow-sm text-xs">Buscar Imóveis</span>
-                        <Link href="/registro/proprietario" className="text-slate-600 font-semibold px-5 py-2 rounded-full hover:text-slate-900 transition-colors text-xs">Anunciar Imóveis</Link>
+                    <div className="flex items-center gap-2 mb-8 bg-gray-50/80 p-1.5 rounded-full inline-flex border border-gray-100">
+                        <span className="bg-white text-slate-900 font-bold px-6 py-2.5 rounded-full shadow-sm text-sm border border-gray-200">Buscar Imóveis</span>
+                        <Link href="/registro/proprietario" className="text-slate-600 font-semibold px-6 py-2.5 rounded-full hover:text-slate-900 transition-colors text-sm">Anunciar Imóveis</Link>
                     </div>
 
-                    <h1 className="text-[36px] sm:text-[40px] font-extrabold tracking-tight text-slate-900 mb-8 leading-[1.1]">
+                    <h1 className="text-[36px] sm:text-[40px] font-extrabold tracking-tight text-slate-900 mb-8 leading-[1.15]">
                         <span className="block">Achei, gostei,</span>
                         <span className="block text-secondary mt-1">aluguei na hora!</span>
                     </h1>
-                    
-                    {/* QuintoAndar-style Sub-tabs (Alugar | Comprar) */}
-                    <div className="flex gap-6 border-b border-gray-200 mb-6">
-                        <button className="text-primary border-b-2 border-primary pb-3 font-bold text-sm tracking-wide">Alugar</button>
-                        <button className="text-gray-400 pb-3 font-semibold text-sm hover:text-gray-600 transition-colors">Comprar</button>
-                    </div>
 
                     {/* Search Bar Component configured vertically */}
                     <div className="relative z-20">
