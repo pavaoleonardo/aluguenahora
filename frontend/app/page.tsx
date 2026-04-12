@@ -26,26 +26,25 @@ export default async function Home() {
             {/* No gradient overlay needed; the QuintoAndar style uses a crisp image behind a solid white card */}
         </div>
         
-        {/* Exact QuintoAndar metrics: Hero Height ~672px, Content width spanning 100% screen width */}
-        <div className="min-h-[672px] flex flex-col justify-center relative w-full items-start overflow-hidden">
-            {/* Wrapper matching devtools info: Margin 32px 0px, Padding 0px 48px */}
-            <div className="w-full px-4 md:px-[48px] my-[32px] relative z-10">
-                {/* Floating Left Card explicitly matching QuintoAndar structure */}
-                <div className="bg-white rounded-[2rem] p-8 sm:p-10 max-w-[480px] shadow-2xl animate-in slide-in-from-left-8 duration-700">
+        {/* Restored to a centered hero approach but wrapping both title and search in the unified card */}
+        <div className="min-h-[650px] flex flex-col justify-center relative w-full items-center overflow-hidden py-16">
+            <div className="w-full relative z-10 flex justify-center px-4">
+                {/* Floating Centered Card */}
+                <div className="bg-white rounded-[2rem] p-8 sm:p-12 max-w-[500px] w-full shadow-2xl animate-in zoom-in-95 duration-700 text-center">
                     
-                    {/* QuintoAndar-style Pill Tabs */}
-                    <div className="flex items-center gap-2 mb-8 bg-gray-50/80 p-1.5 rounded-full inline-flex border border-gray-100">
+                    {/* Pill Tabs Centered */}
+                    <div className="flex items-center justify-center gap-2 mb-8 bg-gray-50/80 p-1.5 rounded-full inline-flex border border-gray-100">
                         <span className="bg-white text-slate-900 font-bold px-6 py-2.5 rounded-full shadow-sm text-sm border border-gray-200">Buscar Imóveis</span>
                         <Link href="/registro/proprietario" className="text-slate-600 font-semibold px-6 py-2.5 rounded-full hover:text-slate-900 transition-colors text-sm">Anunciar Imóveis</Link>
                     </div>
 
                     <h1 className="text-[36px] sm:text-[40px] font-extrabold tracking-tight text-slate-900 mb-8 leading-[1.15]">
-                        <span className="block">Achei, gostei,</span>
+                        <span className="block text-primary">Achei, gostei,</span>
                         <span className="block text-secondary mt-1">aluguei na hora!</span>
                     </h1>
 
                     {/* Search Bar Component configured vertically */}
-                    <div className="relative z-20">
+                    <div className="relative z-20 text-left">
                         <SearchBar orientation="vertical" />
                     </div>
                 </div>
