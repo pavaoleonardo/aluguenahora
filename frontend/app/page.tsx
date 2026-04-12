@@ -16,10 +16,10 @@ export default async function Home() {
         {/* Photo Background */}
         <div className="absolute inset-0 -z-10 bg-white">
             <Image 
-                src="/livingroom.jpg" 
-                alt="Alugue na Hora Background" 
+                src="/livingroom-flipped.png" 
+                alt="Alugue na Hora Background Flipped" 
                 fill 
-                className="object-cover object-center" 
+                className="object-cover object-left md:object-center" 
                 priority 
                 unoptimized
             />
