@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import PropertyGrid from "@/components/PropertyGrid";
 import SearchBar from "@/components/SearchBar";
 import NewsGrid from "@/components/NewsGrid";
@@ -12,9 +13,18 @@ export default async function Home() {
     <div className="bg-white overflow-x-clip">
       {/* Hero Section */}
       <div className="relative isolate overflow-hidden">
-        {/* Modern Gradient Background */}
-        <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80 w-full" aria-hidden="true">
-            <div className="relative left-[50%] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-blue-200 to-primary/30 opacity-40 sm:w-[72.1875rem]" style={{clipPath: 'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)'}}></div>
+        {/* Photo Background */}
+        <div className="absolute inset-0 -z-10 bg-white">
+            <Image 
+                src="/hero-bg.png" 
+                alt="Alugue na Hora Background" 
+                fill 
+                className="object-cover object-center sm:object-[center_right] opacity-90" 
+                priority 
+                unoptimized
+            />
+            {/* Subtle Gradient Overlay to ensure text legibility */}
+            <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-white/40 to-transparent"></div>
         </div>
         
         <div className="pb-12 pt-24 sm:pb-16 lg:pb-24 relative">
@@ -35,10 +45,7 @@ export default async function Home() {
             </div>
         </div>
         
-         {/* Second Gradient Blob */}
-         <div className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)] w-full" aria-hidden="true">
-          <div className="relative left-[50%] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-secondary/30 to-orange-200 opacity-40 sm:w-[72.1875rem]" style={{clipPath: 'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)'}}></div>
-        </div>
+         {/* Second Gradient Blob Removed for Image Clarity */}
       </div>
 
       {/* Featured Section */}
@@ -56,7 +63,7 @@ export default async function Home() {
             </Link>
         </div>
         
-        <PropertyGrid limit={3} emptyMessage="Nenhum imóvel em destaque encontrado no momento." />
+        <PropertyGrid emptyMessage="Nenhum imóvel em destaque encontrado no momento." />
       </div>
 
       {/* How It Works Section */}

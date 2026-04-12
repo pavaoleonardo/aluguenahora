@@ -122,7 +122,7 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
   }
 
   return (
-    <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+    <div className="mt-12 grid grid-rows-2 grid-flow-col auto-cols-[85vw] sm:auto-cols-[350px] gap-x-6 gap-y-8 overflow-x-auto pb-8 snap-x snap-mandatory hide-scrollbar">
       {properties.length > 0 ? (
         properties.map((property) => {
           const bairroLabel =
@@ -137,7 +137,7 @@ function PropertyGridContent({ limit, emptyMessage }: PropertyGridProps) {
             <Link
               key={property.id || property.documentId}
               href={`/imoveis/${property.documentId || property.id}`}
-              className="group flex flex-col items-start justify-between hover:shadow-lg transition-shadow rounded-2xl p-4 bg-white border border-gray-100"
+              className="group flex flex-col items-start justify-between hover:shadow-lg transition-shadow rounded-2xl p-4 bg-white border border-gray-100 snap-center h-full"
             >
               <div className="relative w-full overflow-hidden rounded-xl bg-gray-200 aspect-[16/9]">
                 {(() => {
