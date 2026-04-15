@@ -12,47 +12,43 @@ export default async function Home() {
   return (
     <div className="bg-white overflow-x-clip">
       {/* Hero Section */}
-      <div className="relative isolate overflow-hidden">
-        {/* Photo Background */}
-        <div className="absolute inset-0 -z-10 bg-white">
-            <Image 
-                src="/livingroom.jpg" 
-                alt="Alugue na Hora Background" 
-                fill 
-                className="object-cover object-center" 
-                priority 
-                unoptimized
-            />
-            {/* No gradient overlay needed; the QuintoAndar style uses a crisp image behind a solid white card */}
-        </div>
-        
-        {/* Exact QuintoAndar metrics: Hero Height ~672px, Content width spanning 100% screen width */}
-        <div className="min-h-[672px] flex flex-col justify-center relative w-full items-start overflow-hidden">
-            {/* Wrapper matching devtools info: Margin 32px 0px, Padding 0px 48px */}
-            <div className="w-full px-4 md:px-[48px] my-[32px] relative z-10">
-                {/* Floating Left Card explicitly matching QuintoAndar structure */}
-                <div className="bg-white rounded-[2rem] p-8 sm:p-10 max-w-[480px] shadow-2xl animate-in slide-in-from-left-8 duration-700">
-                    
-                    {/* QuintoAndar-style Pill Tabs */}
-                    <div className="flex items-center gap-2 mb-8 bg-gray-50/80 p-1.5 rounded-full inline-flex border border-gray-100">
-                        <span className="bg-white text-slate-900 font-bold px-6 py-2.5 rounded-full shadow-sm text-sm border border-gray-200">Buscar Imóveis</span>
-                        <Link href="/registro/proprietario" className="text-slate-600 font-semibold px-6 py-2.5 rounded-full hover:text-slate-900 transition-colors text-sm">Anunciar Imóveis</Link>
-                    </div>
+      <div className="relative isolate">
+        {/* Deep Blue Hero Container with Title */}
+        <div className="relative w-full bg-primary overflow-hidden pt-24 pb-48 lg:pt-32 lg:pb-56">
+            
+            {/* Background Architecture Photo with deep opacity overlay */}
+            <div className="absolute inset-0 z-0">
+                <Image 
+                    src="/livingroom.jpg" 
+                    alt="Alugue na Hora Background" 
+                    fill 
+                    className="object-cover object-center" 
+                    priority 
+                    unoptimized
+                />
+                <div className="absolute inset-0 bg-[#002f4b]/80 mix-blend-multiply" /> {/* Infoimóveis-style deep dark oceanic blue overlay */}
+            </div>
 
-                    <h1 className="text-[36px] sm:text-[40px] font-extrabold tracking-tight text-slate-900 mb-8 leading-[1.15]">
-                        <span className="block">Achei, gostei,</span>
-                        <span className="block text-secondary mt-1">aluguei na hora!</span>
-                    </h1>
+            {/* Centered Hero Text */}
+            <div className="relative z-10 w-full max-w-5xl mx-auto px-4 text-center">
+                <h1 className="text-4xl sm:text-5xl lg:text-[64px] font-bold tracking-tight text-white mb-6 drop-shadow-xl">
+                    Encontre o <span className="border-b-[6px] border-secondary pb-1">Imóvel Perfeito</span>
+                </h1>
+                <p className="text-xl sm:text-2xl text-white/90 font-medium">Milhares de opções para venda, aluguel e temporada em todo o país</p>
+            </div>
 
-                    {/* Search Bar Component configured vertically */}
-                    <div className="relative z-20">
-                        <SearchBar orientation="vertical" />
-                    </div>
-                </div>
+            {/* SVG Wave Effect exactly blending into the white background below */}
+            <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0]">
+                <svg className="relative block w-full h-[60px] md:h-[120px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                    <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V0C71.39,21.5,145.47,43.23,214.34,51,250.64,55.12,287.16,56.9,321.39,56.44Z" fill="#ffffff"></path>
+                </svg>
             </div>
         </div>
         
-         {/* Second Gradient Blob Removed for Image Clarity */}
+        {/* Floating Horizontal Search Bar Overlapping the Wave */}
+        <div className="relative z-20 max-w-7xl mx-auto px-6 lg:px-8 -mt-28 md:-mt-32 mb-16">
+             <SearchBar orientation="horizontal" />
+        </div>
       </div>
 
       {/* Featured Section */}
