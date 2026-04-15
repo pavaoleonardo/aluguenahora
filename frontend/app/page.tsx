@@ -26,7 +26,8 @@ export default async function Home() {
                     priority 
                     unoptimized
                 />
-                <div className="absolute inset-0 bg-[#002f4b]/80 mix-blend-multiply" /> {/* Infoimóveis-style deep dark oceanic blue overlay */}
+                {/* Neutral deep slate/black overlay provides perfect contrast for orange text without color clashing */}
+                <div className="absolute inset-0 bg-slate-900/80 mix-blend-multiply" />
             </div>
 
             {/* Centered Hero Text */}
