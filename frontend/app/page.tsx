@@ -22,7 +22,7 @@ export default async function Home() {
             {/* Background Architecture Photo with deep opacity overlay */}
             <div className="absolute inset-0 z-0">
                 <Image 
-                    src="/livingroom.jpg" 
+                    src="/modern_facade.jpg" 
                     alt="Alugue na Hora Background" 
                     fill 
                     className="object-cover object-center" 
