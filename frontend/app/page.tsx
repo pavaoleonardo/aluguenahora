@@ -26,16 +26,16 @@ export default async function Home() {
                     priority 
                     unoptimized
                 />
-                {/* Lightened deep slate overlay for better photo visibility while keeping contrast for white text */}
-                <div className="absolute inset-0 bg-slate-900/60 mix-blend-multiply" />
+                {/* Deepened slate overlay for maximum orange contrast */}
+                <div className="absolute inset-0 bg-slate-900/85 mix-blend-multiply" />
             </div>
 
             {/* Centered Hero Text */}
             <div className="relative z-10 w-full max-w-5xl mx-auto px-4 text-center">
                 <h1 className="text-4xl sm:text-5xl lg:text-[64px] font-bold tracking-tight text-white mb-6 drop-shadow-xl leading-[1.1]">
                     <span className="block">Achei, gostei,</span>
-                    <span className="block text-secondary mt-2">
-                        <span className="border-b-[6px] border-secondary pb-1">aluguei na hora!</span>
+                    <span className="block text-accent mt-2">
+                        <span className="border-b-[6px] border-accent pb-1">aluguei na hora!</span>
                     </span>
                 </h1>
             </div>
