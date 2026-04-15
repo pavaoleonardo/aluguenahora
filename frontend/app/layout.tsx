@@ -39,7 +39,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen overflow-x-clip`}
       >
         <AuthProvider>
-          {/* <MaintenanceOverlay /> */}
+          <MaintenanceOverlay />
           <Navbar />
           <main className="flex-1 w-full max-w-full overflow-x-clip">
             {children}
