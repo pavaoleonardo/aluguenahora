@@ -34,21 +34,21 @@ export default async function Home() {
             <div className="relative z-10 w-full max-w-5xl mx-auto px-4 text-center">
                 <h1 className="text-4xl sm:text-5xl lg:text-[64px] font-bold tracking-tight text-white mb-6 drop-shadow-xl leading-[1.1]">
                     <span className="block">Achei, gostei,</span>
-                    <span className="block text-secondary mt-2">
+                    <span className="block text-white mt-2">
                         <span className="border-b-[6px] border-secondary pb-1">aluguei na hora!</span>
                     </span>
                 </h1>
             </div>
 
-            {/* Large Elegant SVG Wave - Sweeps downward from left to right */}
+            {/* Deep Symmetrical Sweeping SVG Wave completely wrapping around the Search Bar edges */}
             <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0]">
-                <svg className="relative block w-full h-[100px] md:h-[180px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
-                    <path fill="#ffffff" fillOpacity="1" d="M0,64L80,69.3C160,75,320,85,480,117.3C640,149,800,203,960,224C1120,245,1280,235,1360,229.3L1440,224L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
+                <svg className="relative block w-full h-[150px] md:h-[220px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+                    <path fill="#ffffff" fillOpacity="1" d="M0,0 C480,320 960,320 1440,0 L1440,320 L0,320 Z"></path>
                 </svg>
             </div>
         </div>
         
-        {/* Floating Horizontal Search Bar Overlapping the Wave - Pushed higher up */}
+        {/* Floating Horizontal Search Bar - Overlapping precisely in the deep trough of the wave */}
         <div className="relative z-20 max-w-7xl mx-auto px-6 lg:px-8 -mt-36 md:-mt-48 mb-16">
              <SearchBar orientation="horizontal" />
         </div>
