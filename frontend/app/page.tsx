@@ -26,8 +26,8 @@ export default async function Home() {
                     priority 
                     unoptimized
                 />
-                {/* Neutral deep slate/black overlay provides perfect contrast for orange text without color clashing */}
-                <div className="absolute inset-0 bg-slate-900/80 mix-blend-multiply" />
+                {/* Lightened deep slate overlay for better photo visibility while keeping contrast for white text */}
+                <div className="absolute inset-0 bg-slate-900/60 mix-blend-multiply" />
             </div>
 
             {/* Centered Hero Text */}
