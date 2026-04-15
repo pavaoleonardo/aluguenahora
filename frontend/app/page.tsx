@@ -13,8 +13,11 @@ export default async function Home() {
     <div className="bg-white overflow-x-clip">
       {/* Hero Section */}
       <div className="relative isolate">
-        {/* Deep Blue Hero Container with Title */}
-        <div className="relative w-full bg-primary overflow-hidden pt-24 pb-48 lg:pt-32 lg:pb-56">
+        {/* Deep Slate Hero Container with Title - Angled clip-path perfectly matching Infoimóveis */}
+        <div 
+            className="relative w-full bg-primary overflow-hidden pt-24 pb-48 lg:pt-32 lg:pb-64"
+            style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 85%)' }}
+        >
             
             {/* Background Architecture Photo with deep opacity overlay */}
             <div className="absolute inset-0 z-0">
@@ -38,13 +41,6 @@ export default async function Home() {
                         <span className="border-b-[6px] border-secondary pb-1">aluguei na hora!</span>
                     </span>
                 </h1>
-            </div>
-
-            {/* SVG Wave Effect exactly blending into the white background below */}
-            <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0]">
-                <svg className="relative block w-full h-[60px] md:h-[120px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-                    <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V0C71.39,21.5,145.47,43.23,214.34,51,250.64,55.12,287.16,56.9,321.39,56.44Z" fill="#ffffff"></path>
-                </svg>
             </div>
         </div>
         
