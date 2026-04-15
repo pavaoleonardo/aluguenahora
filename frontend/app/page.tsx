@@ -13,11 +13,8 @@ export default async function Home() {
     <div className="bg-white overflow-x-clip">
       {/* Hero Section */}
       <div className="relative isolate">
-        {/* Deep Slate Hero Container with Title - Angled clip-path perfectly matching Infoimóveis */}
-        <div 
-            className="relative w-full bg-primary overflow-hidden pt-24 pb-48 lg:pt-32 lg:pb-64"
-            style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 85%)' }}
-        >
+        {/* Deep Slate Hero Container with Title */}
+        <div className="relative w-full bg-primary overflow-hidden pt-24 pb-48 lg:pt-32 lg:pb-64">
             
             {/* Background Architecture Photo with deep opacity overlay */}
             <div className="absolute inset-0 z-0">
@@ -42,10 +39,17 @@ export default async function Home() {
                     </span>
                 </h1>
             </div>
+
+            {/* Large Elegant SVG Wave - Sweeps downward from left to right */}
+            <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0]">
+                <svg className="relative block w-full h-[100px] md:h-[180px]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+                    <path fill="#ffffff" fillOpacity="1" d="M0,64L80,69.3C160,75,320,85,480,117.3C640,149,800,203,960,224C1120,245,1280,235,1360,229.3L1440,224L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
+                </svg>
+            </div>
         </div>
         
-        {/* Floating Horizontal Search Bar Overlapping the Wave */}
-        <div className="relative z-20 max-w-7xl mx-auto px-6 lg:px-8 -mt-28 md:-mt-32 mb-16">
+        {/* Floating Horizontal Search Bar Overlapping the Wave - Pushed higher up */}
+        <div className="relative z-20 max-w-7xl mx-auto px-6 lg:px-8 -mt-36 md:-mt-48 mb-16">
              <SearchBar orientation="horizontal" />
         </div>
       </div>
