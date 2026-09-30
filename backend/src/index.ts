@@ -171,30 +171,68 @@ export default {
           console.warn('[Bootstrap] Could not update advanced settings:', e.message);
         }
 
-        // Public Permissions
+        // Public Permissions — grant-only allowlist, idempotent on every boot.
+        //
+        // DO NOT bring back `updateMany({ data: { enabled: true } })`. Strapi 5 dropped the
+        // `enabled` attribute from plugin::users-permissions.permission: the row *is* the grant
+        // (the auth strategy rebuilds the public role's ability from `findMany({ where: { role:
+        // { type: 'public' } } })` on every request). Updating a field that no longer exists gives
+        // the DB layer no data to write, so it threw `Update requires data` — swallowed by the
+        // catch below, which is why nobody noticed: the grant never happened and the Public role
+        // answered 403 on /api/noticias, so the homepage silently fell back to `initialNews`
+        // (diagnosed and reproduced locally 2026-09-30). Grant by making sure the row EXISTS;
+        // never by flipping a flag, and never by creating a duplicate.
         try {
-          const publicRole = await strapi.db.query('plugin::users-permissions.role').findOne({
+          const publicRole = (await strapi.db.query('plugin::users-permissions.role').findOne({
             where: { type: 'public' },
-          });
+            populate: ['permissions'],
+          })) as any;
 
           if (publicRole) {
             const actions = [
               'api::imovel.imovel.find',
               'api::imovel.imovel.findOne',
               'api::noticia.noticia.find',
-              'api::noticia.noticia.findOne'
+              'api::noticia.noticia.findOne',
             ];
-            
+
+            const alreadyGranted: string[] = (publicRole.permissions ?? []).map(
+              (permission: { action: string }) => permission.action
+            );
+            const created: string[] = [];
+
             for (const action of actions) {
-              await strapi.db.query('plugin::users-permissions.permission').updateMany({
-                where: {
-                  role: publicRole.id,
-                  action: action,
-                },
-                data: { enabled: true },
+              if (alreadyGranted.includes(action)) continue;
+
+              // Same shape as Strapi's own role service (server/services/role.js): the DB layer
+              // writes the up_permissions_role_lnk link row for us.
+              await strapi.db.query('plugin::users-permissions.permission').create({
+                data: { action, role: publicRole.id },
               });
+              created.push(action);
             }
-            console.log('✅ [Bootstrap] Public permissions unified.');
+
+            // Verify by re-reading through the very service the request path uses. Logging an
+            // intention is not evidence; this read is.
+            const grantedNow: string[] = (
+              await (strapi.service('plugin::users-permissions.permission') as any).findPublicPermissions()
+            ).map((permission: { action: string }) => permission.action);
+
+            const missing = actions.filter((action) => !grantedNow.includes(action));
+
+            if (missing.length > 0) {
+              console.error(
+                `❌ [Bootstrap] Public permissions still missing: ${missing.join(', ')} — the public API will answer 403 for those routes`
+              );
+            } else {
+              console.log(
+                `✅ [Bootstrap] Public permissions ensured${
+                  created.length ? ` (created: ${created.join(', ')})` : ' (all already present)'
+                }.`
+              );
+            }
+          } else {
+            console.warn('[Bootstrap] Public role not found — public permission grant skipped.');
           }
         } catch (e: any) {
           console.warn('[Bootstrap] Could not update public permissions:', e.message);
