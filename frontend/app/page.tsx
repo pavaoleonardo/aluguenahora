@@ -22,7 +22,7 @@ export default async function Home() {
                     src="/modern_facade.jpg" 
                     alt="Alugue na Hora Background" 
                     fill 
-                    className="object-cover object-center" 
+                    className="object-cover object-center opacity-70" 
                     priority 
                     unoptimized
                 />

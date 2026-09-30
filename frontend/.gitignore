@@ -15,6 +15,12 @@
 
 # next.js
 /.next/
+# Build snapshots and copies (.next.bak, .next.old, ...) must stay ignored:
+# Tailwind scans every non-ignored file as plain text, and a snapshot keeps the
+# prerendered HTML where React writes class="... bg-[url(&#x27;/img-2.jpg&#x27;)] ...".
+# Tailwind turns that into a broken url() rule and `next build` aborts with
+# "Module not found". Proven cause of the failed production build on 2026-09-30.
+/.next*
 /out/
 
 # production
