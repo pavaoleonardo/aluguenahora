@@ -22,12 +22,12 @@ export default async function Home() {
                     src="/modern_facade.jpg" 
                     alt="Alugue na Hora Background" 
                     fill 
-                    className="object-cover object-center opacity-70" 
+                    className="object-cover object-center" 
                     priority 
                     unoptimized
                 />
-                {/* Deepened slate overlay for maximum brand orange contrast */}
-                <div className="absolute inset-0 bg-slate-900/85 mix-blend-multiply" />
+                {/* Slate overlay: keeps the white/orange headline readable without hiding the house */}
+                <div className="absolute inset-0 bg-slate-900/60 mix-blend-multiply" />
             </div>
 
             {/* Centered Hero Text */}
