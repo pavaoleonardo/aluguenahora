@@ -7,7 +7,12 @@ export default defineConfig({
   retries: 1,
   reporter: 'html',
   use: {
-    baseURL: 'https://aluguenahora.com.br',
+    // Local by default would hide the real target of these tests; they were written
+    // against production, so production stays the default ON PURPOSE — pass
+    // BASE_URL=http://localhost:3000 to point them at the dev server instead.
+    // Note: the production homepage is covered by MaintenanceOverlay for anonymous
+    // visitors, so the logged-out specs only pass against a local stack.
+    baseURL: process.env.BASE_URL ?? 'https://aluguenahora.com.br',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
