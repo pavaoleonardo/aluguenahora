@@ -97,6 +97,17 @@
       ],
       "required": true
     },
+    "estado": {
+      "type": "enumeration",
+      "enum": [
+        "Novo",
+        "Seminovo",
+        "Ótimo",
+        "Bom",
+        "Regular",
+        "Em construção"
+      ]
+    },
     "fotos": {
       "type": "media",
       "multiple": true,

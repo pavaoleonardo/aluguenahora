@@ -51,6 +51,7 @@ export default function NewPropertyPage() {
     cidade: 'Campo Grande',
     finalidade: 'aluguel',
     tipo: '',
+    estado: '',
     tamanho: '',
     area_total: '',
     endereco: '',
@@ -310,6 +311,7 @@ export default function NewPropertyPage() {
             cidade: formData.cidade,
             finalidade: formData.finalidade,
             tipo: formData.tipo,
+            estado: formData.estado || null,
             tamanho: Number(formData.tamanho.replace(',', '.')),
             area_total: Number(formData.area_total.replace(',', '.')),
             endereco: formData.endereco || null,
@@ -512,6 +514,19 @@ export default function NewPropertyPage() {
                 <div>
                     <label className="block text-sm font-medium leading-6 text-gray-900">Condomínio (mensal)</label>
                     <input type="text" name="condominio" value={formData.condominio} onChange={handlePriceChange} placeholder="R$ 0,00" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Estado do imóvel</label>
+                    <select name="estado" value={formData.estado} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm appearance-none bg-white">
+                        <option value="">Não informado</option>
+                        <option value="Novo">Novo</option>
+                        <option value="Seminovo">Seminovo</option>
+                        <option value="Ótimo">Ótimo</option>
+                        <option value="Bom">Bom</option>
+                        <option value="Regular">Regular</option>
+                        <option value="Em construção">Em construção</option>
+                    </select>
                 </div>
 
                 {/* 13, 14, 15: Same line */}
