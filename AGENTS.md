@@ -187,9 +187,9 @@ bash tools/check-prod.sh             # read-only production health check (no pas
 - `git status` may show `backend-debug.log` and `backup_local.sql`; both are gitignored local
   artifacts — leave them alone and never stage them.
 - `*.md` is gitignored on purpose: `SPEC.md` stays **local** because it names the VPS IP, the deploy
-  paths and the mail host, and this repo may be public. `AGENTS.md` is **meant to be tracked** through
-  `!AGENTS.md` (negation in place; **commit still pending** as of 2026-09-28, so `git ls-files`
-  returns no docs yet) — it must never contain a secret, a password or an IP-shaped credential.
+  paths and the mail host, and this repo may be public. `AGENTS.md` **is tracked** since `1ccf25a`
+  (2026-09-30, together with `tools/`) — it must never contain a secret, a password or an IP-shaped
+  credential.
 - Repo visibility is unverified (no `gh` on this machine): assume public.
 
 ### D6. Deploy (Alugue na Hora specific)
@@ -197,18 +197,26 @@ bash tools/check-prod.sh             # read-only production health check (no pas
   `SPEC.md` §7, which is the canonical recipe:
 ```bash
 git add <paths> && git commit -m "<type>: <scope>" && git push origin main
-ssh root@"$VPS_IP" "cd /var/www/aluguenahora && git pull origin main && bash hostinger-deploy.sh"
+bash .agents/skills/deploy-to-hostinger/scripts/deploy.sh [frontend|backend|all]
 ```
+- **The deploy runs from the Mac, not from the server.** `hostinger-deploy.sh` **never existed in this
+  repo** — any recipe telling you to `bash hostinger-deploy.sh` on the VPS is wrong (it cost a failed
+  deploy on 2026-09-30: the pull succeeds, the build never runs). The real script is gitignored and lives
+  at `.agents/skills/deploy-to-hostinger/scripts/deploy.sh`; it streams over SSH `git reset --hard &&
+  git pull origin main`, then `npm install && npm run build` in the target app, then
+  `pm2 startOrRestart ecosystem.config.js --only aluguenahora-<target> --update-env`. If it is missing
+  again, recover it with
+  `git show f1edc6f:.agents/skills/deploy-to-hostinger/scripts/deploy.sh` — **`f1edc6f` is the last
+  revision that carried it** (removed in `b6f4915`, which is why `deploy-to-hostinger/SKILL.md` still
+  points at a script that is not on disk).
 - The VPS uses **root + password SSH, no key auth** → the **user** runs these commands in their own
   terminal. Never run them in the background, never ask for the password, at most 2–3 verification
   checks afterwards.
 - Always push **before** deploying (the script pulls `main`), and remember the **maintenance shield
   is currently ON** for anonymous visitors: "the site looks like a placeholder" is that overlay
   (`a67737d`), not a failed deploy.
-- `hostinger-deploy.sh` exists **only on the server** (app root `/var/www/aluguenahora/`); the local
-  wrapper was never kept and the repo root has no `*.sh` at all. Never hand over a local script command as
-  if it works. `tools/*.sh` (since 2026-09-29: `check-prod.sh`, `dev.sh`) are **operational helpers, not
-  deploy scripts** — they touch neither git nor PM2.
+- `tools/*.sh` (`check-prod.sh`, `dev.sh`, and the `~/ahn-prod-fix/` one-paste scripts) are
+  **operational helpers, not deploy scripts** — they touch neither git nor PM2.
 - After a deploy, verify from the outside with `bash tools/check-prod.sh` instead of asking for extra SSH
   round-trips (the 2–3 check budget in shared §6). PM2/nginx logs need a separate SSH session, which the
   user runs.
