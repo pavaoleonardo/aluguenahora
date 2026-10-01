@@ -212,9 +212,9 @@ bash .agents/skills/deploy-to-hostinger/scripts/deploy.sh [frontend|backend|all]
 - The VPS uses **root + password SSH, no key auth** → the **user** runs these commands in their own
   terminal. Never run them in the background, never ask for the password, at most 2–3 verification
   checks afterwards.
-- Always push **before** deploying (the script pulls `main`), and remember the **maintenance shield
-  is currently ON** for anonymous visitors: "the site looks like a placeholder" is that overlay
-  (`a67737d`), not a failed deploy.
+- Always push **before** deploying (the script pulls `main`). The **maintenance shield is retired**
+  (`0bd967b`, 2026-09-30): anonymous visitors get the real site, so "the site looks like a placeholder"
+  is **not** an expected state — treat it as a real failure.
 - `tools/*.sh` (`check-prod.sh`, `dev.sh`, and the `~/ahn-prod-fix/` one-paste scripts) are
   **operational helpers, not deploy scripts** — they touch neither git nor PM2.
 - After a deploy, verify from the outside with `bash tools/check-prod.sh` instead of asking for extra SSH
@@ -247,7 +247,7 @@ bash .agents/skills/deploy-to-hostinger/scripts/deploy.sh [frontend|backend|all]
   this" plan; it documents what each level can and cannot catch.
 - **`bash tools/dev.sh`** (`both|backend|frontend`) starts Strapi on `:1337` + Next on `:3000`, waits for
   `/_health` and `:3000`, and stops both on Ctrl+C. Anonymous visitors — you included — get the
-  **maintenance overlay**; sign in at `/login` (the overlay deliberately lets `/login` through).
+  **real site**: the maintenance overlay was retired on 2026-09-30 (`0bd967b`).
 - **`bash tools/check-prod.sh`** is the read-only pre/post-deploy gate: frontend 200s + brand, the deployed
   bundles carry the production API host, redirects/HSTS/TLS, `/dashboard` protection, Strapi health/admin,
   the public API's `pagination.total`, CORS, and a port scan. It exits non-zero for the two known failures
@@ -258,7 +258,23 @@ bash .agents/skills/deploy-to-hostinger/scripts/deploy.sh [frontend|backend|all]
 - Playwright defaults to **production** (`BASE_URL=http://localhost:3000` overrides it), and the registration
   spec **writes to whatever database the target API uses**. Run it locally unless the user explicitly asks for
   a production run.
-- The maintenance shield is **client-side**, so `curl` always sees the real site (and so will Google). Never
-  use "curl gets 200 with content" as evidence that a visitor sees the page.
+- The maintenance shield that used to make `curl` and the browser disagree is **retired** (`0bd967b`), so a
+  `curl` 200 with content now does mean a visitor sees the page — but judge a deploy by the deployed **JS
+  chunks**, never by the HTML alone.
+
+### D10. Token budget & peak hours (added 2026-10-01)
+- The operating protocol is **`SPEC.md` §10** (non-negotiable). DeepSeek **PEAK = Mon–Fri `01:00–04:00`
+  and `06:00–10:00` UTC** (Madrid CEST: 03:00–06:00 & 08:00–12:00; CET: 02:00–05:00 & 07:00–11:00).
+  Everything else — **all weekend and the Chinese holidays in full** — is off-peak at half price.
+  Builds, Playwright and doc syncs belong off-peak; the cheap block runs Fri 12:00 → Mon 03:00 local.
+- **LIGHT mode** inside a peak window, or the moment the owner says `peak`: ≤2 tool calls, `grep`/ranged
+  reads only, no whole-file reads or re-reads, no builds, no doc syncs, terse output.
+- **Never edit this file or the head of `SPEC.md` mid-session.** A prefix edit invalidates DeepSeek's
+  context cache for everything after it, and a cache hit is 30–50× cheaper than a miss. New deltas are
+  **appended at the end of this file**; doc edits are batched into one write at the end of a session.
+- Documentation is **deferred, not skipped**: during peak/NORMAL the only write is one line into the
+  Engram memory **`doc sync queue`** (`--project aluguenahora`, topic `docs/sync-queue`). SYNC drains it
+  into `SPEC.md` → Dossier → mirror and refreshes §3.0. Engram is the crash-safe journal — never lose a
+  session's state to a logout.
 
 
