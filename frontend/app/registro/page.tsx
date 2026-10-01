@@ -34,7 +34,7 @@ export default function RegistroPage() {
               </div>
               <div className="text-left">
                 <p className="font-bold text-gray-900 group-hover:text-secondary transition-colors text-base">Sou proprietário(a)</p>
-                <p className="text-sm text-gray-500 mt-0.5">Anuncie seu próprio imóvel diretamente na plataforma</p>
+                <p className="text-sm text-gray-500 mt-0.5 leading-snug">Seu imóvel pode render mais com menos preocupação. Anuncie no Alugue na Hora e encontre o inquilino ideal com segurança e agilidade.</p>
               </div>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 group-hover:text-secondary ml-auto flex-shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -53,7 +53,7 @@ export default function RegistroPage() {
               </div>
               <div className="text-left">
                 <p className="font-bold text-gray-900 group-hover:text-primary transition-colors text-base">Sou corretor(a) / imobiliária</p>
-                <p className="text-sm text-gray-500 mt-0.5">Anuncie imóveis de seus clientes e gerencie sua carteira</p>
+                <p className="text-sm text-gray-500 mt-0.5 leading-snug">Uma parceria que conecta oportunidades e gera negócios. Anuncie seus imóveis no Alugue na Hora e amplie suas possibilidades de locação.</p>
               </div>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 group-hover:text-primary ml-auto flex-shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
