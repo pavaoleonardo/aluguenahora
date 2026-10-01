@@ -76,6 +76,9 @@
     "cpf": {
       "type": "string"
     },
+    "cnpj": {
+      "type": "string"
+    },
     "tipo_usuario": {
       "type": "enumeration",
       "enum": [

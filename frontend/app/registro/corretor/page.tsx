@@ -12,6 +12,8 @@ export default function RegisterCorretorPage() {
   const router = useRouter()
   const [formData, setFormData] = useState({
     nomeCompleto: '',
+    cpf: '',
+    cnpj: '',
     nomeImobiliaria: '',
     creci: '',
     telefone: '',
@@ -35,14 +37,37 @@ export default function RegisterCorretorPage() {
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`
   }
 
+  // Real-time CPF mask: 000.000.000-00
+  const applyCpfMask = (val: string) => {
+    const digits = val.replace(/\D/g, '').slice(0, 11)
+    if (digits.length <= 3) return digits
+    if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`
+    if (digits.length <= 9) return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`
+    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`
+  }
+
+  // Real-time CNPJ mask: 00.000.000/0000-00
+  const applyCnpjMask = (val: string) => {
+    const digits = val.replace(/\D/g, '').slice(0, 14)
+    if (digits.length <= 2) return digits
+    if (digits.length <= 5) return `${digits.slice(0, 2)}.${digits.slice(2)}`
+    if (digits.length <= 8) return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5)}`
+    if (digits.length <= 12) return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8)}`
+    return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8, 12)}-${digits.slice(12)}`
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
     
-    // Apply phone mask in real-time
-    if (name === 'telefone' || name === 'celular') {
+    // Apply phone / CPF / CNPJ mask in real-time
+    if (name === 'telefone' || name === 'celular' || name === 'cpf' || name === 'cnpj') {
       setFormData(prev => ({
         ...prev,
-        [name]: applyPhoneMask(value)
+        [name]: name === 'cpf'
+          ? applyCpfMask(value)
+          : name === 'cnpj'
+            ? applyCnpjMask(value)
+            : applyPhoneMask(value)
       }))
       return
     }
@@ -65,6 +90,10 @@ export default function RegisterCorretorPage() {
     setError('')
     setSuccess('')
 
+    // Documents are stored digits-only (000.000.000-00 -> 00000000000)
+    const cpfDigits = formData.cpf.replace(/\D/g, '')
+    const cnpjDigits = formData.cnpj.replace(/\D/g, '')
+
     try {
       // 1. Cadastro: Usamos o e-mail como username para evitar conflitos de nomes iguais
       // Adicionamos também o campo 'nome' (se existir no Strapi) para salvar o nome real
@@ -79,6 +108,9 @@ export default function RegisterCorretorPage() {
           nome_completo: formData.nomeCompleto,
           telefone: formData.telefone,
           celular: formData.celular,
+          cpf: cpfDigits,
+          // CNPJ is optional: omit the key entirely when the field is blank
+          ...(cnpjDigits ? { cnpj: cnpjDigits } : {}),
           creci: formData.creci,
           nome_imobiliaria: formData.nomeImobiliaria,
           tipo_usuario: 'corretor'
@@ -111,6 +143,8 @@ export default function RegisterCorretorPage() {
               creci: formData.creci,
               telefone: formData.telefone,
               celular: formData.celular,
+              cpf: cpfDigits,
+              ...(cnpjDigits ? { cnpj: cnpjDigits } : {}),
               tipo_usuario: 'corretor'
             }),
           });
@@ -127,7 +161,7 @@ export default function RegisterCorretorPage() {
       if (!data.jwt) {
         setSuccess('Conta criada com sucesso! Enviamos um link mágico de confirmação para o seu e-mail. Por favor, acesse sua caixa de entrada para ativar sua conta antes de fazer o login!')
         setFormData({
-          nomeCompleto: '', nomeImobiliaria: '', creci: '',
+          nomeCompleto: '', cpf: '', cnpj: '', nomeImobiliaria: '', creci: '',
           telefone: '', celular: '', email: '', password: '', termos: false
         })
         window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -182,7 +216,35 @@ export default function RegisterCorretorPage() {
               />
             </div>
 
-            {/* 2. Nome da Imobiliária */}
+            {/* 2. CPF */}
+            <div>
+              <label htmlFor="cpf" className="block text-sm font-semibold text-gray-900 mb-1">CPF</label>
+              <input
+                id="cpf" name="cpf" type="text" inputMode="numeric" maxLength={14} required
+                value={formData.cpf} onChange={handleChange}
+                className="block w-full rounded-md py-2 px-3 text-gray-900 text-sm font-medium border-gray-300 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-gray-400 shadow-sm"
+                placeholder="000.000.000-00"
+              />
+              <p className="mt-1 text-xs font-medium text-gray-500">
+                Usamos o CPF para identificar você e evitar cadastros duplicados.
+              </p>
+            </div>
+
+            {/* 3. CNPJ (opcional) */}
+            <div>
+              <label htmlFor="cnpj" className="block text-sm font-semibold text-gray-900 mb-1">CNPJ (opcional)</label>
+              <input
+                id="cnpj" name="cnpj" type="text" inputMode="numeric" maxLength={18}
+                value={formData.cnpj} onChange={handleChange}
+                className="block w-full rounded-md py-2 px-3 text-gray-900 text-sm font-medium border-gray-300 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-gray-400 shadow-sm"
+                placeholder="00.000.000/0000-00"
+              />
+              <p className="mt-1 text-xs font-medium text-gray-500">
+                Preencha apenas se você anuncia por uma imobiliária (pessoa jurídica).
+              </p>
+            </div>
+
+            {/* 4. Nome da Imobiliária */}
             <div>
               <label htmlFor="nomeImobiliaria" className="block text-sm font-semibold text-gray-900 mb-1">Nome da imobiliária (opcional)</label>
               <input 
@@ -193,7 +255,7 @@ export default function RegisterCorretorPage() {
               />
             </div>
 
-            {/* 3. CRECI */}
+            {/* 5. CRECI */}
             <div>
               <label htmlFor="creci" className="block text-sm font-semibold text-gray-900 mb-1">CRECI</label>
               <input 
@@ -204,7 +266,7 @@ export default function RegisterCorretorPage() {
               />
             </div>
 
-            {/* 4. Telefone and 5. Celular row */}
+            {/* 6. Telefone and 7. Celular row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="telefone" className="block text-sm font-semibold text-gray-900 mb-1">Telefone (fixo)</label>
@@ -226,7 +288,7 @@ export default function RegisterCorretorPage() {
               </div>
             </div>
 
-            {/* 6. Endereço de e-mail */}
+            {/* 8. Endereço de e-mail */}
             <div>
               <label htmlFor="email" className="block text-sm font-semibold text-gray-900 mb-1">Endereço de e-mail</label>
               <input 
@@ -237,7 +299,7 @@ export default function RegisterCorretorPage() {
               />
             </div>
 
-            {/* 7. Senha */}
+            {/* 9. Senha */}
             <div>
               <label htmlFor="password" className="block text-sm font-semibold text-gray-900 mb-1">Senha</label>
               <div className="flex relative shadow-sm rounded-md">
@@ -262,7 +324,7 @@ export default function RegisterCorretorPage() {
               </div>
             </div>
 
-            {/* 8. Termos e Condições */}
+            {/* 10. Termos e Condições */}
             <div className="flex items-start mt-4 mb-6">
               <div className="flex items-center h-5">
                 <input 
