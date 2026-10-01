@@ -4,14 +4,12 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useAuth } from '@/context/AuthContext'
 import { API_BASE_URL } from '@/lib/apiBase'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 import { translateError } from '@/lib/errorTranslations'
 
 export default function RegisterCorretorPage() {
   const router = useRouter()
-  const { login } = useAuth()
   const [formData, setFormData] = useState({
     nomeCompleto: '',
     nomeImobiliaria: '',
@@ -134,8 +132,9 @@ export default function RegisterCorretorPage() {
         })
         window.scrollTo({ top: 0, behavior: 'smooth' })
       } else {
-        login(data.jwt, data.user)
-        router.push('/dashboard')
+        // Registration succeeded: hand the user to the login screen instead of
+        // auto-logging them in (Miro board 21/09/26: "deve levar direto ao login").
+        router.push('/login')
       }
     } catch (err: any) {
       setError(translateError(err.message))

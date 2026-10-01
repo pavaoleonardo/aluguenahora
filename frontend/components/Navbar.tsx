@@ -3,20 +3,29 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Dialog, DialogPanel, Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Bars3Icon, XMarkIcon, ChevronDownIcon, UserIcon } from '@heroicons/react/24/outline'
+import { Dialog, DialogPanel } from '@headlessui/react'
+import { ArrowLongRightIcon, Bars3Icon, XMarkIcon, UserIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '@/context/AuthContext'
+import LoginModal from '@/components/LoginModal'
+import { USER_PROFILES } from '@/lib/userProfiles'
 
-const navigation = [
+// `label` overrides the display text (ANUNCIAR is uppercase on purpose).
+const navigation: { name: string; label?: string; href: string }[] = [
   { name: 'Início', href: '/' },
   { name: 'Destaques', href: '/#destaques' },
-  { name: 'Anunciar Imóveis', href: '/dashboard/novo-imovel' },
+  { name: 'Anunciar Imóveis', label: 'ANUNCIAR', href: '/dashboard/novo-imovel' },
   { name: 'Alugue na hora', href: '/sobre' },
 ]
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [loginOpen, setLoginOpen] = useState(false)
   const { user, logout, loading } = useAuth()
+
+  const openLoginModal = () => {
+    setMobileMenuOpen(false)
+    setLoginOpen(true)
+  }
 
   return (
     <header className="bg-white/95 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-100 shadow-sm transition-all duration-300">
@@ -48,40 +57,44 @@ export default function Navbar() {
           {navigation.map((item) => {
             if (item.name === 'Anunciar Imóveis' && !user) {
               return (
-                <Menu as="div" key={item.name} className="relative inline-block text-left">
-                  <MenuButton className="group relative inline-flex items-center text-base font-semibold text-gray-900 transition-all duration-300 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-center">
-                    {item.name}
-                    <ChevronDownIcon aria-hidden="true" className="ml-1 -mr-1 size-4 text-gray-400 group-hover:text-primary transition-colors" />
-                  </MenuButton>
-                  <MenuItems
-                    transition
-                    className="absolute right-0 z-10 mt-2 w-64 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                <div key={item.name} className="group relative">
+                  <button
+                    type="button"
+                    aria-haspopup="true"
+                    className="relative inline-flex items-center gap-1 text-base font-semibold text-gray-900 transition-all duration-300 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-center cursor-pointer"
                   >
-                    <div className="py-1">
-                      <MenuItem>
-                        <Link
-                          href="/registro/corretor"
-                          className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900"
-                        >
-                          Sou corretor(a) / imobiliária
-                        </Link>
-                      </MenuItem>
-                      <MenuItem>
-                        <Link
-                          href="/registro/proprietario"
-                          className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900"
-                        >
-                          Sou proprietário(a)
-                        </Link>
-                      </MenuItem>
-                    </div>
-                  </MenuItems>
-                </Menu>
+                    {item.label ?? item.name}
+                    <ArrowLongRightIcon
+                      aria-hidden="true"
+                      className="size-4 text-secondary transition-transform duration-300 group-hover:translate-x-1"
+                    />
+                  </button>
+
+                  {/* Hover window with the account profiles (Miro 21/09/26) */}
+                  <div className="invisible absolute left-0 z-10 mt-2 w-72 origin-top-left translate-y-1 rounded-xl bg-white p-2 opacity-0 shadow-lg ring-1 ring-black/5 transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
+                    {USER_PROFILES.map((option) => (
+                      <Link
+                        key={option.id}
+                        href={option.registerHref}
+                        className="flex flex-col gap-0.5 rounded-lg px-3 py-2.5 transition-colors hover:bg-gray-50"
+                      >
+                        <span className="text-sm font-bold text-gray-900">{option.title}</span>
+                        <span className="text-xs text-gray-500">{option.description}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
               )
             }
             return (
-              <Link key={item.name} href={item.href} className="group relative inline-flex text-base font-semibold text-gray-900 transition-all duration-300 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-center">
-                {item.name}
+              <Link key={item.name} href={item.href} className="group relative inline-flex items-center gap-1 text-base font-semibold text-gray-900 transition-all duration-300 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-center">
+                {item.label ?? item.name}
+                {item.label && (
+                  <ArrowLongRightIcon
+                    aria-hidden="true"
+                    className="size-4 text-secondary transition-transform duration-300 group-hover:translate-x-1"
+                  />
+                )}
               </Link>
             )
           })}
@@ -110,10 +123,14 @@ export default function Navbar() {
                 <Link href="/registro" className="text-base font-semibold text-gray-900 flex items-center hover:text-primary transition-colors">
                   Cadastrar
                 </Link>
-                <Link href="/login" className="flex items-center gap-2 rounded-full bg-primary px-6 py-2 text-base font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors">
+                <button
+                  type="button"
+                  onClick={() => setLoginOpen(true)}
+                  className="flex items-center gap-2 rounded-full bg-primary px-6 py-2 text-base font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary transition-colors cursor-pointer"
+                >
                   <UserIcon className="w-5 h-5" />
                   Entrar
-                </Link>
+                </button>
               </>
             )
           )}
@@ -149,24 +166,21 @@ export default function Navbar() {
                   if (item.name === 'Anunciar Imóveis' && !user) {
                     return (
                       <div key={item.name} className="-mx-3">
-                        <div className="block px-3 py-2 text-base/7 font-semibold text-gray-900">
-                          {item.name}
+                        <div className="flex items-center gap-1 px-3 py-2 text-base/7 font-semibold text-gray-900">
+                          {item.label ?? item.name}
+                          <ArrowLongRightIcon aria-hidden="true" className="size-4 text-secondary" />
                         </div>
                         <div className="pl-6 space-y-1 pb-2">
-                           <Link
-                              href="/registro/corretor"
-                              onClick={() => setMobileMenuOpen(false)}
-                              className="block rounded-lg px-3 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
-                            >
-                              Sou corretor(a) / imobiliária
-                            </Link>
+                          {USER_PROFILES.map((option) => (
                             <Link
-                              href="/registro/proprietario"
+                              key={option.id}
+                              href={option.registerHref}
                               onClick={() => setMobileMenuOpen(false)}
                               className="block rounded-lg px-3 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
                             >
-                              Sou proprietário(a)
+                              {option.title}
                             </Link>
+                          ))}
                         </div>
                       </div>
                     )
@@ -178,7 +192,7 @@ export default function Navbar() {
                       onClick={() => setMobileMenuOpen(false)}
                       className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 hover:text-gray-900 transition-colors"
                     >
-                      {item.name}
+                      {item.label ?? item.name}
                     </Link>
                   )
                 })}
@@ -218,14 +232,14 @@ export default function Navbar() {
                       >
                         Cadastrar
                       </Link>
-                      <Link
-                        href="/login"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="mt-2 flex items-center justify-center gap-2 w-full rounded-lg px-3 py-2.5 text-base font-semibold text-white bg-primary hover:bg-primary-hover transition-colors shadow-sm"
+                      <button
+                        type="button"
+                        onClick={openLoginModal}
+                        className="mt-2 flex items-center justify-center gap-2 w-full rounded-lg px-3 py-2.5 text-base font-semibold text-white bg-primary hover:bg-primary-hover transition-colors shadow-sm cursor-pointer"
                       >
                         <UserIcon className="w-5 h-5" />
                         Entrar
-                      </Link>
+                      </button>
                     </>
                   )
                 )}
@@ -234,6 +248,8 @@ export default function Navbar() {
           </div>
         </DialogPanel>
       </Dialog>
+
+      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
     </header>
   )
 }
