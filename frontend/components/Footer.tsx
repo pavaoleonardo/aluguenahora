@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { whatsappDisplayNumber, whatsappLink } from '@/lib/contact'
 
 
 const navigation = {
@@ -119,7 +120,14 @@ export default function Footer() {
                     contato@aluguenahora.com.br
                   </li>
                   <li className="text-sm leading-6 text-gray-300">
-                    +55 (00) 00000-0000
+                    <a
+                      href={whatsappLink('Olá! Vim pelo site da Alugue na Hora e gostaria de mais informações.')}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="transition-colors hover:text-white"
+                    >
+                      {whatsappDisplayNumber()}
+                    </a>
                   </li>
                 </ul>
               </div>

@@ -2,12 +2,20 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { api } from '@/lib/api'
 import PropertyGallery from '@/components/PropertyGallery'
-import { ArrowsPointingOutIcon, CheckIcon, MapPinIcon, ShareIcon } from '@heroicons/react/24/outline'
+import {
+  ArrowsPointingOutIcon,
+  CheckIcon,
+  ChevronDownIcon,
+  ClipboardDocumentIcon,
+  MapPinIcon,
+  ShareIcon,
+} from '@heroicons/react/24/outline'
 import { formatCurrency, formatNumber } from '@/lib/format'
 import { API_BASE_URL } from '@/lib/apiBase'
-import { whatsappLink } from '@/lib/contact'
+import { whatsappLink, whatsappShareLink } from '@/lib/contact'
 import dynamic from 'next/dynamic'
 
 const PropertyMap = dynamic(() => import('@/components/PropertyMap'), {
@@ -135,29 +143,43 @@ export default function PropertyDetailClient({ id }: { id: string }) {
     `Olá! Tenho interesse no imóvel "${property.titulo}" (Cód: ${property.id}).`
   )
 
-  const handleShare = async () => {
-    const shareUrl = window.location.href
-    const payload = {
-      title: property.titulo,
-      text: `${property.titulo} — ${formatCurrency(Number(property.preco) || 0)}`,
-      url: shareUrl,
-    }
+  // "Compartilhar" opens a menu with explicit options. WhatsApp comes first because it is
+  // the channel Brazilian visitors actually use; the native share sheet (missing on many
+  // desktops) is offered as an extra instead of being the only path — that was the bug:
+  // on desktop it either opened an OS sheet with no WhatsApp or silently copied the link.
+  const shareUrl = () => (typeof window === 'undefined' ? '' : window.location.href)
+  const shareText = () => `${property.titulo} — ${formatCurrency(Number(property.preco) || 0)}`
 
-    if (typeof navigator.share === 'function') {
-      try {
-        await navigator.share(payload)
-        return
-      } catch {
-        // The share sheet was dismissed (AbortError) or is unavailable — fall through to copying.
-      }
-    }
+  const flashShareFeedback = (message: string) => {
+    setShareFeedback(message)
+    setTimeout(() => setShareFeedback(null), 2000)
+  }
 
+  const handleWhatsAppShare = () => {
+    // No recipient in the URL (`wa.me/?text=`) — WhatsApp asks which contact to send it to.
+    window.open(whatsappShareLink(`${shareText()} ${shareUrl()}`), '_blank', 'noopener,noreferrer')
+  }
+
+  const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(shareUrl)
-      setShareFeedback('Link copiado!')
-      setTimeout(() => setShareFeedback(null), 2000)
+      await navigator.clipboard.writeText(shareUrl())
+      flashShareFeedback('Link copiado!')
     } catch {
       setShareFeedback(null)
+    }
+  }
+
+  const handleNativeShare = async () => {
+    if (typeof navigator.share !== 'function') {
+      // Desktop browsers without the Web Share API: copying the link is the closest thing,
+      // and it keeps the menu item honest on every browser.
+      await handleCopyLink()
+      return
+    }
+    try {
+      await navigator.share({ title: property.titulo, text: shareText(), url: shareUrl() })
+    } catch {
+      // The share sheet was dismissed (AbortError) — nothing to do.
     }
   }
 
@@ -382,23 +404,58 @@ export default function PropertyDetailClient({ id }: { id: string }) {
                 <WhatsAppIcon className="h-5 w-5 flex-shrink-0" />
                 QUERO ALUGAR
               </a>
-              <button
-                type="button"
-                onClick={handleShare}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-4 text-center text-sm font-bold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-200 hover:bg-gray-50 transition-colors"
-              >
-                {shareFeedback ? (
-                  <>
-                    <CheckIcon className="h-5 w-5 flex-shrink-0 text-green-600" strokeWidth={2} />
-                    {shareFeedback}
-                  </>
-                ) : (
-                  <>
-                    <ShareIcon className="h-5 w-5 flex-shrink-0 text-gray-500" strokeWidth={2} />
-                    Compartilhar
-                  </>
-                )}
-              </button>
+              <Menu as="div" className="relative flex-1">
+                <MenuButton className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-4 text-center text-sm font-bold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-200 hover:bg-gray-50 transition-colors">
+                  {shareFeedback ? (
+                    <>
+                      <CheckIcon className="h-5 w-5 flex-shrink-0 text-green-600" strokeWidth={2} />
+                      {shareFeedback}
+                    </>
+                  ) : (
+                    <>
+                      <ShareIcon className="h-5 w-5 flex-shrink-0 text-gray-500" strokeWidth={2} />
+                      Compartilhar
+                      <ChevronDownIcon className="h-4 w-4 flex-shrink-0 text-gray-400" strokeWidth={2} />
+                    </>
+                  )}
+                </MenuButton>
+                <MenuItems
+                  transition
+                  anchor="bottom end"
+                  className="z-50 w-56 rounded-xl bg-white p-1.5 shadow-lg ring-1 ring-gray-900/5 transition duration-100 ease-out focus:outline-none data-[closed]:scale-95 data-[closed]:opacity-0"
+                >
+                  <MenuItem>
+                    <button
+                      type="button"
+                      onClick={handleWhatsAppShare}
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-gray-900 data-[focus]:bg-gray-50"
+                    >
+                      <WhatsAppIcon className="h-5 w-5 flex-shrink-0 text-[#25D366]" />
+                      Enviar por WhatsApp
+                    </button>
+                  </MenuItem>
+                  <MenuItem>
+                    <button
+                      type="button"
+                      onClick={handleCopyLink}
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-gray-900 data-[focus]:bg-gray-50"
+                    >
+                      <ClipboardDocumentIcon className="h-5 w-5 flex-shrink-0 text-gray-400" strokeWidth={2} />
+                      Copiar link
+                    </button>
+                  </MenuItem>
+                  <MenuItem>
+                    <button
+                      type="button"
+                      onClick={handleNativeShare}
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-gray-900 data-[focus]:bg-gray-50"
+                    >
+                      <ShareIcon className="h-5 w-5 flex-shrink-0 text-gray-400" strokeWidth={2} />
+                      Mais opções…
+                    </button>
+                  </MenuItem>
+                </MenuItems>
+              </Menu>
             </div>
           </div>
 
