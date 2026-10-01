@@ -12,6 +12,7 @@ export default function RegisterProprietarioPage() {
   const router = useRouter()
   const [formData, setFormData] = useState({
     nomeCompleto: '',
+    cpf: '',
     telefone: '',
     celular: '',
     email: '',
@@ -33,14 +34,23 @@ export default function RegisterProprietarioPage() {
     return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`
   }
 
+  // Real-time CPF mask: 000.000.000-00
+  const applyCpfMask = (val: string) => {
+    const digits = val.replace(/\D/g, '').slice(0, 11)
+    if (digits.length <= 3) return digits
+    if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`
+    if (digits.length <= 9) return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`
+    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
     
-    // Apply phone mask in real-time
-    if (name === 'telefone' || name === 'celular') {
+    // Apply phone / CPF mask in real-time
+    if (name === 'telefone' || name === 'celular' || name === 'cpf') {
       setFormData(prev => ({
         ...prev,
-        [name]: applyPhoneMask(value)
+        [name]: name === 'cpf' ? applyCpfMask(value) : applyPhoneMask(value)
       }))
       return
     }
@@ -73,6 +83,7 @@ export default function RegisterProprietarioPage() {
           email: formData.email, 
           password: formData.password,
           nome_completo: formData.nomeCompleto,
+          cpf: formData.cpf.replace(/\D/g, ''),
           telefone: formData.telefone,
           celular: formData.celular,
           tipo_usuario: 'proprietario'
@@ -101,6 +112,7 @@ export default function RegisterProprietarioPage() {
             body: JSON.stringify({ 
               telefone: formData.telefone,
               celular: formData.celular,
+              cpf: formData.cpf.replace(/\D/g, ''),
               tipo_usuario: 'proprietario'
             }),
           });
@@ -117,7 +129,7 @@ export default function RegisterProprietarioPage() {
       if (!data.jwt) {
         setSuccess('Conta criada com sucesso! Enviamos um link mágico de confirmação para o seu e-mail. Por favor, acesse sua caixa de entrada para ativar sua conta antes de fazer o login!')
         setFormData({
-          nomeCompleto: '', telefone: '', celular: '', email: '', password: '', termos: false
+          nomeCompleto: '', cpf: '', telefone: '', celular: '', email: '', password: '', termos: false
         })
         window.scrollTo({ top: 0, behavior: 'smooth' })
       } else {
@@ -171,7 +183,21 @@ export default function RegisterProprietarioPage() {
               />
             </div>
 
-            {/* 2. Telefone and 3. Celular row */}
+            {/* 2. CPF */}
+            <div>
+              <label htmlFor="cpf" className="block text-sm font-semibold text-gray-900 mb-1">CPF</label>
+              <input
+                id="cpf" name="cpf" type="text" inputMode="numeric" maxLength={14} required
+                value={formData.cpf} onChange={handleChange}
+                className="block w-full rounded-md py-2 px-3 text-gray-900 text-sm font-medium border-gray-300 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary placeholder:text-gray-400 shadow-sm"
+                placeholder="000.000.000-00"
+              />
+              <p className="mt-1 text-xs font-medium text-gray-500">
+                Usamos o CPF para identificar você e evitar cadastros duplicados.
+              </p>
+            </div>
+
+            {/* 3. Telefone and 4. Celular row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="telefone" className="block text-sm font-semibold text-gray-900 mb-1">Telefone (fixo)</label>

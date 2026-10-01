@@ -10,6 +10,7 @@ type BootstrapContext = { strapi: Core.Strapi };
 type RegistrationState = {
   telefone?: string;
   celular?: string;
+  cpf?: string;
   creci?: string;
   nome_imobiliaria?: string;
   nome_completo?: string;
@@ -87,6 +88,7 @@ const applyRegistrationFields = (data: Record<string, unknown>, custom?: Registr
 
   if (custom.telefone) data.telefone = custom.telefone;
   if (custom.celular) data.celular = custom.celular;
+  if (custom.cpf) data.cpf = custom.cpf;
   if (custom.creci) data.creci = custom.creci;
   if (custom.nome_imobiliaria) data.nome_imobiliaria = custom.nome_imobiliaria;
   if (custom.nome_completo) data.nome_completo = custom.nome_completo;
@@ -107,7 +109,7 @@ export default {
     //    This runs before the router, so the body is clean when Yup validates it.
     //    The custom fields are stashed on ctx.state.customRegistration for the
     //    beforeCreate lifecycle hook to pick up and write to the database.
-    const CUSTOM_FIELDS = ['telefone', 'celular', 'creci', 'nome_imobiliaria', 'nome_completo', 'tipo_usuario'];
+    const CUSTOM_FIELDS = ['telefone', 'celular', 'cpf', 'creci', 'nome_imobiliaria', 'nome_completo', 'tipo_usuario'];
 
     strapi.server.use(async (ctx: any, next: () => Promise<void>) => {
       if (

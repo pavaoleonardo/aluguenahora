@@ -73,6 +73,9 @@
     "celular": {
       "type": "string"
     },
+    "cpf": {
+      "type": "string"
+    },
     "tipo_usuario": {
       "type": "enumeration",
       "enum": [
