@@ -395,16 +395,16 @@ export default function EditPropertyPage() {
   return (
     <div className="bg-white px-6 py-12 lg:px-8">
       <div className="mx-auto max-w-2xl">
-        <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl text-center mb-8">Editar Imóvel</h2>
+        <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl text-center mb-8">Editar imóvel</h2>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-3">
              {/* 1, 2, 3: Same line */}
               <div className="relative">
-                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Tipo do imóvel</label>
+                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold">Tipo do imóvel</label>
                   <div className="relative">
                       <select name="tipo" required value={formData.tipo} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm appearance-none bg-white">
-                        <option value="">TODOS OS IMÓVEIS</option>
+                        <option value="">Todos os imóveis</option>
                         <optgroup label="--- RESIDENCIAL ---">
                           <option value="Apart Hotel / Flat / Loft">Apart Hotel / Flat / Loft</option>
                           <option value="Apartamento">Apartamento</option>
@@ -446,7 +446,7 @@ export default function EditPropertyPage() {
               </div>
 
               <div className="relative">
-                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Finalidade</label>
+                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold">Finalidade</label>
                   <div className="relative">
                       <select name="finalidade" required value={formData.finalidade} disabled onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm bg-gray-100 cursor-not-allowed appearance-none">
                         <option value="aluguel">Aluguel</option>
@@ -460,7 +460,7 @@ export default function EditPropertyPage() {
               </div>
 
               <div className="relative" ref={bairroRef}>
-                <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Bairro</label>
+                <label className="block text-sm font-medium leading-6 text-gray-900 font-bold">Bairro</label>
                 <input type="text" name="bairro" required value={formData.bairro} onChange={(e) => handleBairroChange(e.target.value)} onFocus={() => setShowBairroSuggestions(true)} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
                 {showBairroSuggestions && bairroSuggestions.length > 0 && (
                   <div className="absolute z-10 mt-1 w-full bg-white rounded-md shadow-lg border border-gray-200 py-1 max-h-48 overflow-y-auto">
@@ -473,7 +473,7 @@ export default function EditPropertyPage() {
 
              {/* 4, 5: Same line */}
               <div className="sm:col-span-3">
-                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Cidade/UF</label>
+                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold">Cidade/UF</label>
                   <input
                     type="text"
                     value="Campo Grande - MS"
@@ -484,69 +484,69 @@ export default function EditPropertyPage() {
 
               {/* 6: Endereço */}
               <div className="sm:col-span-3">
-                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Endereço Completo</label>
+                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold">Endereço completo</label>
                   <input type="text" name="endereco" value={formData.endereco} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
               </div>
 
               {/* 7: Título */}
               <div className="sm:col-span-3">
-                <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Título do Anúncio</label>
+                <label className="block text-sm font-medium leading-6 text-gray-900 font-bold">Título do anúncio</label>
                 <input type="text" name="titulo" required value={formData.titulo} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
               </div>
               
               {/* 8: Descrição */}
               <div className="sm:col-span-3">
-                <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Descrição do Imóvel</label>
+                <label className="block text-sm font-medium leading-6 text-gray-900 font-bold">Descrição do imóvel</label>
                 <textarea name="descricao" rows={3} value={formData.descricao} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
               </div>
 
               {/* 10, 11, 12: Same line */}
               <div>
-                <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">VALOR (R$)</label>
+                <label className="block text-sm font-medium leading-6 text-gray-900 font-bold">Valor (R$)</label>
                 <input type="text" name="preco" required value={formData.preco} onChange={handlePriceChange} placeholder="R$ 0,00" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
               </div>
 
               <div>
-                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase text-xs">IPTU (Mensal)</label>
+                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold text-xs">IPTU (mensal)</label>
                   <input type="text" name="iptu" value={formData.iptu} onChange={handlePriceChange} placeholder="R$ 0,00" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
               </div>
 
               <div>
-                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase text-xs">Condomínio</label>
+                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold text-xs">Condomínio</label>
                   <input type="text" name="condominio" value={formData.condominio} onChange={handlePriceChange} placeholder="R$ 0,00" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
               </div>
 
               {/* 13, 14, 15: Same line */}
               <div>
-                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Quartos</label>
+                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold">Quartos</label>
                   <input type="number" name="quartos" value={formData.quartos} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
               </div>
 
               <div>
-                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Banheiros</label>
+                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold">Banheiros</label>
                   <input type="number" name="banheiros" value={formData.banheiros} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
               </div>
 
               <div>
-                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Vagas</label>
+                  <label className="block text-sm font-medium leading-6 text-gray-900 font-bold">Vagas</label>
                   <input type="number" name="vagas" value={formData.vagas} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
               </div>
 
               {/* 16, 17 Area */}
               <div className="sm:col-span-1">
-                <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase text-xs">ÁREA CONSTRUÍDA (m²)</label>
+                <label className="block text-sm font-medium leading-6 text-gray-900 font-bold text-xs">Área construída (m²)</label>
                 <input type="text" name="tamanho" value={formData.tamanho} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
               </div>
 
               <div className="sm:col-span-1">
-                <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">ÁREA TOTAL (m²)</label>
+                <label className="block text-sm font-medium leading-6 text-gray-900 font-bold">Área total (m²)</label>
                 <input type="text" name="area_total" value={formData.area_total} onChange={handleChange} placeholder="0,00" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm" />
               </div>
             </div>
 
             {/* Characteristics Section */}
             <div className="mt-8">
-              <label className="block text-lg font-bold text-gray-900 mb-4 border-b pb-2 uppercase">Características</label>
+              <label className="block text-lg font-bold text-gray-900 mb-4 border-b pb-2">Características</label>
               <div className="flex flex-col gap-y-2 lg:columns-3 lg:block lg:gap-x-6 border p-4 rounded-lg bg-gray-50/30">
                 {LISTA_CARACTERISTICAS.map((item) => (
                   <label key={item} className="relative flex items-center group cursor-pointer break-inside-avoid mb-3">
@@ -559,12 +559,12 @@ export default function EditPropertyPage() {
 
             {/* Photos Section */}
             <div className="mt-8 bg-gray-50/50 p-6 rounded-xl border-2 border-dashed border-gray-200">
-              <label className="block text-sm font-bold text-gray-900 uppercase mb-4">Gerenciar Fotos</label>
+              <label className="block text-sm font-bold text-gray-900 mb-4">Gerenciar fotos</label>
               
               {/* Existing Photos */}
               {existingFotos.length > 0 && (
                 <div className="mb-6">
-                  <h4 className="text-xs font-bold text-gray-500 uppercase mb-3">Fotos Atuais</h4>
+                  <h4 className="text-xs font-bold text-gray-500 mb-3">Fotos atuais</h4>
                   <div className="grid grid-cols-3 gap-4">
                     {existingFotos.map((foto) => (
                       <div key={foto.id} className="relative aspect-square rounded-lg overflow-hidden border bg-white group cursor-pointer" onClick={() => setActivePhotoUrl(foto.url)}>
@@ -582,7 +582,7 @@ export default function EditPropertyPage() {
               {/* New Photos Preview */}
               {newFotos.length > 0 && (
                 <div className="mb-6">
-                  <h4 className="text-xs font-bold text-gray-500 uppercase mb-3">Novas Fotos</h4>
+                  <h4 className="text-xs font-bold text-gray-500 mb-3">Novas fotos</h4>
                   <div className="grid grid-cols-3 gap-4">
                     {previewUrls.map((url, idx) => (
                       <div key={url} className="relative aspect-square rounded-lg overflow-hidden border bg-white group cursor-pointer" onClick={() => setActivePhotoUrl(url)}>
@@ -598,8 +598,8 @@ export default function EditPropertyPage() {
               )}
 
               <div className="flex flex-col items-center">
-                <button type="button" onClick={() => fileInputRef.current?.click()} className="rounded-md bg-white px-8 py-3 text-sm font-bold text-primary shadow-sm ring-1 ring-inset ring-primary hover:bg-white/80 transition-all uppercase">
-                  ENVIAR FOTOS
+                <button type="button" onClick={() => fileInputRef.current?.click()} className="rounded-md bg-white px-8 py-3 text-sm font-bold text-primary shadow-sm ring-1 ring-inset ring-primary hover:bg-white/80 transition-all">
+                  Enviar fotos
                 </button>
                 <input type="file" ref={fileInputRef} multiple accept="image/*" onChange={handleFotosChange} className="hidden" />
                 <p className="mt-2 text-[10px] text-gray-500">As fotos passarão pela aprovação do administrador</p>
@@ -620,15 +620,15 @@ export default function EditPropertyPage() {
 
             {/* VIDEO SECTION */}
             <div className="mt-8 border rounded-xl p-6 bg-gray-50/50">
-              <label className="block text-sm font-bold text-gray-900 uppercase mb-4">Vídeo do Imóvel</label>
+              <label className="block text-sm font-bold text-gray-900 mb-4">Vídeo do imóvel</label>
               <p className="mt-1 text-xs text-gray-500 mb-4">Selecione um vídeo de até 60MB. Se o imóvel já possui um vídeo, o novo irá substituí-lo.</p>
               
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 <label
                   htmlFor={videoInputId}
-                  className="rounded-md bg-white px-6 py-3 text-base font-bold text-secondary shadow-sm ring-1 ring-inset ring-secondary hover:bg-gray-50 active:bg-gray-100 transition-all uppercase cursor-pointer select-none"
+                  className="rounded-md bg-white px-6 py-3 text-base font-bold text-secondary shadow-sm ring-1 ring-inset ring-secondary hover:bg-gray-50 active:bg-gray-100 transition-all cursor-pointer select-none"
                 >
-                  {videoFile ? '🔄 Trocar Vídeo' : '🎬 Selecionar Vídeo'}
+                  {videoFile ? '🔄 Trocar vídeo' : '🎬 Selecionar vídeo'}
                 </label>
                 <input
                   type="file"
@@ -643,16 +643,16 @@ export default function EditPropertyPage() {
                     type="button"
                     onClick={handleVideoUpload}
                     disabled={uploadingVideo}
-                    className="rounded-md bg-secondary px-6 py-3 text-base font-bold text-white shadow-sm hover:bg-secondary-hover transition-all uppercase disabled:opacity-50"
+                    className="rounded-md bg-secondary px-6 py-3 text-base font-bold text-white shadow-sm hover:bg-secondary-hover transition-all disabled:opacity-50"
                   >
-                    {uploadingVideo ? '⏳ Enviando...' : '☁️ Upload Vídeo'}
+                    {uploadingVideo ? '⏳ Enviando...' : '☁️ Upload vídeo'}
                   </button>
                 )}
 
                 {formData.video_url && (
                   <div className="flex items-center gap-2 text-green-600 font-bold">
                     <span className="text-xl">✅</span>
-                    <span>{videoFile ? 'Novo Vídeo Pronto!' : 'Vídeo Atual Ativo'}</span>
+                    <span>{videoFile ? 'Novo vídeo pronto!' : 'Vídeo atual ativo'}</span>
                   </div>
                 )}
               </div>
@@ -671,7 +671,7 @@ export default function EditPropertyPage() {
                 geocoding ? 'Localizando...' : 
                 compressing ? 'Otimizando fotos...' : 
                 'Salvando...'
-              ) : 'Salvar e Enviar para Aprovação'}
+              ) : 'Salvar e enviar para aprovação'}
             </button>
           </div>
         </form>

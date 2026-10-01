@@ -1,50 +1,24 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/context/AuthContext'
-import { API_BASE_URL } from '@/lib/apiBase'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
-import { translateError } from '@/lib/errorTranslations'
+import { useCredentialsLogin } from '@/lib/useCredentialsLogin'
 
 export default function LoginPage() {
-  const router = useRouter()
-  const { login } = useAuth()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/local`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier: email, password }),
-      })
-      
-      const data = await res.json()
-      
-      if (!res.ok) {
-        throw new Error(data.error?.message || 'Erro ao entrar')
-      }
-
-      login(data.jwt, data.user)
-      router.push('/dashboard')
-      router.refresh()
-    } catch (err: any) {
-      setError(translateError(err.message))
-    } finally {
-      setLoading(false)
-    }
-  }
+  // The request, the session and the error text live in lib/useCredentialsLogin.ts, shared with
+  // the ENTRAR LoginModal; this page only renders the markup.
+  const {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    showPassword,
+    toggleShowPassword,
+    error,
+    loading,
+    handleSubmit,
+  } = useCredentialsLogin()
 
   return (
     <section className="h-screen w-full force-light bg-white">
@@ -62,7 +36,7 @@ export default function LoginPage() {
             </Link>
 
             <div className="text-center">
-              <h3 className="text-2xl font-bold text-gray-900 mb-3 tracking-tight">Bem-vindo(a) ao alugue na hora!</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3 tracking-tight">Bem-vindo(a) ao Alugue na Hora!</h3>
               <p className="text-base font-medium text-gray-500">Bem-vindo de volta! Faça login para continuar.</p>
             </div>
           </div>
@@ -70,7 +44,7 @@ export default function LoginPage() {
           <form className="text-start w-full" onSubmit={handleSubmit}>
             <div className="mb-4">
               <label htmlFor="email" className="block text-base font-semibold text-gray-900 mb-2">
-                Endereço de email
+                Endereço de e-mail
               </label>
               <input 
                 id="email" 
@@ -99,7 +73,7 @@ export default function LoginPage() {
                 />
                 <button 
                   type="button" 
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={toggleShowPassword}
                   className="inline-flex items-center justify-center py-2.5 px-4 border rounded-e-md -ms-px border-gray-300 bg-white hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary z-20 transition-colors"
                 >
                   {showPassword ? (

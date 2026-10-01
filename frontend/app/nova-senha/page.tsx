@@ -80,7 +80,7 @@ function NovaSenhaForm() {
         </Link>
 
         <div className="text-center">
-          <h3 className="text-2xl font-bold text-gray-900 mb-3 tracking-tight">Bem-vindo(a) ao alugue na hora.</h3>
+          <h3 className="text-2xl font-bold text-gray-900 mb-3 tracking-tight">Bem-vindo(a) ao Alugue na Hora.</h3>
           <p className="text-base font-medium text-gray-500">Alterar a senha e confirmar a senha</p>
         </div>
       </div>
@@ -88,7 +88,7 @@ function NovaSenhaForm() {
       <form className="text-start w-full space-y-4" onSubmit={handleSubmit}>
         {/* Nova Senha */}
         <div>
-          <label htmlFor="password" className="block text-sm font-semibold text-gray-900 mb-1">Nova Senha</label>
+          <label htmlFor="password" className="block text-sm font-semibold text-gray-900 mb-1">Nova senha</label>
           <div className="flex relative shadow-sm rounded-md">
             <input 
               type={showPassword ? "text" : "password"} 

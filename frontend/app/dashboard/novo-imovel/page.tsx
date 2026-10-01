@@ -345,7 +345,7 @@ export default function NewPropertyPage() {
   return (
     <div className="bg-white px-6 py-12 lg:px-8">
        <div className="mx-auto max-w-2xl">
-         <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl text-center mb-8">Anunciar Imóvel</h2>
+         <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl text-center mb-8">Anunciar imóvel</h2>
          
          {errors.length > 0 && (
            <div className="mb-6 rounded-md bg-red-50 p-4 border border-red-200">
@@ -360,7 +360,7 @@ export default function NewPropertyPage() {
             <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-3">
                  {/* 1, 2, 3: Same line */}
                  <div className="relative">
-                     <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Tipo do imóvel</label>
+                     <label className="block text-sm font-medium leading-6 text-gray-900 font-bold">Tipo do imóvel</label>
                      <div className="relative">
                          <select
                            name="tipo"
@@ -410,7 +410,7 @@ export default function NewPropertyPage() {
                  </div>
 
                  <div className="relative">
-                     <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Finalidade</label>
+                     <label className="block text-sm font-medium leading-6 text-gray-900 font-bold">Finalidade</label>
                      <div className="relative">
                          <select
                            name="finalidade"
@@ -474,7 +474,7 @@ export default function NewPropertyPage() {
 
                 {/* 6: Endereço */}
                 <div className="sm:col-span-3">
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Endereço Completo</label>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Endereço completo</label>
                     <input
                       type="text"
                       name="endereco"
@@ -488,29 +488,29 @@ export default function NewPropertyPage() {
 
                 {/* 7: Título */}
                 <div className="sm:col-span-3">
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Título do Anúncio</label>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Título do anúncio</label>
                     <input type="text" name="titulo" value={formData.titulo} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
                 </div>
                 
                 {/* 8: Descrição */}
                 <div className="sm:col-span-3">
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Descrição do Imóvel</label>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Descrição do imóvel</label>
                     <textarea name="descricao" rows={3} value={formData.descricao} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-1.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6" />
                 </div>
 
                 {/* 10, 11, 12: Same line */}
                 <div>
-                    <label className="block text-sm font-medium leading-6 text-gray-900">VALOR DO ALUGUEL (R$)</label>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Valor do aluguel (R$)</label>
                     <input type="text" name="preco" value={formData.preco} onChange={handlePriceChange} placeholder="R$ 0,00" inputMode="decimal" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium leading-6 text-gray-900">IPTU (Mensal)</label>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">IPTU (mensal)</label>
                     <input type="text" name="iptu" value={formData.iptu} onChange={handlePriceChange} placeholder="R$ 0,00" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Condomínio (Mensal)</label>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Condomínio (mensal)</label>
                     <input type="text" name="condominio" value={formData.condominio} onChange={handlePriceChange} placeholder="R$ 0,00" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
                 </div>
 
@@ -526,18 +526,18 @@ export default function NewPropertyPage() {
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium leading-6 text-gray-900 font-bold uppercase">Vagas</label>
+                    <label className="block text-sm font-medium leading-6 text-gray-900 font-bold">Vagas</label>
                     <input type="number" name="vagas" value={formData.vagas} onChange={handleChange} className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
                 </div>
 
                 {/* 16, 17 Area */}
                 <div className="sm:col-span-1">
-                    <label className="block text-sm font-medium leading-6 text-gray-900 uppercase">Área Construída / Útil (m²)</label>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Área construída / útil (m²)</label>
                     <input type="text" name="tamanho" value={formData.tamanho} onChange={handleChange} placeholder="0,00" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
                 </div>
 
                 <div className="sm:col-span-1">
-                    <label className="block text-sm font-medium leading-6 text-gray-900 uppercase">Área Total (m²)</label>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Área total (m²)</label>
                     <input type="text" name="area_total" value={formData.area_total} onChange={handleChange} placeholder="0,00" className="mt-2 block w-full rounded-md border-0 py-2.5 pl-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm" />
                 </div>
             </div>
@@ -565,15 +565,15 @@ export default function NewPropertyPage() {
             </div>
 
                 <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium leading-6 text-gray-900">Fotos do Imóvel</label>
+                    <label className="block text-sm font-medium leading-6 text-gray-900">Fotos do imóvel</label>
                     <p className="mt-1 text-xs text-gray-500 mb-4">Dica: A primeira foto selecionada será usada como a principal (fachada) nos resultados de busca.</p>
                     
                     <div className="flex flex-col items-start gap-4">
                       <label
                         htmlFor={fileInputId}
-                        className="rounded-md bg-white px-6 py-3 text-base font-bold text-primary shadow-sm ring-1 ring-inset ring-primary hover:bg-gray-50 active:bg-gray-100 transition-all uppercase cursor-pointer select-none touch-manipulation"
+                        className="rounded-md bg-white px-6 py-3 text-base font-bold text-primary shadow-sm ring-1 ring-inset ring-primary hover:bg-gray-50 active:bg-gray-100 transition-all cursor-pointer select-none touch-manipulation"
                       >
-                        📷 SELECIONAR FOTOS
+                        📷 Selecionar fotos
                       </label>
                       <input
                         type="file"
@@ -607,15 +607,15 @@ export default function NewPropertyPage() {
 
                     {/* VIDEO UPLOAD SECTION */}
                     <div className="mt-8 pt-8 border-t border-gray-200">
-                      <h3 className="text-lg font-bold text-gray-900 uppercase">🎥 Vídeo do Imóvel</h3>
+                      <h3 className="text-lg font-bold text-gray-900">🎥 Vídeo do imóvel</h3>
                       <p className="mt-1 text-xs text-gray-500 mb-4">Selecione um vídeo de até 60MB para mostrar mais detalhes do imóvel.</p>
                       
                       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                         <label
                           htmlFor={videoInputId}
-                          className="rounded-md bg-white px-6 py-3 text-base font-bold text-secondary shadow-sm ring-1 ring-inset ring-secondary hover:bg-gray-50 active:bg-gray-100 transition-all uppercase cursor-pointer select-none"
+                          className="rounded-md bg-white px-6 py-3 text-base font-bold text-secondary shadow-sm ring-1 ring-inset ring-secondary hover:bg-gray-50 active:bg-gray-100 transition-all cursor-pointer select-none"
                         >
-                          {videoFile ? '🔄 Trocar Vídeo' : '🎬 Selecionar Vídeo'}
+                          {videoFile ? '🔄 Trocar vídeo' : '🎬 Selecionar vídeo'}
                         </label>
                         <input
                           type="file"
@@ -630,9 +630,9 @@ export default function NewPropertyPage() {
                             type="button"
                             onClick={handleVideoUpload}
                             disabled={uploadingVideo}
-                            className="rounded-md bg-secondary px-6 py-3 text-base font-bold text-white shadow-sm hover:bg-secondary-hover transition-all uppercase disabled:opacity-50"
+                            className="rounded-md bg-secondary px-6 py-3 text-base font-bold text-white shadow-sm hover:bg-secondary-hover transition-all disabled:opacity-50"
                           >
-                            {uploadingVideo ? '⏳ Enviando...' : '☁️ Upload Vídeo'}
+                            {uploadingVideo ? '⏳ Enviando...' : '☁️ Upload vídeo'}
                           </button>
                         )}
 
@@ -662,7 +662,7 @@ export default function NewPropertyPage() {
                     geocoding ? '📍 Localizando endereço...' : 
                     compressing ? '🔄 Otimizando fotos...' : 
                     '⏳ Enviando...'
-                  ) : '✅ Enviar para Aprovação'}
+                  ) : '✅ Enviar para aprovação'}
                 </button>
             </div>
          </form>

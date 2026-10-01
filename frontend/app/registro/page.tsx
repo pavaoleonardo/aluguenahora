@@ -22,26 +22,7 @@ export default function RegistroPage() {
           </div>
 
           <div className="w-full flex flex-col gap-4">
-            {/* Opção Corretor / Imobiliária */}
-            <Link
-              href="/registro/corretor"
-              className="group flex items-center gap-5 w-full p-5 rounded-xl border-2 border-gray-200 hover:border-primary hover:bg-primary/5 transition-all duration-200 cursor-pointer"
-            >
-              <div className="flex-shrink-0 w-14 h-14 rounded-full bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
-              <div className="text-left">
-                <p className="font-bold text-gray-900 group-hover:text-primary transition-colors text-base">Sou Corretor / Imobiliária</p>
-                <p className="text-sm text-gray-500 mt-0.5">Anuncie imóveis de seus clientes e gerencie sua carteira</p>
-              </div>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 group-hover:text-primary ml-auto flex-shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
-
-            {/* Opção Proprietário */}
+            {/* Opção 1 — Proprietário (matches the ANUNCIAR window and the mobile drawer order) */}
             <Link
               href="/registro/proprietario"
               className="group flex items-center gap-5 w-full p-5 rounded-xl border-2 border-gray-200 hover:border-secondary hover:bg-secondary/5 transition-all duration-200 cursor-pointer"
@@ -52,10 +33,29 @@ export default function RegistroPage() {
                 </svg>
               </div>
               <div className="text-left">
-                <p className="font-bold text-gray-900 group-hover:text-secondary transition-colors text-base">Sou Proprietário(a)</p>
+                <p className="font-bold text-gray-900 group-hover:text-secondary transition-colors text-base">Sou proprietário(a)</p>
                 <p className="text-sm text-gray-500 mt-0.5">Anuncie seu próprio imóvel diretamente na plataforma</p>
               </div>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 group-hover:text-secondary ml-auto flex-shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+
+            {/* Opção 2 — Corretor / Imobiliária */}
+            <Link
+              href="/registro/corretor"
+              className="group flex items-center gap-5 w-full p-5 rounded-xl border-2 border-gray-200 hover:border-primary hover:bg-primary/5 transition-all duration-200 cursor-pointer"
+            >
+              <div className="flex-shrink-0 w-14 h-14 rounded-full bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <p className="font-bold text-gray-900 group-hover:text-primary transition-colors text-base">Sou corretor(a) / imobiliária</p>
+                <p className="text-sm text-gray-500 mt-0.5">Anuncie imóveis de seus clientes e gerencie sua carteira</p>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 group-hover:text-primary ml-auto flex-shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Link>

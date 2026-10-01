@@ -41,7 +41,7 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
         originalUrl: video_url,
         displayUrl: video_url,
         thumb: video_url,
-        label: 'Vídeo do Imóvel',
+        label: 'Vídeo do imóvel',
         isVideo: true,
       })
     }
@@ -206,7 +206,7 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
                     preload="metadata"
                   />
                   <PlayIconOverlay />
-                  <div className="absolute left-0 top-0 bg-secondary px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white rounded-br-md z-20 h-8 flex items-center pointer-events-none">
+                  <div className="absolute left-0 top-0 bg-secondary px-4 py-1.5 text-xs font-bold tracking-widest text-white rounded-br-md z-20 h-8 flex items-center pointer-events-none">
                     🎬 Vídeo
                   </div>
                 </>

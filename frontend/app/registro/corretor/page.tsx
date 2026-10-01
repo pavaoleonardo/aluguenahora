@@ -27,7 +27,7 @@ export default function RegisterCorretorPage() {
   
   // Real-time phone mask: (XX) XXXX-XXXX or (XX) XXXXX-XXXX
   const applyPhoneMask = (val: string) => {
-    let digits = val.replace(/\D/g, '')
+    const digits = val.replace(/\D/g, '')
     if (digits.length === 0) return ''
     if (digits.length <= 2) return `(${digits}`
     if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
@@ -57,7 +57,7 @@ export default function RegisterCorretorPage() {
     e.preventDefault()
     
     if (!formData.termos) {
-      setError('Você deve aceitar os Termos e Condições.')
+      setError('Você deve aceitar os termos e condições.')
       return
     }
 
@@ -85,7 +85,7 @@ export default function RegisterCorretorPage() {
         }),
       })
       
-      let data = await res.json()
+      const data = await res.json()
       
       if (!res.ok) {
         // Se o erro for "Username regardless of case must be unique", 
@@ -136,8 +136,8 @@ export default function RegisterCorretorPage() {
         // auto-logging them in (Miro board 21/09/26: "deve levar direto ao login").
         router.push('/login')
       }
-    } catch (err: any) {
-      setError(translateError(err.message))
+    } catch (err) {
+      setError(translateError(err instanceof Error ? err.message : String(err)))
     } finally {
       setLoading(false)
     }
@@ -159,7 +159,7 @@ export default function RegisterCorretorPage() {
             </Link>
 
             <div className="text-center">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2 tracking-tight">Criar conta Corretor / Imobiliária</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2 tracking-tight">Criar conta corretor / imobiliária</h3>
               <p className="text-sm font-medium text-gray-500">Preencha os dados para começar a anunciar imóveis.</p>
             </div>
           </div>
@@ -184,7 +184,7 @@ export default function RegisterCorretorPage() {
 
             {/* 2. Nome da Imobiliária */}
             <div>
-              <label htmlFor="nomeImobiliaria" className="block text-sm font-semibold text-gray-900 mb-1">Nome da Imobiliária (Opcional)</label>
+              <label htmlFor="nomeImobiliaria" className="block text-sm font-semibold text-gray-900 mb-1">Nome da imobiliária (opcional)</label>
               <input 
                 id="nomeImobiliaria" name="nomeImobiliaria" type="text"
                 value={formData.nomeImobiliaria} onChange={handleChange}
@@ -207,7 +207,7 @@ export default function RegisterCorretorPage() {
             {/* 4. Telefone and 5. Celular row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="telefone" className="block text-sm font-semibold text-gray-900 mb-1">Telefone (Fixo)</label>
+                <label htmlFor="telefone" className="block text-sm font-semibold text-gray-900 mb-1">Telefone (fixo)</label>
                 <input 
                   id="telefone" name="telefone" type="text"
                   value={formData.telefone} onChange={handleChange}
@@ -274,7 +274,7 @@ export default function RegisterCorretorPage() {
               </div>
               <div className="ml-3 text-sm">
                 <label htmlFor="termos" className="font-medium text-gray-500 cursor-pointer">
-                  Eu concordo com os <Link href="/termos" className="text-primary hover:underline">Termos e Condições</Link>
+                  Eu concordo com os <Link href="/termos" className="text-primary hover:underline">Termos e condições</Link>
                 </label>
               </div>
             </div>
@@ -289,7 +289,7 @@ export default function RegisterCorretorPage() {
                 disabled={loading}
                 className="w-full inline-flex items-center justify-center px-6 py-2.5 bg-primary hover:bg-primary-hover font-bold text-base text-white rounded-md transition-all duration-300 disabled:opacity-50 shadow-sm"
               >
-                {loading ? 'Cadastrando...' : 'Criar Conta e Continuar'}
+                {loading ? 'Cadastrando...' : 'Criar conta e continuar'}
               </button>
             </div>
 

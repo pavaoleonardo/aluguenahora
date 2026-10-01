@@ -58,7 +58,7 @@ export default async function Home() {
       <div id="destaques" className="mx-auto max-w-7xl px-6 pt-12 pb-24 sm:pt-16 sm:pb-32 lg:px-8 bg-gray-50/50 rounded-3xl mb-8">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
             <div className="max-w-2xl">
-                <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Imóveis em Destaque</h2>
+                <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Imóveis em destaque</h2>
                 <p className="mt-4 text-lg leading-8 text-slate-600">
                     Propriedades selecionadas a dedo por nossa equipe de especialistas.
                 </p>
@@ -76,7 +76,7 @@ export default async function Home() {
       <div id="como-funciona" className="py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
-                <span className="text-secondary font-semibold tracking-wide uppercase text-sm">Passo a Passo</span>
+                <span className="text-secondary font-semibold tracking-wide text-sm">Passo a passo</span>
                 <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Traga o seu imóvel e Alugue na Hora!</h2>
                 <p className="mt-4 text-lg leading-8 text-slate-600">Transforme seu imóvel vazio em renda imediata.</p>
             </div>
@@ -131,7 +131,7 @@ export default async function Home() {
 
         <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Noticias do Mercado Imobiliario</h2>
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Notícias do mercado imobiliário</h2>
             <p className="mt-2 text-lg leading-8 text-slate-600">
               Fique por dentro das tendências e oportunidades no mercado imobiliário da nossa capital.
             </p>

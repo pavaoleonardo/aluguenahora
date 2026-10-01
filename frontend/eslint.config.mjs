@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Local Node utility scripts, deliberately CommonJS (`node make-favicon.cjs`): not app code,
+    // so no-require-imports does not apply.
+    "make-favicon.cjs",
   ]),
 ]);
 

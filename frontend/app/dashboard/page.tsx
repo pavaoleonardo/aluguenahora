@@ -90,8 +90,8 @@ export default function DashboardPage() {
               </h1>
               <p className="mt-1 text-sm text-gray-500 font-medium">
                 {user?.tipo_usuario === 'corretor' 
-                  ? `Painel do Corretor ${user?.creci ? `(CRECI: ${user.creci})` : ''}`
-                  : 'Painel do Proprietário'}
+                  ? `Painel do corretor ${user?.creci ? `(CRECI: ${user.creci})` : ''}`
+                  : 'Painel do proprietário'}
               </p>
             </div>
             <Link
@@ -137,7 +137,7 @@ export default function DashboardPage() {
                                       className="object-cover"
                                     />
                                 ) : (
-                                    <div className="flex h-full items-center justify-center text-gray-400">Sem Foto</div>
+                                    <div className="flex h-full items-center justify-center text-gray-400">Sem foto</div>
                                 )}
                                 <div className="absolute top-2 right-2">
                                      <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${

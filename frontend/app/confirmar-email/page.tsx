@@ -33,7 +33,7 @@ function ConfirmarEmailContent() {
 
         <>
           <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-3 tracking-tight">E-mail Confirmado!</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3 tracking-tight">E-mail confirmado!</h3>
             <p className="text-base font-medium text-gray-500">Sua conta foi ativada com sucesso. Redirecionando para o login...</p>
           </div>
           <div className="flex justify-center mb-10">

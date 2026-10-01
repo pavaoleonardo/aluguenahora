@@ -164,7 +164,7 @@ export default function PropertyDetailClient({ id }: { id: string }) {
                   3: "text-lg font-bold mt-5 mb-2 text-gray-900",
                   4: "text-base font-bold mt-4 mb-2 text-gray-900",
                   5: "text-base font-semibold mt-4 mb-2 text-gray-900",
-                  6: "text-sm font-bold mt-4 mb-2 text-gray-900 uppercase tracking-wider"
+                  6: "text-sm font-bold mt-4 mb-2 text-gray-900 tracking-wider"
                 }[level as 1|2|3|4|5|6] || "text-lg font-bold mt-6 mb-3 text-gray-900";
                 
                 return <Tag key={i} className={hClasses}>{renderChildren(block.children)}</Tag>;
@@ -244,10 +244,10 @@ export default function PropertyDetailClient({ id }: { id: string }) {
               </nav>
 
               <div className="flex items-center gap-2 mb-2 hidden">
-                <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary uppercase tracking-wider">
+                <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary tracking-wider">
                   {property.tipo}
                 </span>
-                <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 uppercase tracking-wider">
+                <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 tracking-wider">
                   {finalidadeLabel}
                 </span>
               </div>
@@ -292,7 +292,7 @@ export default function PropertyDetailClient({ id }: { id: string }) {
 
               <div className="mt-8 overflow-hidden rounded-2xl border border-gray-100 shadow-sm bg-gray-50/30">
                 <div className="bg-gray-100/50 px-5 py-3 border-b border-gray-100">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-gray-500">Detalhes Técnicos</h3>
+                  <h3 className="text-xs font-black tracking-widest text-gray-500">Detalhes técnicos</h3>
                 </div>
                 <div className="p-5 space-y-3">
                   <div className="flex justify-between text-sm">
@@ -346,7 +346,7 @@ export default function PropertyDetailClient({ id }: { id: string }) {
               <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
               </div>
-              <h3 className="text-2xl font-black text-gray-900">Descrição Completa</h3>
+              <h3 className="text-2xl font-black text-gray-900">Descrição completa</h3>
             </div>
             
             <div className="relative">
@@ -362,9 +362,9 @@ export default function PropertyDetailClient({ id }: { id: string }) {
               className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-primary hover:text-primary/80 transition-colors group"
             >
               {isDescriptionExpanded ? (
-                <>Ver Menos <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"/></svg></>
+                <>Ver menos <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"/></svg></>
               ) : (
-                <>Ler Descrição Completa <svg className="w-4 h-4 group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></>
+                <>Ler descrição completa <svg className="w-4 h-4 group-hover:translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg></>
               )}
             </button>
           </div>
@@ -373,7 +373,7 @@ export default function PropertyDetailClient({ id }: { id: string }) {
         {/* Characteristics Section */}
         {property.caracteristicas && property.caracteristicas.length > 0 && (
           <div className="mt-16 lg:mt-24 border-t border-gray-200 pt-10">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">Características do Imóvel</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-6">Características do imóvel</h3>
             <div className="flex flex-col gap-y-4 lg:columns-4 lg:block lg:gap-x-6">
               {[...property.caracteristicas].sort((a, b) => a.localeCompare(b, 'pt-BR')).map((item) => (
                 <div key={item} className="flex items-center gap-3 text-sm text-gray-700 break-inside-avoid mb-4">

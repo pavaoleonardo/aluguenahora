@@ -95,7 +95,7 @@ export default function NoticiaDetailPage() {
         <div className="absolute bottom-0 left-0 right-0 px-8 pt-8 pb-20 md:px-16 md:pt-16 md:pb-24 text-white">
           <div className="max-w-5xl mx-auto">
             <div className="flex flex-wrap items-center gap-4 mb-6">
-                <span className="bg-primary text-white px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/30">
+                <span className="bg-primary text-white px-4 py-1.5 rounded-full text-xs font-black tracking-widest shadow-lg shadow-primary/30">
                 {noticia.categoria}
                 </span>
                 <div className="flex items-center gap-2 text-sm font-medium text-slate-200 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full">
@@ -117,7 +117,7 @@ export default function NoticiaDetailPage() {
                 <div className="p-2 rounded-full bg-slate-50 group-hover:bg-primary group-hover:text-white transition-all">
                     <ChevronLeftIcon className="h-4 w-4 stroke-[3px]" />
                 </div>
-                VOLTAR PARA O INÍCIO
+                Voltar para o início
             </Link>
 
             <div className="space-y-10">
@@ -145,8 +145,8 @@ export default function NoticiaDetailPage() {
                         <h3 className="text-2xl md:text-3xl font-black mb-3 text-white">Pronto para encontrar seu imóvel?</h3>
                         <p className="text-slate-400 font-medium max-w-md">Nossa equipe está pronta para te ajudar a encontrar a melhor oportunidade em Campo Grande e região.</p>
                     </div>
-                    <Link href="/imoveis" className="bg-primary text-white px-10 py-5 rounded-2xl font-black hover:bg-white hover:text-slate-950 transition-all whitespace-nowrap shadow-xl shadow-primary/20 hover:shadow-white/10 uppercase tracking-tighter">
-                        Explorar Portfólio
+                    <Link href="/imoveis" className="bg-primary text-white px-10 py-5 rounded-2xl font-black hover:bg-white hover:text-slate-950 transition-all whitespace-nowrap shadow-xl shadow-primary/20 hover:shadow-white/10 tracking-tighter">
+                        Explorar portfólio
                     </Link>
                 </div>
             </div>

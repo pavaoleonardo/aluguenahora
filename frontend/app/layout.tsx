@@ -1,15 +1,27 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const geistSans = Geist({
+// Geist Sans / Geist Mono are now self-hosted from ./fonts (same latin-subset variable fonts,
+// wght 100-900, that next/font/google used to serve — rendering is unchanged). next/font/google
+// downloads the CSS + woff2 from Google *at build time*, so any hiccup on that path aborted both
+// `next build` and a cold `next dev` (NextFontError / Turbopack "Module not found ... font/google/font",
+// SPEC.md §3 drift #15). Self-hosting removes that build-time third-party dependency.
+// License: SIL OFL 1.1 — see ./fonts/LICENSE-OFL-1.1.txt.
+const geistSans = localFont({
+  src: "./fonts/geist-latin.woff2",
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  weight: "100 900",
+  display: "swap",
+  fallback: ["system-ui", "sans-serif"],
 });
 
-const geistMono = Geist_Mono({
+const geistMono = localFont({
+  src: "./fonts/geist-mono-latin.woff2",
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: "100 900",
+  display: "swap",
+  fallback: ["monospace"],
 });
 
 export const metadata: Metadata = {
@@ -20,7 +32,9 @@ export const metadata: Metadata = {
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import MaintenanceOverlay from "@/components/MaintenanceOverlay";
+// The maintenance shield (components/MaintenanceOverlay.tsx) was retired on 2026-09-30: the public launch is
+// on, so anonymous visitors get the real site. The component file is parked, unused, for a future outage
+// screen — do not re-mount it without updating SPEC.md §3 drift #3 and tools/dev.sh.
 import { AuthProvider } from "@/context/AuthContext";
 
 export default function RootLayout({
@@ -39,7 +53,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen overflow-x-clip`}
       >
         <AuthProvider>
-          <MaintenanceOverlay />
           <Navbar />
           <main className="flex-1 w-full max-w-full overflow-x-clip">
             {children}
