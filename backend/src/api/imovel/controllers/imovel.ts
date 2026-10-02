@@ -113,7 +113,12 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
       let populate: any = sanitizedQuery.populate;
       
       if (!populate) {
-        populate = ['usuario', 'fotos', 'foto_fachada'];
+        // `foto_fachada` is **not** an attribute of this content type (the media field is `fotos`),
+        // and naming a missing key makes the document service throw "Invalid key foto_fachada":
+        // every detail request sent *without* `populate` answered 400 — still true in production
+        // (checked 2026-02-10: `GET /api/imoveis/<documentId>` → 400 "Erro ao buscar detalhes do
+        // imóvel."). Only populate attributes the schema actually declares.
+        populate = ['usuario', 'fotos'];
       } else if (populate === '*') {
         populate = '*';
       } else if (Array.isArray(populate)) {
@@ -133,10 +138,28 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
           : ['draft', 'published']
         : ['published'];
 
+      let documentId = id;
+      // `findOne` resolves a **documentId** only. A bare numeric id (`/imoveis/55` — the shape old
+      // links and `PropertyGrid`'s `documentId || id` fallback can produce) is not one, so the call
+      // used to throw, the endpoint answered 400 and the share card fell back to the generic site
+      // title/logo while the page itself showed "Imóvel não encontrado". Resolve it first.
+      if (/^\d+$/.test(id)) {
+        for (const status of statusesToTry) {
+          const match = await strapi.documents('api::imovel.imovel').findFirst({
+            filters: { id: { $eq: Number(id) } },
+            status: status as any,
+          });
+          if (match?.documentId) {
+            documentId = match.documentId;
+            break;
+          }
+        }
+      }
+
       let property = null;
       for (const status of statusesToTry) {
         property = await strapi.documents('api::imovel.imovel').findOne({
-          documentId: id,
+          documentId: documentId,
           populate: populate,
           status: status as any,
         });

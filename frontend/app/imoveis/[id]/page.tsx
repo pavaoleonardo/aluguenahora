@@ -1,8 +1,7 @@
 import PropertyDetailClient from '@/components/PropertyDetailClient'
 import { Metadata } from 'next'
 import { api } from '@/lib/api'
-import { formatCurrency } from '@/lib/format'
-import { SITE_NAME, richTextToPlainText, socialImageUrl, truncate } from '@/lib/site'
+import { SITE_NAME, buildShareTitle, richTextToPlainText, socialImageUrl, truncate } from '@/lib/site'
 
 /** Subset of the imóvel payload `generateMetadata` needs (see `populate: '*'` below). */
 type ImovelShareData = {
@@ -27,11 +26,31 @@ function bairroLabel(bairro: ImovelShareData['bairro']): string {
   return bairro?.bairro ?? ''
 }
 
+/** Lower-case letters/digits only, so punctuation, accents and the price suffix cannot defeat a comparison. */
+function normalizeShareText(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+}
+
+/** True when the owner's description is just the title again ("Apartamento Mobiliado" vs "Apartamento Mobiliado — R$ 2.000,00"). */
+function repeatsTitle(descricao: string, title: string): boolean {
+  const description = normalizeShareText(descricao)
+  const normalizedTitle = normalizeShareText(title)
+  if (!description || !normalizedTitle) return false
+  return normalizedTitle === description || normalizedTitle.startsWith(description)
+}
+
 /**
- * Preview description ("Resumo do anúncio") shown by WhatsApp below the thumbnail: type + purpose
- * + location + rooms, the price, then the first lines of the owner's own description.
+ * Preview description shown by WhatsApp below the thumbnail: the same summary line the property
+ * page opens with (type + purpose + location + rooms), then the first lines of the owner's own
+ * description — the card carries both the "what" and the "why". `shareTitle` is passed in so a
+ * description that merely repeats the headline is dropped instead of being echoed back.
  */
-function buildShareDescription(property: ImovelShareData): string {
+function buildShareDescription(property: ImovelShareData, shareTitle: string): string {
   const finalidade =
     property.finalidade === 'aluguel' ? 'para alugar' : property.finalidade === 'venda' ? 'à venda' : ''
   const local = [bairroLabel(property.bairro), property.cidade || 'Campo Grande']
@@ -44,20 +63,13 @@ function buildShareDescription(property: ImovelShareData): string {
   ]
     .filter(Boolean)
     .join(', ')
-  const preco = Number(property.preco) || 0
-  const valor = preco
-    ? `Valor: ${formatCurrency(preco)}${property.finalidade === 'aluguel' ? '/mês' : ''}.`
-    : ''
+
+  const resumo = `${property.tipo || 'Imóvel'} ${finalidade} em ${local}${detalhes ? ` — ${detalhes}` : ''}.`
+  const descricao = richTextToPlainText(property.descricao)
 
   return truncate(
-    [
-      `${property.tipo || 'Imóvel'} ${finalidade} em ${local}${detalhes ? ` — ${detalhes}` : ''}.`,
-      valor,
-      richTextToPlainText(property.descricao),
-    ]
-      .filter(Boolean)
-      .join(' '),
-    320
+    [resumo, descricao && !repeatsTitle(descricao, shareTitle) ? descricao : ''].filter(Boolean).join(' '),
+    300
   )
 }
 
@@ -71,9 +83,16 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       const res = await api.get(`/api/imoveis/${id}`, { params: { populate: '*' } });
       property = res.data?.data;
     } catch {
-      // Fallback search by documentId if ID fetch fails
+      // Fallback when `/api/imoveis/:id` fails (numeric id, or a cold API): the collection endpoint
+      // accepts both shapes — `filters[id]` for a numeric id, `filters[documentId]` for the opaque
+      // one. The old version filtered on `status` (Strapi answers 400 "Invalid key status") and did
+      // not populate, so it could never recover: the card lost its photo and description.
+      const numericId = /^\d+$/.test(id);
       const res = await api.get('/api/imoveis', { 
-        params: { 'filters[documentId][$eq]': id, 'filters[status][$in]': ['published', 'draft'] } 
+        params: {
+          populate: '*',
+          [numericId ? 'filters[id][$eq]' : 'filters[documentId][$eq]']: id,
+        }, 
       });
       property = res.data?.data?.[0];
     }
@@ -89,10 +108,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       // Infoimóveis style format: "Venda - Apartamento - MS - Campo Grande - Tiradentes"
       const breadcrumbTitle = `${finalidade} - ${tipo}${estado ? ` - ${estado}` : ''}${cidade ? ` - ${cidade}` : ''}${bairro ? ` - ${bairro}` : ''}`;
 
-      // Preview card (WhatsApp / Facebook / Telegram): the listing photo, the listing title and
-      // the description below. Crawlers read these tags from the server-rendered HTML only.
-      const shareTitle = imovel.titulo || breadcrumbTitle;
-      const shareDescription = buildShareDescription(imovel);
+      // Preview card (WhatsApp / Facebook / Telegram): the listing photo, the same headline the
+      // "Enviar por WhatsApp" share message uses (`titulo — R$ preço`) and the summary + first
+      // lines of the owner's description below. Crawlers read these tags from the
+      // server-rendered HTML only, never from JavaScript.
+      const shareTitle = buildShareTitle(imovel);
+      const shareDescription = buildShareDescription(imovel, shareTitle);
       const shareImage = socialImageUrl(imovel.foto_fachada?.url || imovel.fotos?.[0]?.url);
       const canonicalPath = `/imoveis/${imovel.documentId || id}`;
 

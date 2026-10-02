@@ -16,6 +16,7 @@ import {
 import { formatCurrency, formatNumber } from '@/lib/format'
 import { API_BASE_URL } from '@/lib/apiBase'
 import { whatsappLink, whatsappShareLink } from '@/lib/contact'
+import { buildShareTitle } from '@/lib/site'
 import dynamic from 'next/dynamic'
 
 const PropertyMap = dynamic(() => import('@/components/PropertyMap'), {
@@ -91,17 +92,22 @@ export default function PropertyDetailClient({ id }: { id: string }) {
       } catch (err: any) {
         // Fallback for documentId search if the primary fetch by ID/documentId failed
         try {
+          // Same two shapes the API resolves: a numeric id (`/imoveis/55`) or a documentId. The
+          // `status` filter this used to send is not a filterable key — Strapi answered 400, so the
+          // fallback never worked and the page showed "Imóvel não encontrado" instead.
+          const numericId = /^\d+$/.test(id)
           const res = await api.get('/api/imoveis', {
             params: {
               populate: '*',
-              'filters[documentId][$eq]': id,
-              'filters[status][$in]': ['published', 'draft'],
+              [numericId ? 'filters[id][$eq]' : 'filters[documentId][$eq]']: id,
             },
           })
           const data = res.data.data
           if (active) {
-            // Ensure we got the specific property we filtered for
-            const foundProperty = Array.isArray(data) ? data.find((p: any) => p.documentId === id) : data
+            // Ensure we got the specific property we filtered for (either shape of the URL id).
+            const foundProperty = Array.isArray(data)
+              ? data.find((p: any) => p.documentId === id || String(p.id) === id)
+              : data
             setProperty(foundProperty || null)
           }
         } catch {
@@ -148,7 +154,9 @@ export default function PropertyDetailClient({ id }: { id: string }) {
   // desktops) is offered as an extra instead of being the only path — that was the bug:
   // on desktop it either opened an OS sheet with no WhatsApp or silently copied the link.
   const shareUrl = () => (typeof window === 'undefined' ? '' : window.location.href)
-  const shareText = () => `${property.titulo} — ${formatCurrency(Number(property.preco) || 0)}`
+  // Same helper the preview card uses for `og:title`: the message WhatsApp shows above the card
+  // and the headline inside it stay identical (`titulo — R$ preço`).
+  const shareText = () => buildShareTitle(property)
 
   const flashShareFeedback = (message: string) => {
     setShareFeedback(message)

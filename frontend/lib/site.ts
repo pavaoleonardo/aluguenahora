@@ -11,6 +11,7 @@
  * URLs (relative `og:image` values are ignored by WhatsApp).
  */
 import { API_BASE_URL } from '@/lib/apiBase'
+import { formatCurrency } from '@/lib/format'
 
 /** Public origin of the storefront, no trailing slash: `https://aluguenahora.com.br`. */
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://aluguenahora.com.br').replace(/\/+$/, '')
@@ -92,6 +93,26 @@ export function richTextToPlainText(value: unknown): string {
   const parts: string[] = []
   collectNodeText(value, parts)
   return parts.join(' ').replace(/\s+/g, ' ').trim()
+}
+
+type ShareTitleInput = {
+  titulo?: string | null
+  preco?: number | string | null
+}
+
+/**
+ * Headline shared by the "Enviar por WhatsApp" message and the preview card (`og:title`):
+ * `Apartamento Mobiliado — R$ 2.000,00`.
+ *
+ * One function for both call sites is the whole point: the text WhatsApp shows *above* the card
+ * and the headline *inside* it are the same string, so they can never drift apart. The price is
+ * only appended when it exists (`Number()` first, because `formatCurrency` reads a bare *string*
+ * as cents), so a listing without a price does not advertise `R$ 0,00`.
+ */
+export function buildShareTitle(property: ShareTitleInput): string {
+  const titulo = (property.titulo || '').trim() || SITE_NAME
+  const preco = Number(property.preco) || 0
+  return preco > 0 ? `${titulo} — ${formatCurrency(preco)}` : titulo
 }
 
 /** Cuts `text` at a word boundary, appending an ellipsis when it was actually shortened. */
