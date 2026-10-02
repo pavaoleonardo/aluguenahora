@@ -40,6 +40,11 @@ find-orphan.sh
 pull-logs.sh
 fix-db.sh
 
+# Operational helper that prints production ports, the nginx proxy target and the
+# protected routes — a reconnaissance map, so it stays local like the docs.
+# Un-tracked 2026-10-02 (it had been public since 1ccf25a); the working copy stays on disk.
+tools/check-prod.sh
+
 # ── Agent tooling ─────────────────────────────────────────────────────────────
 # Spec-kit and Gemini CLI scaffolding: generated locally, carries no app code.
 .specify/
