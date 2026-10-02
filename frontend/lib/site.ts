@@ -33,11 +33,28 @@ export const SITE_DESCRIPTION =
 const FALLBACK_SHARE_IMAGE = '/og-default.jpg'
 
 /**
- * Cloudinary derivative used for previews: JPEG (WhatsApp's crawler does not render the WebP/AVIF
- * that `f_auto` would hand it), quality-optimised and capped at 1200px wide (preview thumbnails
- * have a small byte budget — a 3 MB camera upload is simply dropped by WhatsApp).
+ * Canonical preview-card size: 1.91:1, the ratio Facebook/WhatsApp crop a large card into anyway.
+ * Declaring the exact pixels — and cropping to them here — hands the crawler a ready-made
+ * landscape thumbnail instead of a 4:3 camera upload it has to interpret (every photo in this
+ * library is 1024×768).
  */
-const SHARE_IMAGE_TRANSFORM = 'f_jpg,q_auto:good,w_1200,c_limit'
+export const OG_IMAGE_WIDTH = 1200
+export const OG_IMAGE_HEIGHT = 630
+
+/**
+ * Pixels of the fallback asset (`/og-default.jpg`). It is used as-is — no crop — so it keeps its
+ * own 1200×800 shape; declared so the site-wide card is as explicit as a listing card.
+ */
+export const FALLBACK_SHARE_IMAGE_WIDTH = 1200
+export const FALLBACK_SHARE_IMAGE_HEIGHT = 800
+
+/**
+ * Cloudinary derivative used for previews: JPEG (WhatsApp's crawler does not render the WebP/AVIF
+ * that `f_auto` would hand it), quality-optimised and then cropped around the centre of interest
+ * to the card ratio (preview thumbnails have a small byte budget — a 3 MB camera upload is simply
+ * dropped by WhatsApp).
+ */
+const SHARE_IMAGE_TRANSFORM = `f_jpg,g_auto,q_auto:good,c_fill,w_${OG_IMAGE_WIDTH},h_${OG_IMAGE_HEIGHT}`
 
 /** Turns a possibly-relative media path into an absolute URL usable inside `og:image`. */
 export function absoluteUrl(pathOrUrl: string): string {
@@ -60,6 +77,37 @@ export function socialImageUrl(rawUrl?: string | null): string {
   return absolute.includes('/image/upload/')
     ? absolute.replace('/image/upload/', `/image/upload/${SHARE_IMAGE_TRANSFORM}/`)
     : absolute
+}
+
+/** Entry for `openGraph.images`: the preview URL, plus its pixels when we control the crop. */
+type ShareImage = { url: string; alt?: string; width?: number; height?: number; type?: string }
+
+/**
+ * `openGraph.images` descriptor for a media `url`.
+ *
+ * The width/height/type are declared **only** for the Cloudinary derivative, whose pixels we set
+ * ourselves. The site fallback and local uploads carry no declared size on purpose: guessing it
+ * would be a lie the crawler may act on (a mismatched `og:image:width` is worse than none).
+ */
+export function shareImage(rawUrl?: string | null, alt?: string): ShareImage {
+  const url = socialImageUrl(rawUrl)
+  const entry: ShareImage = { url }
+  if (alt) entry.alt = alt
+
+  if (!rawUrl) {
+    // Our own fallback asset: fixed 1200×800 JPEG.
+    entry.width = FALLBACK_SHARE_IMAGE_WIDTH
+    entry.height = FALLBACK_SHARE_IMAGE_HEIGHT
+    entry.type = 'image/jpeg'
+  } else if (url.includes('/image/upload/')) {
+    entry.width = OG_IMAGE_WIDTH
+    entry.height = OG_IMAGE_HEIGHT
+    entry.type = 'image/jpeg'
+  }
+  // Local (non-Cloudinary) uploads keep no declared size on purpose: guessing one would be a lie
+  // the crawler may act on, and a wrong `og:image:width` is worse than an absent one.
+
+  return entry
 }
 
 type RichTextNode = {

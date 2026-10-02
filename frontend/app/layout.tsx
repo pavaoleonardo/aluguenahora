@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, socialImageUrl } from "@/lib/site";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, shareImage, socialImageUrl } from "@/lib/site";
 
 // Geist Sans / Geist Mono are now self-hosted from ./fonts (same latin-subset variable fonts,
 // wght 100-900, that next/font/google used to serve — rendering is unchanged). next/font/google
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
-    images: [{ url: socialImageUrl(), alt: SITE_NAME }],
+    images: [shareImage(undefined, SITE_NAME)],
   },
   twitter: {
     card: "summary_large_image",

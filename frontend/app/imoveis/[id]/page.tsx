@@ -1,7 +1,7 @@
 import PropertyDetailClient from '@/components/PropertyDetailClient'
 import { Metadata } from 'next'
 import { api } from '@/lib/api'
-import { SITE_NAME, buildShareTitle, richTextToPlainText, socialImageUrl, truncate } from '@/lib/site'
+import { SITE_NAME, buildShareTitle, richTextToPlainText, shareImage, truncate } from '@/lib/site'
 
 /** Subset of the imóvel payload `generateMetadata` needs (see `populate: '*'` below). */
 type ImovelShareData = {
@@ -114,7 +114,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       // server-rendered HTML only, never from JavaScript.
       const shareTitle = buildShareTitle(imovel);
       const shareDescription = buildShareDescription(imovel, shareTitle);
-      const shareImage = socialImageUrl(imovel.foto_fachada?.url || imovel.fotos?.[0]?.url);
+      // 1200×630 JPEG with `og:image:width`/`height`/`type` declared — the exact shape the
+      // crawlers draw a large card from (see `shareImage` in lib/site.ts).
+      const sharePhoto = shareImage(imovel.foto_fachada?.url || imovel.fotos?.[0]?.url, shareTitle);
       const canonicalPath = `/imoveis/${imovel.documentId || id}`;
 
       return {
@@ -128,13 +130,13 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
           url: canonicalPath,
           title: shareTitle,
           description: shareDescription,
-          images: [{ url: shareImage, alt: shareTitle }],
+          images: [sharePhoto],
         },
         twitter: {
           card: 'summary_large_image',
           title: shareTitle,
           description: shareDescription,
-          images: [shareImage],
+          images: [sharePhoto.url],
         },
       };
     }
@@ -154,7 +156,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       description: 'Imóvel para alugar ou comprar em Campo Grande - MS | Alugue na Hora.',
       // Explicit image: Next replaces (not deep-merges) the layout's openGraph object, so a page
       // that returns one must carry its own image or the card loses its thumbnail.
-      images: [{ url: socialImageUrl(), alt: SITE_NAME }],
+      images: [shareImage(undefined, SITE_NAME)],
     },
   };
 }
