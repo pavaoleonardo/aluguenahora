@@ -1,0 +1,78 @@
+#!/bin/sh
+# Alugue na Hora — pre-commit guard.
+#
+# Purpose: keep documentation and secrets out of a PUBLIC repository for good.
+# This repo already leaked the VPS address and generated-looking production
+# secrets through its history (see SECURITY-ROTATION.md); this hook stops the
+# next one at the source.
+#
+# Source of truth: tools/git-hooks/pre-commit (tracked, contains no secrets).
+# Install:  cp tools/git-hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+# Bypass:   git commit --no-verify   (deliberate, rare, and only after reading the reason)
+
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
+[ -z "$staged" ] && exit 0
+
+fail=0
+
+# ── 1. No markdown, ever ──────────────────────────────────────────────────────
+md=$(printf '%s\n' "$staged" | grep -iE '\.md$' || true)
+if [ -n "$md" ]; then
+  echo "✖ .md files are never committed here (docs stay local: SPEC.md, AGENTS.md, dossiers)."
+  printf '    %s\n' $md
+  fail=1
+fi
+
+# ── 2. No secret-bearing file types ───────────────────────────────────────────
+risky=$(printf '%s\n' "$staged" | grep -iE '(^|/)\.env($|\.)|\.sql$|\.dump$|\.log$|\.pem$|\.p12$|\.crt$|(^|/)id_rsa|id_ed25519|\.sqlite$|(^|/)backup' || true)
+if [ -n "$risky" ]; then
+  echo "✖ secret-bearing file types must stay local (.env*, *.sql, *.log, certs, keys):"
+  printf '    %s\n' $risky
+  fail=1
+fi
+
+# ── 3. No secret-shaped content in the staged diff ────────────────────────────
+# Only the file NAMES are printed, never the matched value.
+diff=$(git diff --cached -U0 --diff-filter=ACMR)
+if [ -n "$diff" ]; then
+  # 3a. assignment of a literal value: 12+ chars incl. a digit, and no dot/brace
+  #     (so `password: formData.password` and `token: ${x}` stay legal, real secrets do not)
+  if printf '%s\n' "$diff" | grep -E '^\+' | grep -iE '(password|passwd|secret|token|api[_-]?key|salt)[^a-zA-Z]{0,4}[:=][[:space:]]*["]?[A-Za-z0-9+/=_-]*[0-9][A-Za-z0-9+/=_-]{5,}' | grep -q .; then
+    echo "✖ the staged diff assigns a secret-shaped literal (value hidden on purpose)."
+    fail=1
+  fi
+  # 3b. hardcoded IPv4 that is not a documented placeholder/loopback
+  if printf '%s\n' "$diff" | grep -nE '^\+' | grep -oE '([0-9]{1,3}\.){3}[0-9]{1,3}' \
+     | grep -vE '^(0\.0\.0\.0|127\.0\.0\.1|255\.255\.255\.255|1\.2\.3\.4)$' | grep -q .; then
+    echo "✖ the staged diff contains a hardcoded IP address (real hosts stay out of git)."
+    fail=1
+  fi
+  # 3c. third-party token formats and key material
+  #     The last alternative is split (`A''AAA`) purely so this hook file does not
+  #     contain its own pattern and trip itself when the hook itself is committed.
+  if printf '%s\n' "$diff" | grep -nE '^\+' | grep -qE 'AKIA[0-9A-Z]{16}|sk_(live|test)_[A-Za-z0-9]{10,}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|xox[baprs]-[A-Za-z0-9-]{10,}|re_[A-Za-z0-9]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY|ssh-rsa A''AAA'; then
+    echo "✖ the staged diff contains a token or private key (never commit these)."
+    fail=1
+  fi
+  if [ "$fail" -ne 0 ]; then
+    echo "  Inspect:  git diff --cached"
+    echo "  Undo:     git restore --staged <file>"
+  fi
+fi
+
+# ── 4. Paths that leaked once already ─────────────────────────────────────────
+leaky=$(printf '%s\n' "$staged" | grep -iE 'PRODUCTION_ENV_TEMPLATE|find-orphan|pull-logs|(^|/)fix-db\.sh|PROJECT_CONTEXT|deploy-to-hostinger|\.antigravity/|^\.agents/' || true)
+if [ -n "$leaky" ]; then
+  echo "✖ these paths put the VPS address/secrets in the public history before:"
+  printf '    %s\n' $leaky
+  fail=1
+fi
+
+if [ "$fail" -ne 0 ]; then
+  echo ""
+  echo "Commit blocked on purpose. Docs, addresses and secrets stay local."
+  echo "Context: SECURITY-ROTATION.md and AGENTS.md (project deltas)."
+  exit 1
+fi
+
+exit 0
