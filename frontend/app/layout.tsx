@@ -53,9 +53,12 @@ export const metadata: Metadata = {
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-// The maintenance shield (components/MaintenanceOverlay.tsx) was retired on 2026-09-30: the public launch is
-// on, so anonymous visitors get the real site. The component file is parked, unused, for a future outage
-// screen — do not re-mount it without updating SPEC.md §3 drift #3 and tools/dev.sh.
+// The maintenance shield is BACK ON (re-enabled 2026-10-02 at the owner's request; the same two lines
+// `0bd967b` removed). It is a client-only component: it returns null once `useAuth().user` exists, so a
+// signed-in visitor never sees it, and it lets `/login*` through so there is always a way in. Because it
+// only renders after mount, the server HTML — and therefore every OG / link-preview crawler — is
+// unaffected (see SPEC.md §3 drift #3 and AGENTS.md D12).
+import MaintenanceOverlay from "@/components/MaintenanceOverlay";
 import { AuthProvider } from "@/context/AuthContext";
 
 export default function RootLayout({
@@ -74,6 +77,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen overflow-x-clip`}
       >
         <AuthProvider>
+          <MaintenanceOverlay />
           <Navbar />
           <main className="flex-1 w-full max-w-full overflow-x-clip">
             {children}
