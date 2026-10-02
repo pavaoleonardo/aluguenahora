@@ -26,6 +26,71 @@ type BootstrapNewsItem = {
   data: string;
 };
 
+/** Public storefront origin — used by the transactional e-mails and the confirmation redirect. */
+const SITE_URL = 'https://aluguenahora.com.br';
+
+/** Verified sender pinned into the plugin store at every boot (same address as config/plugins.ts). */
+const SITE_EMAIL_FROM = { name: 'Alugue na Hora', email: 'noreply@mail.aluguenahora.com.br' };
+
+/**
+ * PT-BR subject + body of the two transactional e-mails the SITE sends, applied on every boot so
+ * the store can never drift back to Strapi's English defaults. Two constraints when editing:
+ *
+ * 1. `@strapi/plugin-users-permissions` renders these with
+ *    `createStrictInterpolationRegExp(keysDeep(data))`, so ONLY the variables its controller passes
+ *    may appear inside `<%= %>`: `URL`, `SERVER_URL`, `ADMIN_URL`, `USER`, `TOKEN` for
+ *    reset-password, and `URL`, `SERVER_URL`, `ADMIN_URL`, `USER`, `CODE` for e-mail confirmation.
+ *    Any other name throws "Invalid email template" and the mail is never sent. For that same
+ *    reason the greeting stays generic instead of reaching for `USER.<field>`: a key path that is
+ *    absent from the sanitised user throws instead of rendering empty.
+ * 2. The rendered result is used as BOTH `text` and `html` (see the plugin's auth controller), so
+ *    the markup stays simple enough to be readable as plain text. The link is a real `<a href>` —
+ *    a bare URL is not clickable in most mail clients (same finding as the admin template in
+ *    config/admin.ts).
+ */
+const siteEmailTemplates = {
+  reset_password: {
+    object: 'Redefinir sua senha — Alugue na Hora',
+    message: [
+      '<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#1f2937">',
+      '  <p>Olá!</p>',
+      '  <p>Recebemos um pedido para redefinir a senha da sua conta no <strong>Alugue na Hora</strong>.</p>',
+      '  <p style="margin:28px 0">',
+      '    <a href="<%= URL %>?code=<%= TOKEN %>"',
+      '       style="background:#f97316;color:#ffffff;padding:12px 22px;border-radius:6px;text-decoration:none;font-weight:bold;display:inline-block">',
+      '      Criar nova senha',
+      '    </a>',
+      '  </p>',
+      '  <p>Se o botão não funcionar, copie este endereço e cole no navegador:</p>',
+      '  <p style="word-break:break-all">',
+      '    <a href="<%= URL %>?code=<%= TOKEN %>" style="color:#2563eb;text-decoration:underline"><%= URL %>?code=<%= TOKEN %></a>',
+      '  </p>',
+      '  <p style="color:#6b7280;font-size:13px">Se você não pediu a redefinição, ignore este e-mail: sua senha continua a mesma.</p>',
+      '</div>',
+    ].join('\n'),
+  },
+  email_confirmation: {
+    object: 'Confirme seu e-mail — Alugue na Hora',
+    message: [
+      '<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#1f2937">',
+      '  <p>Olá!</p>',
+      '  <p>Obrigado por se cadastrar no <strong>Alugue na Hora</strong>. Falta só confirmar o seu e-mail.</p>',
+      '  <p style="margin:28px 0">',
+      '    <a href="<%= URL %>?confirmation=<%= CODE %>"',
+      '       style="background:#f97316;color:#ffffff;padding:12px 22px;border-radius:6px;text-decoration:none;font-weight:bold;display:inline-block">',
+      '      Confirmar meu e-mail',
+      '    </a>',
+      '  </p>',
+      '  <p>Se o botão não funcionar, copie este endereço e cole no navegador:</p>',
+      '  <p style="word-break:break-all">',
+      '    <a href="<%= URL %>?confirmation=<%= CODE %>" style="color:#2563eb;text-decoration:underline"><%= URL %>?confirmation=<%= CODE %></a>',
+      '  </p>',
+      '  <p style="color:#6b7280;font-size:13px">Se você não criou esta conta, ignore este e-mail.</p>',
+      '</div>',
+    ].join('\n'),
+  },
+};
+
 const geocodeAddress = async (
   endereco: string,
   bairro: unknown,
@@ -253,20 +318,39 @@ export default {
           name: 'users-permissions',
         });
 
-        // Email Templates
+        // Email Templates — the SITE's transactional e-mails, forced to PT-BR on every boot.
+        // The bodies live in `siteEmailTemplates` (with the strict-interpolation rules).
         try {
           const templateSettings = (await pluginStore.get({ key: 'email' })) as any;
-          if (templateSettings?.email_confirmation) {
-            templateSettings.email_confirmation.options.from.email = 'noreply@mail.aluguenahora.com.br';
-            templateSettings.email_confirmation.options.from.name = 'Alugue na Hora';
-            templateSettings.email_confirmation.options.response_email = 'noreply@mail.aluguenahora.com.br';
+          let templatesChanged = false;
 
-            templateSettings.reset_password.options.from.email = 'noreply@mail.aluguenahora.com.br';
-            templateSettings.reset_password.options.from.name = 'Alugue na Hora';
-            templateSettings.reset_password.options.response_email = 'noreply@mail.aluguenahora.com.br';
+          for (const [templateKey, content] of Object.entries(siteEmailTemplates)) {
+            const options = templateSettings?.[templateKey]?.options;
 
+            if (!options) {
+              console.warn(
+                `[Bootstrap] E-mail template "${templateKey}" is missing from the plugin store — skipped.`
+              );
+              continue;
+            }
+
+            if (options.object !== content.object || options.message !== content.message) {
+              options.object = content.object;
+              options.message = content.message;
+              templatesChanged = true;
+            }
+
+            // Sender identity is pinned as well: the store value is what Strapi uses at send time,
+            // so it must not depend on a manual edit in the admin panel.
+            options.from = { ...(options.from || {}), ...SITE_EMAIL_FROM };
+            options.response_email = SITE_EMAIL_FROM.email;
+          }
+
+          if (templatesChanged) {
             await pluginStore.set({ key: 'email', value: templateSettings });
-            console.log('✅ [Bootstrap] Email templates re-aligned.');
+            console.log('✅ [Bootstrap] Site e-mail templates set to PT-BR.');
+          } else {
+            console.log('✅ [Bootstrap] Site e-mail templates already in PT-BR.');
           }
         } catch (e: any) {
           console.warn('[Bootstrap] Could not update email templates:', e.message);
@@ -276,7 +360,11 @@ export default {
         try {
           const advancedSettings = (await pluginStore.get({ key: 'advanced' })) as any;
           if (advancedSettings) {
-            advancedSettings.email_confirmation_redirection = 'https://aluguenahora.com.br/login?confirmed=true';
+            advancedSettings.email_confirmation_redirection = `${SITE_URL}/login?confirmed=true`;
+            // Base URL the reset-password e-mail appends `?code=<TOKEN>` to. It was NULL in the
+            // store (measured 2026-10-02), which renders the link as `null?code=…` — a dead link
+            // the site's /nova-senha page can never read.
+            advancedSettings.email_reset_password = `${SITE_URL}/nova-senha`;
             await pluginStore.set({ key: 'advanced', value: advancedSettings });
             console.log('✅ [Bootstrap] Advanced settings re-aligned.');
           }
@@ -393,26 +481,49 @@ export default {
           }
 
           // Heal Users Metadata (Document ID / Locale)
-          const usersMissingDocs = await strapi.db.connection('up_users')
-            .whereNull('document_id')
-            .orWhereNull('locale')
+          //
+          // ⚠️ `plugin::users-permissions.user` is NOT an i18n content type (see
+          // src/extensions/users-permissions/content-types/user/schema.json): its `locale` column
+          // must stay NULL. This block used to end with `locale: user.locale || 'pt-BR'`, and that
+          // one value broke owner linking for EVERY site user: Strapi resolves a relation target as
+          // `documentId + locale`, so a user row reporting `locale = 'pt-BR'` can no longer be
+          // found — the imóvel controller's owner assignment died with
+          //   Document with id "<user documentId>", locale "null" not found
+          // (thrown by @strapi/core document-service transform/data-ids.js) and every listing
+          // created from /dashboard stayed with `usuario: NULL`, invisible in the owner's painel.
+          // Repair (2026-10-02): fill a missing `document_id`, and reset to NULL any row an earlier
+          // boot stamped with a locale. Idempotent — once repaired, this query matches nothing.
+          const usersNeedingHeal = await strapi.db.connection('up_users')
+            .where((builder: any) => builder.whereNull('document_id').orWhereNotNull('locale'))
             .limit(100);
 
-          if (usersMissingDocs.length > 0) {
-            console.log(`🚨 [Bootstrap] Healing ${usersMissingDocs.length} users...`);
-            for (const user of usersMissingDocs) {
+          if (usersNeedingHeal.length > 0) {
+            console.log(`🚨 [Bootstrap] Healing ${usersNeedingHeal.length} user rows (document_id / locale)...`);
+            for (const user of usersNeedingHeal) {
               try {
-                // Determine if we should use ID or some fallback for document_id
-                const docId = user.document_id || require('crypto').randomBytes(12).toString('hex');
                 await strapi.db.connection('up_users')
                   .where({ id: user.id })
                   .update({
-                    document_id: docId,
-                    locale: user.locale || 'pt-BR'
+                    document_id: user.document_id || require('crypto').randomBytes(12).toString('hex'),
+                    locale: null,
                   });
               } catch (e: any) {
                 console.warn(`[Bootstrap] User heal failed (${user.id}):`, e.message);
               }
+            }
+
+            // Verify by re-reading: a log line is not evidence.
+            const stillBroken = await strapi.db.connection('up_users')
+              .where((builder: any) => builder.whereNull('document_id').orWhereNotNull('locale'))
+              .count({ count: '*' });
+            const remaining = Number((stillBroken?.[0] as any)?.count ?? 0);
+
+            if (remaining > 0) {
+              console.error(
+                `❌ [Bootstrap] ${remaining} user rows still have a document_id/locale problem — owner linking will keep failing for them.`
+              );
+            } else {
+              console.log('✅ [Bootstrap] User rows healed (locale back to NULL, document_id present).');
             }
           }
 

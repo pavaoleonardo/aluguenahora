@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, socialImageUrl } from "@/lib/site";
 
 // Geist Sans / Geist Mono are now self-hosted from ./fonts (same latin-subset variable fonts,
 // wght 100-900, that next/font/google used to serve — rendering is unchanged). next/font/google
@@ -25,9 +26,29 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
+  // Absolute-ises relative metadata URLs (canonical, og:image) — WhatsApp ignores relative ones.
+  metadataBase: new URL(SITE_URL),
   title: "Alugue na Hora",
-  description: "Encontre o seu próximo lar! Imóveis para alugar com agilidade e os melhores preços em Campo Grande - MS.",
+  description: SITE_DESCRIPTION,
   keywords: "aluguel, imóveis, campo grande, ms, casa, apartamento, alugar",
+  // Site-wide fallback card: every page gets a thumbnail + description when shared on WhatsApp,
+  // even the ones (home, notícias, sobre) that do not override these fields themselves. The
+  // property page replaces them with the listing's own photo, title and details.
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: [{ url: socialImageUrl(), alt: SITE_NAME }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    images: [socialImageUrl()],
+  },
 };
 
 import Navbar from "@/components/Navbar";

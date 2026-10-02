@@ -227,12 +227,21 @@ export default factories.createCoreController('api::imovel.imovel', ({ strapi })
       // Create using default core logic (handles drafts, data normalization)
       const result = await super.create(ctx);
       
-      // Force assign the current user as the owner using Document API
+      // Force assign the current user as the owner using Document API.
+      //
+      // The owner is connected by NUMERIC id — `ctx.state.user.id`, straight off the row the request
+      // was authorised with — and never by documentId. A documentId relation makes Strapi resolve
+      // the target as `documentId + locale`, which throws
+      //   Document with id "…", locale "null" not found
+      // whenever the target row's `locale` column is not NULL. That is exactly how every listing
+      // created from /dashboard ended up with `usuario: NULL` (diagnosed 2026-10-02, root cause
+      // fixed in the bootstrap heal of src/index.ts). The numeric id needs no lookup and the JWT
+      // strategy already proved the row exists, so it cannot drift.
       if (ctx.state.user && result?.data?.documentId) {
         await strapi.documents('api::imovel.imovel').update({
           documentId: result.data.documentId,
           data: {
-            usuario: ctx.state.user.documentId || ctx.state.user.id
+            usuario: ctx.state.user.id
           },
           status: 'draft', // ensure we update the draft version
         });
