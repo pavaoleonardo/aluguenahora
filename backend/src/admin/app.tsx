@@ -2,6 +2,20 @@ import type { StrapiApp } from '@strapi/strapi/admin';
 import AuthLogo from './extensions/logo.svg';
 import favicon from './extensions/favicon.png';
 
+// WHY THIS LINE EXISTS: Strapi 5.33 serves the admin panel as `<html lang="en">` with no
+// `notranslate` meta, and its `config.head` only supports `favicon`/`title` (no `metas` — checked
+// against the installed `@strapi/admin` types), so the head cannot be extended from here. A pt-BR
+// browser (the owner's and Jack's) therefore gets Chrome's auto-translate, and Chrome's translation
+// rewrites text nodes under React's feet: the panel throws
+// `Failed to execute 'removeChild' on 'Node'` and shows mixed EN/PT strings with changed fonts.
+// `translate="no"` on <html> is the documented opt-out. This runs at admin-bundle load, before
+// React mounts, which is the earliest hook the app exposes — `register`/`bootstrap` are too late.
+// The surgical alternative (a Koa middleware rewriting the admin HTML response) is deliberately NOT
+// used: the served body can be a stream, and breaking the panel is worse than translating it.
+if (typeof document !== 'undefined') {
+  document.documentElement.setAttribute('translate', 'no');
+}
+
 export default {
   config: {
     head: {
