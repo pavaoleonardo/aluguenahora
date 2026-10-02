@@ -183,6 +183,67 @@ export default {
       await next();
     });
 
+    // 0c. Koa Middleware: the SAME explicit feedback for the Strapi ADMIN panel's
+    //     "Esqueceu sua senha?" form (api host /admin). Strapi's admin auth answers
+    //     204 No Content for ANY address (measured on production 2026-10-02), so the
+    //     panel always prints "E-mail enviado" and the owner could not tell whether his
+    //     address is an admin account, or whether the reset mail had silently failed.
+    //     Trade-off accepted here as well (see 0b): this discloses whether an address
+    //     is an admin account. The two message variants matter: typing a SITE e-mail
+    //     (up_users) into the panel is the mistake that screen invites, so it is named.
+    strapi.server.use(async (ctx: any, next: () => Promise<void>) => {
+      if (ctx.request.method !== 'POST' || !ctx.request.url?.includes('/admin/forgot-password')) {
+        return next();
+      }
+
+      // Fail open if the body never reached us: never break the panel's own flow.
+      if (!ctx.request.body || typeof ctx.request.body !== 'object') {
+        return next();
+      }
+
+      const reply = (status: number, name: string, message: string) => {
+        ctx.status = status;
+        ctx.body = { data: null, error: { status, name, message, details: {} } };
+      };
+
+      const rawEmail = typeof ctx.request.body.email === 'string' ? ctx.request.body.email : '';
+      const email = rawEmail.trim().toLowerCase();
+
+      if (!email) {
+        reply(400, 'ApplicationError', 'Informe o e-mail da conta de administrador.');
+        return;
+      }
+
+      const admin = (await strapi.db
+        .query('admin::user')
+        // $eqi, not a plain $eq: a stored address with different casing must never
+        // produce a false "não está cadastrado" on a recovery screen.
+        .findOne({ where: { email: { $eqi: email } } })) as { blocked?: boolean } | null;
+
+      if (!admin) {
+        const siteUser = await strapi.db
+          .query('plugin::users-permissions.user')
+          .findOne({ where: { email: { $eqi: email } } });
+
+        reply(
+          400,
+          'ApplicationError',
+          siteUser
+            ? 'Este e-mail é uma conta do SITE (anunciante/cliente), não do painel. Recupere a senha do site em /esqueci-senha; para o painel, informe o e-mail de um administrador.'
+            : 'Este e-mail não está cadastrado como administrador. Confira o endereço ou peça a outro administrador para redefinir sua senha.'
+        );
+        return;
+      }
+
+      if (admin.blocked) {
+        reply(403, 'ForbiddenError', 'Esta conta de administrador está bloqueada.');
+        return;
+      }
+
+      // Address belongs to an admin: let Strapi send its own reset e-mail.
+      await next();
+    });
+
     // 1. Configure Plugin Settings (Safe Mode)
     void (async () => {
       try {
