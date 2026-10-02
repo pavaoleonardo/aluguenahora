@@ -35,13 +35,20 @@ export default function MaintenanceOverlay() {
 
       <div className="relative z-10 max-w-lg w-full text-center bg-white/5 backdrop-blur-xl border border-white/10 p-10 md:p-16 rounded-[3rem] shadow-2xl">
         <div className="flex items-center justify-center mb-8">
+          {/* Static, already-resized WebP (360x360 for a 180 CSS px box, ~9 KB) instead of the 640x640
+              / 427 KB PNG. Two delays used to stack here: this panel is client-only, so the request
+              only started *after* hydration, and the raw PNG then had to be transcoded on the fly by
+              /_next/image (a cold sharp pass measured at ~1.3 s). layout.tsx now preloads this exact
+              URL, so the download runs in parallel with the JS, and the file needs no processing at
+              all. See SPEC.md §3 drift #3. */}
           <Image 
-            src="/mascot-construction-branded.png" 
+            src="/mascot-construction-branded.webp" 
             alt="Em Construção" 
             width={180} 
             height={180} 
             className="drop-shadow-2xl hover:scale-110 transition-transform duration-500 ease-in-out" 
             priority
+            unoptimized
           />
         </div>
         

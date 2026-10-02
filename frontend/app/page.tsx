@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import PropertyGrid from "@/components/PropertyGrid";
 import SearchBar from "@/components/SearchBar";
 import NewsGrid from "@/components/NewsGrid";
@@ -18,13 +17,24 @@ export default async function Home() {
             
             {/* Background Architecture Photo with deep opacity overlay */}
             <div className="absolute inset-0 z-0">
-                <Image 
-                    src="/modern_facade.jpg" 
-                    alt="Alugue na Hora Background" 
-                    fill 
-                    className="object-cover object-center" 
-                    priority 
-                    unoptimized
+                {/*
+                  A pre-encoded responsive WebP set (public/modern-facade-hero-*.webp, 25-209 KB) rather
+                  than next/image. The master photo is a 7781x5190 / 5.9 MB JPEG, so shipping it whole —
+                  which `unoptimized` did — meant every visitor downloaded ~6 MB just to fill a
+                  background. Only one format is needed, so a plain <img> does the job: `sizes="100vw"`
+                  lets the browser pick the smallest candidate that still covers the viewport (a phone
+                  gets 71 KB, a desktop up to 209 KB), and because this is a server component the tag
+                  lands in the initial HTML, which is what lets the preload scanner start the fetch
+                  immediately. Regenerate the whole set if the master photo is ever replaced.
+                */}
+                {/* eslint-disable-next-line @next/next/no-img-element -- hand-encoded WebP set, deliberate */}
+                <img
+                    src="/modern-facade-hero-1920.webp"
+                    srcSet="/modern-facade-hero-640.webp 640w, /modern-facade-hero-1280.webp 1280w, /modern-facade-hero-1920.webp 1920w, /modern-facade-hero-2560.webp 2560w"
+                    sizes="100vw"
+                    alt="Alugue na Hora Background"
+                    fetchPriority="high"
+                    className="absolute inset-0 h-full w-full object-cover object-center"
                 />
                 {/* Slate overlay: keeps the white/orange headline readable without hiding the house */}
                 <div className="absolute inset-0 bg-slate-900/60 mix-blend-multiply" />

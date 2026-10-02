@@ -72,6 +72,17 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
         <meta httpEquiv="content-language" content="pt" />
         <meta name="google" content="translate" />
+        {/* MaintenanceOverlay is client-only, so its <Image> is only discovered *after* hydration:
+            that serialisation — not the file size — is why the banner's mascot appeared seconds late.
+            Preloading the exact URL the component requests (a static, already-resized WebP that never
+            goes through /_next/image) starts the download alongside the HTML and the JS instead of
+            behind them. ~9 KB, cached for a week by the header rule in next.config.ts. */}
+        <link
+          rel="preload"
+          as="image"
+          href="/mascot-construction-branded.webp"
+          type="image/webp"
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen overflow-x-clip`}

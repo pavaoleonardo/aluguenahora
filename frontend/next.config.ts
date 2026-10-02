@@ -15,6 +15,34 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        // The maintenance banner's mascot (frontend/public/mascot-construction-branded.webp, ~9 KB) is
+        // preloaded by app/layout.tsx, so every visit touches it. Next serves files from /public with
+        // `Cache-Control: public, max-age=0` — a revalidation round trip on every single load — and a
+        // week of freshness removes it. Deliberately not `immutable`: the filename carries no content
+        // hash, so a replaced mascot still has to reach returning visitors within the week.
+        source: '/mascot-construction-branded.webp',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=604800, stale-while-revalidate=86400',
+          },
+        ],
+      },
+      {
+        // The home hero's pre-encoded WebP set (app/page.tsx -> public/modern-facade-hero-*.webp).
+        // Same reasoning as the mascot rule above: these come from /public, so Next's default
+        // `max-age=0` would revalidate a couple hundred KB on every single visit. One week of
+        // freshness, and a re-encoded photo still reaches returning visitors within that week
+        // because the filenames carry no content hash (so: not `immutable`).
+        source: '/modern-facade-hero-:size.webp',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=604800, stale-while-revalidate=86400',
+          },
+        ],
+      },
     ];
   },
   /**
