@@ -26,12 +26,18 @@ const nextConfig: NextConfig = {
    *
    * Next's default list already covers `facebookexternalhit`, `facebookcatalog` and `WhatsApp`, but
    * not the agents Meta uses today (`FacebookBot`, `meta-externalagent`) — those are the additions
-   * at the end. Setting this option *replaces* the default, so the default entries are repeated
-   * verbatim; `Googlebot` is deliberately absent, exactly as in Next's default (its renderer runs
-   * JavaScript and handles streamed HTML).
+   * after the default block. Setting this option *replaces* the default, so the default entries are
+   * repeated verbatim; `Googlebot` is deliberately absent, exactly as in Next's default (its renderer
+   * runs JavaScript and handles streamed HTML).
+   *
+   * The tail adds the remaining non-JS preview fetchers that were falling back to the streamed path:
+   * `Facebot` (Meta's legacy share crawler), `Pinterest`, `Mastodon` and `TelegramBot` (which only
+   * matched by accident before, because its UA string literally contains "(like TwitterBot)").
+   * Verified in production: these agents now receive `og:image` inside `<head>`, while Chrome and
+   * Googlebot keep Next's streamed render.
    */
   htmlLimitedBots:
-    /Mediapartners-Google|Slurp|DuckDuckBot|baiduspider|yandex|sogou|bitlybot|tumblr|vkShare|quora link preview|redditbot|ia_archiver|Bingbot|BingPreview|applebot|facebookexternalhit|facebookcatalog|Twitterbot|LinkedInBot|Slackbot|Discordbot|WhatsApp|SkypeUriPreview|FacebookBot|meta-externalagent|externalagent/i,
+    /Mediapartners-Google|Slurp|DuckDuckBot|baiduspider|yandex|sogou|bitlybot|tumblr|vkShare|quora link preview|redditbot|ia_archiver|Bingbot|BingPreview|applebot|facebookexternalhit|facebookcatalog|Twitterbot|LinkedInBot|Slackbot|Discordbot|WhatsApp|SkypeUriPreview|FacebookBot|meta-externalagent|externalagent|Facebot|Pinterest|TelegramBot|Mastodon/i,
   images: {
     remotePatterns: [
       {
