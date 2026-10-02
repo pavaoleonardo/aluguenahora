@@ -490,6 +490,16 @@ export interface ApiImovelImovel extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     descricao: Schema.Attribute.Blocks;
     endereco: Schema.Attribute.String;
+    estado: Schema.Attribute.Enumeration<
+      [
+        'Novo',
+        'Seminovo',
+        '\u00D3timo',
+        'Bom',
+        'Regular',
+        'Em constru\u00E7\u00E3o',
+      ]
+    >;
     finalidade: Schema.Attribute.Enumeration<['aluguel', 'venda']> &
       Schema.Attribute.Required;
     fotos: Schema.Attribute.Media<'images', true>;
@@ -1053,8 +1063,10 @@ export interface PluginUsersPermissionsUser
   attributes: {
     blocked: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     celular: Schema.Attribute.String;
+    cnpj: Schema.Attribute.String;
     confirmationToken: Schema.Attribute.String & Schema.Attribute.Private;
     confirmed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    cpf: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

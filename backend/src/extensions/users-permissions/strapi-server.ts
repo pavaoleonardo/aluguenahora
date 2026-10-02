@@ -7,6 +7,8 @@
 // The actual custom field handling is done via:
 //   1. Koa middleware in src/index.ts (strips fields BEFORE validation)
 //   2. beforeCreate lifecycle in src/index.ts (re-attaches fields to DB write)
+// The forgot-password guard also lives in src/index.ts as Koa middleware, which
+// runs ahead of this plugin's routes (see the comment there).
 
 export default (plugin: any) => {
   // Remove the strict body schema from the register route so Strapi 5

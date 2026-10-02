@@ -30,9 +30,11 @@ export default function RecoverPasswordPage() {
         throw new Error(data.error?.message || 'Erro ao enviar e-mail de recuperação.')
       }
 
-      setMessage('Um e-mail de recuperação foi enviado se este e-mail estiver cadastrado.')
-    } catch (err: any) {
-      setError(err.message)
+      setMessage(
+        `Enviamos um link de recuperação para ${email}. Confira sua caixa de entrada e o spam.`
+      )
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao enviar e-mail de recuperação.')
     } finally {
       setLoading(false)
     }

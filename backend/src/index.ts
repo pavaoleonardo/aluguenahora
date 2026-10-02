@@ -135,6 +135,54 @@ export default {
       await next();
     });
 
+    // 0b. Koa Middleware: /api/auth/forgot-password may only fire for a REGISTERED,
+    //     active e-mail. Strapi's stock handler answers { ok: true } for ANY address
+    //     (anti enumeration), so an unregistered address got the success screen and
+    //     never an e-mail — the owner hit exactly that while recovering his own
+    //     account and asked for explicit feedback instead. Running as Koa middleware
+    //     keeps it ahead of the route's body validation, so even an empty body gets
+    //     our message. Trade-off: this discloses whether an address has an account
+    //     (rate limiting this route is a follow-up).
+    strapi.server.use(async (ctx: any, next: () => Promise<void>) => {
+      if (ctx.request.method !== 'POST' || !ctx.request.url?.includes('/api/auth/forgot-password')) {
+        return next();
+      }
+
+      const reject = (message: string) => {
+        ctx.status = 400;
+        ctx.body = {
+          data: null,
+          error: { status: 400, name: 'ApplicationError', message, details: {} },
+        };
+      };
+
+      const rawEmail = typeof ctx.request.body?.email === 'string' ? ctx.request.body.email : '';
+      const email = rawEmail.trim().toLowerCase();
+
+      if (!email) {
+        reject('Informe o e-mail cadastrado para receber o link de recuperação.');
+        return;
+      }
+
+      const user = (await strapi.db
+        .query('plugin::users-permissions.user')
+        .findOne({ where: { email } })) as { blocked?: boolean } | null;
+
+      if (!user) {
+        reject('Este e-mail não está cadastrado.');
+        return;
+      }
+
+      if (user.blocked) {
+        reject('Esta conta está bloqueada. Fale com o suporte.');
+        return;
+      }
+
+      // Registered and usable: let Strapi run its own flow, so token generation,
+      // the reset_password template and the plugin store stay canonical.
+      await next();
+    });
+
     // 1. Configure Plugin Settings (Safe Mode)
     void (async () => {
       try {
@@ -271,7 +319,7 @@ export default {
 
         if (hasTable) {
           // Add missing columns only
-          const customFields = ['telefone', 'celular', 'creci', 'nome_imobiliaria', 'nome_completo', 'tipo_usuario', 'locale', 'role'];
+          const customFields = ['telefone', 'celular', 'cpf', 'cnpj', 'creci', 'nome_imobiliaria', 'nome_completo', 'tipo_usuario', 'locale', 'role'];
           for (const fieldName of customFields) {
             const hasCol = await strapi.db.connection.schema.hasColumn('up_users', fieldName);
             if (!hasCol) {
