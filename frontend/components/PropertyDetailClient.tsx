@@ -16,7 +16,7 @@ import {
 import { formatCurrency, formatNumber } from '@/lib/format'
 import { API_BASE_URL } from '@/lib/apiBase'
 import { whatsappLink, whatsappShareLink } from '@/lib/contact'
-import { buildShareTitle, SITE_URL } from '@/lib/site'
+import { buildShareTitle, createShareToken, SITE_URL, whatsappShareUrl } from '@/lib/site'
 import dynamic from 'next/dynamic'
 
 const PropertyMap = dynamic(() => import('@/components/PropertyMap'), {
@@ -72,6 +72,12 @@ export default function PropertyDetailClient({ id }: { id: string }) {
   const [loading, setLoading] = useState(true)
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
   const [shareFeedback, setShareFeedback] = useState<string | null>(null)
+
+  // One nonce for the whole page view, used by the `href` built during render (so unrelated
+  // re-renders do not churn the address). The click-time share path mints its own instead — see
+  // `handleWhatsAppShare` — which is what lets the same page be shared twice with two different
+  // URL strings. See `WHATSAPP_SHARE_TOKEN_PARAM` in lib/site.ts.
+  const [shareToken] = useState(() => createShareToken())
 
   useEffect(() => {
     if (!id || id === 'undefined') {
@@ -152,9 +158,16 @@ export default function PropertyDetailClient({ id }: { id: string }) {
   // Built from SITE_URL + documentId rather than `window.location`, so it is identical during SSR
   // and after hydration, and it is always the canonical address even when the visitor arrived
   // through a legacy numeric-id URL. The `Cód:` stays because the broker quotes it in the reply.
+  //
+  // The URL goes through `whatsappShareUrl` so the message carries the `utm_source=whatsapp`
+  // variant *and* the share nonce: WhatsApp caches a preview against the exact URL string, so only
+  // a string it has never seen gets a *fresh* scrape (and a card) instead of the cached "no
+  // preview" from before the preview tags existed. This render only happens after the client-side
+  // fetch resolved, so the nonce cannot cause an SSR/hydration mismatch.
+  // See `WHATSAPP_SHARE_PARAM` / `WHATSAPP_SHARE_TOKEN_PARAM` in lib/site.ts.
   const propertyUrl = `${SITE_URL}/imoveis/${property.documentId || property.id}`
   const whatsappHref = whatsappLink(
-    `Olá! Tenho interesse no imóvel "${property.titulo}" (Cód: ${property.id}).\n${propertyUrl}`
+    `Olá! Tenho interesse no imóvel "${property.titulo}" (Cód: ${property.id}).\n${whatsappShareUrl(propertyUrl, shareToken)}`
   )
 
   // "Compartilhar" opens a menu with explicit options. WhatsApp comes first because it is
@@ -173,7 +186,15 @@ export default function PropertyDetailClient({ id }: { id: string }) {
 
   const handleWhatsAppShare = () => {
     // No recipient in the URL (`wa.me/?text=`) — WhatsApp asks which contact to send it to.
-    window.open(whatsappShareLink(`${shareText()} ${shareUrl()}`), '_blank', 'noopener,noreferrer')
+    // The link carries `utm_source=whatsapp` for the same reason as the "QUERO ALUGAR" message:
+    // a URL string WhatsApp has never seen is a URL whose preview it has never cached. The nonce
+    // is minted here, at click time, so sharing the same page twice sends two different strings —
+    // the second share cannot inherit the first one's cached verdict.
+    window.open(
+      whatsappShareLink(`${shareText()} ${whatsappShareUrl(shareUrl(), createShareToken())}`),
+      '_blank',
+      'noopener,noreferrer'
+    )
   }
 
   const handleCopyLink = async () => {

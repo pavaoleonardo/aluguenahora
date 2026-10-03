@@ -16,6 +16,68 @@ import { formatCurrency } from '@/lib/format'
 /** Public origin of the storefront, no trailing slash: `https://aluguenahora.com.br`. */
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://aluguenahora.com.br').replace(/\/+$/, '')
 
+/**
+ * Click-attribution query pair appended to every link this app sends **inside a WhatsApp message**.
+ *
+ * WhatsApp does not keep a share debugger: it caches a link preview against the **exact URL
+ * string**, and the answer it keeps is the one from the first time it ever saw that string. Every
+ * listing URL that was forwarded before this project had usable `og:*` tags is therefore stuck on
+ * a cached "no preview" — Facebook's Sharing Debugger looks perfect for the same URL, because
+ * re-scraping there does not touch WhatsApp's cache (verified 2026-10-03: live page serves a full
+ * card — title, description, a 1200×630 / 118 KB JPEG — to the `WhatsApp` user agent, and the
+ * debugger renders it, while the pre-existing link still arrives bare).
+ *
+ * A different string is a different cache entry — and that is the *only* escape hatch, because
+ * editing the tags can never revive a URL string WhatsApp has already answered "no preview" for.
+ * A fixed variant is not enough on its own (see {@link WHATSAPP_SHARE_TOKEN_PARAM}): the first
+ * share that goes out with it poisons that exact string too.
+ *
+ * It doubles as click attribution (WhatsApp is where Brazilian brokers forward listings), and it
+ * stays out of the card's own address: `generateMetadata` canonicalises to the clean
+ * `/imoveis/<documentId>`, and the query is ignored by the route.
+ */
+export const WHATSAPP_SHARE_PARAM = 'utm_source=whatsapp'
+
+/**
+ * Nonce appended by {@link whatsappShareUrl} so every share is a URL string WhatsApp has never
+ * seen and therefore always gets a fresh scrape instead of a cached verdict.
+ *
+ * Evidence this is what breaks shares (nginx access log, 2026-10-03): every string that had been
+ * tried before — the plain listing URL, one with `?v=2`, one with `?utm_source=whatsapp` — came
+ * back 200 with the full ~33 KB HTML and still arrived as a bare link, while fresh strings were
+ * fetched again from the sender's own IP with a `WhatsApp/…` user agent. The card is built by the
+ * **sender's** device, not by Meta's servers, so a single poisoned string follows that link
+ * everywhere it is pasted — including into a chat that never saw it.
+ */
+export const WHATSAPP_SHARE_TOKEN_PARAM = 's'
+
+/**
+ * Unique-enough nonce for one share: base-36 milliseconds plus random bits (~14 chars). Not a
+ * secret and not an auth token — it only has to differ from every string shared before it, which
+ * is what makes WhatsApp re-scrape the card.
+ */
+export function createShareToken(): string {
+  return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`
+}
+
+/**
+ * Returns `url` in the shape that goes inside a WhatsApp message: absolute, tagged with
+ * {@link WHATSAPP_SHARE_PARAM} for attribution and a {@link WHATSAPP_SHARE_TOKEN_PARAM} nonce that
+ * defeats the cached verdict. Existing query values are replaced rather than appended, so a link
+ * forwarded from another WhatsApp message does not accumulate `?utm_source=…&s=…` twice.
+ *
+ * `token` is optional: a caller that builds the URL during render can hold one nonce for the whole
+ * page view (a stable `href`, no churn on unrelated re-renders), while a caller that builds it at
+ * click time simply lets the helper create a fresh one.
+ */
+export function whatsappShareUrl(url: string, token: string = createShareToken()): string {
+  const [sourceName, sourceValue] = WHATSAPP_SHARE_PARAM.split('=')
+  const target = new URL(url, SITE_URL)
+  target.searchParams.set(sourceName, sourceValue)
+  target.searchParams.set(WHATSAPP_SHARE_TOKEN_PARAM, token)
+  return target.toString()
+}
+
 /** Brand name shown by link previews as the site name. */
 export const SITE_NAME = 'Alugue na Hora'
 
