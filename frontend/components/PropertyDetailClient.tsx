@@ -16,7 +16,7 @@ import {
 import { formatCurrency, formatNumber } from '@/lib/format'
 import { API_BASE_URL } from '@/lib/apiBase'
 import { whatsappLink, whatsappShareLink } from '@/lib/contact'
-import { buildShareTitle } from '@/lib/site'
+import { buildShareTitle, SITE_URL } from '@/lib/site'
 import dynamic from 'next/dynamic'
 
 const PropertyMap = dynamic(() => import('@/components/PropertyMap'), {
@@ -145,8 +145,16 @@ export default function PropertyDetailClient({ id }: { id: string }) {
   const valorTotal =
     (Number(property.preco) || 0) + (Number(property.condominio) || 0) + (Number(property.iptu) || 0)
 
+  // The anúncio URL rides inside the message: WhatsApp then builds the very same preview card
+  // (photo + headline + description) it builds for the "Compartilhar" path, and the broker gets a
+  // clickable link back to the listing instead of having to look the Cód up by hand.
+  //
+  // Built from SITE_URL + documentId rather than `window.location`, so it is identical during SSR
+  // and after hydration, and it is always the canonical address even when the visitor arrived
+  // through a legacy numeric-id URL. The `Cód:` stays because the broker quotes it in the reply.
+  const propertyUrl = `${SITE_URL}/imoveis/${property.documentId || property.id}`
   const whatsappHref = whatsappLink(
-    `Olá! Tenho interesse no imóvel "${property.titulo}" (Cód: ${property.id}).`
+    `Olá! Tenho interesse no imóvel "${property.titulo}" (Cód: ${property.id}).\n${propertyUrl}`
   )
 
   // "Compartilhar" opens a menu with explicit options. WhatsApp comes first because it is

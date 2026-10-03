@@ -53,8 +53,15 @@ export const FALLBACK_SHARE_IMAGE_HEIGHT = 800
  * that `f_auto` would hand it), quality-optimised and then cropped around the centre of interest
  * to the card ratio (preview thumbnails have a small byte budget — a 3 MB camera upload is simply
  * dropped by WhatsApp).
+ *
+ * Commas and the quality colon are percent-encoded on purpose. Preview crawlers parse the image
+ * URL with a stricter scanner than a browser, and an unencoded comma inside the path is a known
+ * way to get "image could not be downloaded" back from Meta's fetcher while the card still ships
+ * — with no thumbnail. Cloudinary treats `%2C`/`%3A` exactly like `,`/`:`: same derivative, same
+ * bytes (verified 2026-10-02, 130,325 B both ways), so encoding costs nothing and removes the
+ * ambiguity. Keep the encoding if you touch this line.
  */
-const SHARE_IMAGE_TRANSFORM = `f_jpg,g_auto,q_auto:good,c_fill,w_${OG_IMAGE_WIDTH},h_${OG_IMAGE_HEIGHT}`
+const SHARE_IMAGE_TRANSFORM = `f_jpg%2Cg_auto%2Cq_auto%3Agood%2Cc_fill%2Cw_${OG_IMAGE_WIDTH}%2Ch_${OG_IMAGE_HEIGHT}`
 
 /** Turns a possibly-relative media path into an absolute URL usable inside `og:image`. */
 export function absoluteUrl(pathOrUrl: string): string {
@@ -79,8 +86,14 @@ export function socialImageUrl(rawUrl?: string | null): string {
     : absolute
 }
 
-/** Entry for `openGraph.images`: the preview URL, plus its pixels when we control the crop. */
-type ShareImage = { url: string; alt?: string; width?: number; height?: number; type?: string }
+/**
+ * Entry for `openGraph.images`: the preview URL, plus its pixels when we control the crop.
+ *
+ * `secureUrl` repeats the same URL under Meta's dedicated `og:image:secure_url` tag, which the
+ * older readers of the spec look for; it is only ever filled with an `https://` URL so the tag can
+ * never advertise a plaintext variant that does not exist (in local dev the API host is `http://`).
+ */
+type ShareImage = { url: string; secureUrl?: string; alt?: string; width?: number; height?: number; type?: string }
 
 /**
  * `openGraph.images` descriptor for a media `url`.
@@ -92,6 +105,7 @@ type ShareImage = { url: string; alt?: string; width?: number; height?: number; 
 export function shareImage(rawUrl?: string | null, alt?: string): ShareImage {
   const url = socialImageUrl(rawUrl)
   const entry: ShareImage = { url }
+  if (url.startsWith('https://')) entry.secureUrl = url
   if (alt) entry.alt = alt
 
   if (!rawUrl) {
