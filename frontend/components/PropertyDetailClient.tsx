@@ -67,6 +67,20 @@ type ImovelDetail = {
   vagas?: number
 }
 
+/**
+ * True on phones and tablets — where `wa.me` must not be opened in a popup tab.
+ *
+ * On mobile that URL is a redirect stub that hands the text off to the installed app, so the tab it
+ * opens stays blank (reported 2026-10-03 as "sharing opens a blank page"). Touch points are the
+ * primary signal — no desktop browser reports them — with the UA as a fallback for tablets that
+ * report none.
+ */
+function isHandheldDevice(): boolean {
+  if (typeof navigator === 'undefined') return false
+  if (navigator.maxTouchPoints > 0) return true
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+}
+
 export default function PropertyDetailClient({ id }: { id: string }) {
   const [property, setProperty] = useState<ImovelDetail | null>(null)
   const [loading, setLoading] = useState(true)
@@ -184,17 +198,30 @@ export default function PropertyDetailClient({ id }: { id: string }) {
     setTimeout(() => setShareFeedback(null), 2000)
   }
 
-  const handleWhatsAppShare = () => {
+  const handleWhatsAppShare = async () => {
     // No recipient in the URL (`wa.me/?text=`) — WhatsApp asks which contact to send it to.
     // The link carries `utm_source=whatsapp` for the same reason as the "QUERO ALUGAR" message:
     // a URL string WhatsApp has never seen is a URL whose preview it has never cached. The nonce
     // is minted here, at click time, so sharing the same page twice sends two different strings —
     // the second share cannot inherit the first one's cached verdict.
-    window.open(
-      whatsappShareLink(`${shareText()} ${whatsappShareUrl(shareUrl(), createShareToken())}`),
-      '_blank',
-      'noopener,noreferrer'
-    )
+    const message = `${shareText()} ${whatsappShareUrl(shareUrl(), createShareToken())}`
+
+    // On phones the OS share sheet is strictly better than the `wa.me` popup: it opens the app the
+    // visitor picks (WhatsApp, in practice) directly, while `wa.me` in a new tab only redirects —
+    // leaving a blank tab behind. Same message, same tagged URL string. Desktop keeps the popup,
+    // because a desktop share sheet may offer no WhatsApp at all.
+    if (typeof navigator.share === 'function' && isHandheldDevice()) {
+      try {
+        await navigator.share({ title: shareText(), text: message })
+        return
+      } catch (error) {
+        // A dismissed sheet (AbortError) is not a failure — a fallback popup would be rude.
+        if (error instanceof Error && error.name === 'AbortError') return
+        // Anything else (payload rejected, activation lost): fall through to the `wa.me` link.
+      }
+    }
+
+    window.open(whatsappShareLink(message), '_blank', 'noopener,noreferrer')
   }
 
   const handleCopyLink = async () => {
