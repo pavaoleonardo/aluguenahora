@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import MarketingPage from '@/components/MarketingPage'
+import MarketingPage, { MarketingSection, MarketingStepList } from '@/components/MarketingPage'
 import { whatsappLink } from '@/lib/contact'
 
 // Quadro 2 | Como funciona — copy from the Miro board `21/09/26 RETOMADA`. The words are the board's
@@ -55,31 +55,13 @@ export default function ComoFuncionaPage() {
         },
       ]}
     >
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Para quem quer alugar</h2>
-        <p className="mt-4 text-lg font-semibold text-slate-900">Encontre seu imóvel sem complicação.</p>
-        <p className="mt-2 text-base leading-7 text-slate-600">
-          Pesquise os imóveis disponíveis, escolha o que atende às suas necessidades e faça tudo pelo processo de
-          locação de forma simples:
-        </p>
-
-        <ol className="mt-10 space-y-8">
-          {STEPS.map((step, index) => (
-            <li key={step.title} className="flex gap-5">
-              <span
-                aria-hidden="true"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white"
-              >
-                {index + 1}
-              </span>
-              <div>
-                <h3 className="text-lg font-bold leading-7 text-slate-900">{step.title}</h3>
-                <p className="mt-1 text-base leading-7 text-slate-600">{step.description}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </div>
+      <MarketingSection
+        number="01"
+        title="Para quem quer alugar"
+        intro="Encontre seu imóvel sem complicação. Pesquise os imóveis disponíveis, escolha o que atende às suas necessidades e faça tudo pelo processo de locação de forma simples:"
+      >
+        <MarketingStepList items={STEPS} />
+      </MarketingSection>
     </MarketingPage>
   )
 }
