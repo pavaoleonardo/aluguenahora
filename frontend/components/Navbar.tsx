@@ -73,9 +73,9 @@ export default function Navbar() {
                     />
                   </button>
 
-                  {/* Hover window with the account profiles (Miro 21/09/26). Sits `mt-4` below the
-                      button; the `before` strip keeps that gap hoverable so the window never flickers. */}
-                  <div className="invisible absolute left-0 top-full z-10 mt-4 w-72 origin-top-left translate-y-1 rounded-xl bg-white p-2 opacity-0 shadow-lg ring-1 ring-black/5 transition-all duration-200 before:absolute before:-top-4 before:left-0 before:h-4 before:w-full before:content-[''] group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
+                  {/* Hover window with the account profiles (Miro 21/09/26). Sits `mt-6` (24px) below
+                      the button; the `before` strip keeps that gap hoverable so the window never flickers. */}
+                  <div className="invisible absolute left-0 top-full z-10 mt-6 w-72 origin-top-left translate-y-1 rounded-xl bg-white p-2 opacity-0 shadow-lg ring-1 ring-black/5 transition-all duration-200 before:absolute before:-top-6 before:left-0 before:h-6 before:w-full before:content-[''] group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
                     {USER_PROFILES.map((option) => (
                       <Link
                         key={option.id}
@@ -105,9 +105,9 @@ export default function Navbar() {
                   </Link>
 
                   {/* Hover window with the institutional links (Miro 21/09/26: Quadros 1-4).
-                      CSS-only like the ANUNCIAR window, so it stays keyboard-reachable. Same `mt-4`
+                      CSS-only like the ANUNCIAR window, so it stays keyboard-reachable. Same `mt-6`
                       offset + `before` bridge: a visible gap, no dead zone on the way down. */}
-                  <div className="invisible absolute left-0 top-full z-10 mt-4 w-80 origin-top-left translate-y-1 rounded-xl bg-white p-2 opacity-0 shadow-lg ring-1 ring-black/5 transition-all duration-200 before:absolute before:-top-4 before:left-0 before:h-4 before:w-full before:content-[''] group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
+                  <div className="invisible absolute left-0 top-full z-10 mt-6 w-80 origin-top-left translate-y-1 rounded-xl bg-white p-2 opacity-0 shadow-lg ring-1 ring-black/5 transition-all duration-200 before:absolute before:-top-6 before:left-0 before:h-6 before:w-full before:content-[''] group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
                     {ALUGUE_NA_HORA_LINKS.map((link) => {
                       const Icon = link.icon
                       return (
