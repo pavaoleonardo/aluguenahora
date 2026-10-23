@@ -7,6 +7,7 @@ import { Dialog, DialogPanel } from '@headlessui/react'
 import { Bars3Icon, ChevronDownIcon, XMarkIcon, UserIcon } from '@heroicons/react/24/outline'
 import { useAuth } from '@/context/AuthContext'
 import LoginModal from '@/components/LoginModal'
+import { ALUGUE_NA_HORA_LINKS } from '@/lib/alugueNaHoraLinks'
 import { USER_PROFILES } from '@/lib/userProfiles'
 
 const navigation: { name: string; href: string }[] = [
@@ -84,6 +85,45 @@ export default function Navbar() {
                         <span className="text-xs text-gray-500">{option.description}</span>
                       </Link>
                     ))}
+                  </div>
+                </div>
+              )
+            }
+            if (item.name === 'Alugue na hora') {
+              return (
+                <div key={item.name} className="group relative">
+                  <Link
+                    href={item.href}
+                    className="relative inline-flex items-center text-base font-semibold text-gray-900 transition-all duration-300 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-center"
+                  >
+                    {item.name}
+                    <ChevronDownIcon
+                      aria-hidden="true"
+                      className="ml-1 -mr-1 size-4 text-gray-400 group-hover:text-primary transition-colors"
+                    />
+                  </Link>
+
+                  {/* Hover window with the institutional links (Miro 21/09/26: Quadros 1-4).
+                      CSS-only like the ANUNCIAR window, so it stays keyboard-reachable. */}
+                  <div className="invisible absolute left-0 z-10 mt-2 w-80 origin-top-left translate-y-1 rounded-xl bg-white p-2 opacity-0 shadow-lg ring-1 ring-black/5 transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
+                    {ALUGUE_NA_HORA_LINKS.map((link) => {
+                      const Icon = link.icon
+                      return (
+                        <Link
+                          key={link.id}
+                          href={link.href}
+                          className="group/item flex items-start gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-gray-50"
+                        >
+                          <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-gray-50 text-gray-500 transition-colors group-hover/item:bg-primary/10 group-hover/item:text-primary">
+                            <Icon aria-hidden="true" className="size-4" />
+                          </span>
+                          <span className="flex flex-col gap-0.5">
+                            <span className="text-sm font-bold text-gray-900">{link.title}</span>
+                            <span className="text-xs leading-4 text-gray-500">{link.description}</span>
+                          </span>
+                        </Link>
+                      )
+                    })}
                   </div>
                 </div>
               )
@@ -176,6 +216,35 @@ export default function Navbar() {
                               {option.title}
                             </Link>
                           ))}
+                        </div>
+                      </div>
+                    )
+                  }
+                  if (item.name === 'Alugue na hora') {
+                    return (
+                      <div key={item.name} className="-mx-3">
+                        <Link
+                          href={item.href}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="block px-3 py-2 text-base/7 font-semibold text-gray-900 hover:text-primary transition-colors"
+                        >
+                          {item.name}
+                        </Link>
+                        <div className="space-y-1 pb-2 pl-6">
+                          {ALUGUE_NA_HORA_LINKS.map((link) => {
+                            const Icon = link.icon
+                            return (
+                              <Link
+                                key={link.id}
+                                href={link.href}
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                              >
+                                <Icon aria-hidden="true" className="size-4 shrink-0 text-gray-400" />
+                                {link.title}
+                              </Link>
+                            )
+                          })}
                         </div>
                       </div>
                     )
