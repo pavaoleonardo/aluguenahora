@@ -9,6 +9,10 @@ const navigation = {
     { name: 'Imóveis', href: '/imoveis' },
     { name: 'Anunciar', href: '/dashboard/novo-imovel' },
     { name: 'Sobre', href: '/sobre' },
+    // The other three Miro frames (Quadro 2/4/3) — same pages the "Alugue na hora" dropdown links to.
+    { name: 'Como funciona', href: '/como-funciona' },
+    { name: 'Proprietários', href: '/proprietarios' },
+    { name: 'Corretores', href: '/corretores' },
   ],
   legal: [
     { name: 'Privacidade', href: '#' },

@@ -2,7 +2,8 @@ import Link from 'next/link';
 import PropertyGrid from "@/components/PropertyGrid";
 import SearchBar from "@/components/SearchBar";
 import NewsGrid from "@/components/NewsGrid";
-import { HomeIcon, CurrencyDollarIcon, CheckBadgeIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
+import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import { ALUGUE_NA_HORA_LINKS } from '@/lib/alugueNaHoraLinks';
 
 // Force dynamic rendering to ensure we don't cache 403 errors
 export const dynamic = 'force-dynamic';
@@ -82,52 +83,32 @@ export default async function Home() {
         <PropertyGrid emptyMessage="Nenhum imóvel em destaque encontrado no momento." />
       </div>
 
-      {/* How It Works Section */}
+      {/* How It Works Section — the same four entries as the "Alugue na hora" dropdown, fed by the
+          same array (lib/alugueNaHoraLinks.ts), so the nav and the home page can never list different
+          things. The board's sticky note asks where frames 2–4 live: they are the four pages below. */}
       <div id="como-funciona" className="py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
-                <span className="text-secondary font-semibold tracking-wide text-sm">Passo a passo</span>
-                <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Traga o seu imóvel e Alugue na Hora!</h2>
-                <p className="mt-4 text-lg leading-8 text-slate-600">Transforme seu imóvel vazio em renda imediata.</p>
+                <span className="text-secondary font-semibold tracking-wide text-sm">Alugue na Hora</span>
+                <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Como funciona</h2>
+                <p className="mt-4 text-lg leading-8 text-slate-600">Escolha por onde começar — do primeiro imóvel ao contrato assinado.</p>
             </div>
-            
-            <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-                <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
-                    <div className="relative pl-16 group">
+
+            <dl className="mx-auto mt-16 grid max-w-xl grid-cols-1 gap-x-8 gap-y-12 sm:mt-20 lg:mt-24 lg:max-w-none lg:grid-cols-2 xl:grid-cols-4">
+                {ALUGUE_NA_HORA_LINKS.map((item) => (
+                    <div key={item.id} className="relative pl-16 group">
                         <dt className="text-lg font-bold leading-7 text-slate-900">
                             <div className="absolute left-0 top-0 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
-                                <HomeIcon className="h-6 w-6" aria-hidden="true" />
+                                <item.icon className="h-6 w-6" aria-hidden="true" />
                             </div>
-                            1. Como funciona
+                            <Link href={item.href} className="transition-colors hover:text-primary">
+                                {item.title}
+                            </Link>
                         </dt>
-                        <dd className="mt-2 text-base leading-7 text-slate-600">
-                            Crie sua conta gratuitamente em poucos segundos. Tenha acesso a painéis exclusivos de favoritos e alertas.
-                        </dd>
+                        <dd className="mt-2 text-base leading-7 text-slate-600">{item.description}</dd>
                     </div>
-                    <div className="relative pl-16 group">
-                        <dt className="text-lg font-bold leading-7 text-slate-900">
-                            <div className="absolute left-0 top-0 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
-                                <CheckBadgeIcon className="h-6 w-6" aria-hidden="true" />
-                            </div>
-                            2. Anuncie seu Imóvel
-                        </dt>
-                        <dd className="mt-2 text-base leading-7 text-slate-600">
-                            Utilize nossa busca inteligente para encontrar imóveis ou anuncie o seu com fotos profissionais e descrição detalhada.
-                        </dd>
-                    </div>
-                     <div className="relative pl-16 group">
-                        <dt className="text-lg font-bold leading-7 text-slate-900">
-                            <div className="absolute left-0 top-0 flex h-12 w-12 items-center justify-center rounded-2xl bg-secondary text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
-                                <CurrencyDollarIcon className="h-6 w-6" aria-hidden="true" />
-                            </div>
-                            3. Feche Negócio
-                        </dt>
-                        <dd className="mt-2 text-base leading-7 text-slate-600">
-                            Agende visitas, negocie diretamente pela plataforma e assine o contrato digitalmente. Sem papelada.
-                        </dd>
-                    </div>
-                </dl>
-            </div>
+                ))}
+            </dl>
         </div>
       </div>
 

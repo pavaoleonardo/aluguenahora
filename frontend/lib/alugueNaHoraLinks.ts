@@ -1,8 +1,11 @@
 // Entries of the "Alugue na hora" dropdown (Miro board 21/09/26 RETOMADA: Quadro 1 | Sobre nós,
 // Quadro 2 | Como funciona, Quadro 4 | Sou proprietário, Quadro 3 | Sou corretor(a) / Imobiliária).
-// Shared by the desktop hover window and the mobile drawer in Navbar.tsx so the two surfaces
-// cannot drift apart. Every href is a route or section that already exists — the "never invent a
-// route" rule (SPEC drift #16) applies here as well.
+// Shared by the desktop hover window, the mobile drawer in Navbar.tsx AND the home page's
+// `#como-funciona` section, so the three surfaces cannot drift apart.
+//
+// Each entry now owns a real page with the board's copy: /sobre (Quadro 1), /como-funciona (Quadro 2),
+// /proprietarios (Quadro 4) and /corretores (Quadro 3). The registration forms stay one click away from
+// each page's CTA — the dropdown is the "learn more" surface, not the sign-up one.
 import {
   BriefcaseIcon,
   InformationCircleIcon,
@@ -31,7 +34,7 @@ export const ALUGUE_NA_HORA_LINKS: AlugueNaHoraLink[] = [
     id: 'como-funciona',
     title: 'Como funciona',
     description: 'Da busca ao contrato, em poucos passos',
-    href: '/#como-funciona',
+    href: '/como-funciona',
     icon: SparklesIcon,
   },
   {
@@ -40,7 +43,7 @@ export const ALUGUE_NA_HORA_LINKS: AlugueNaHoraLink[] = [
     id: 'proprietario',
     title: 'Sou proprietário(a)',
     description: 'Anuncie seu próprio imóvel diretamente na plataforma',
-    href: '/registro/proprietario',
+    href: '/proprietarios',
     icon: KeyIcon,
   },
   {
@@ -48,7 +51,7 @@ export const ALUGUE_NA_HORA_LINKS: AlugueNaHoraLink[] = [
     id: 'corretor',
     title: 'Sou corretor(a) / imobiliária',
     description: 'Anuncie imóveis de seus clientes e gerencie sua carteira',
-    href: '/registro/corretor',
+    href: '/corretores',
     icon: BriefcaseIcon,
   },
 ]
