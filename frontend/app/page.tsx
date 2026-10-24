@@ -60,13 +60,13 @@ export default async function Home() {
         </div>
         
         {/* Floating Horizontal Search Bar Overlapping the Wave - Pushed higher up */}
-        <div className="relative z-20 max-w-7xl mx-auto px-6 lg:px-8 -mt-36 md:-mt-48 mb-16">
+        <div className="relative z-20 max-w-7xl mx-auto px-6 lg:px-8 -mt-36 md:-mt-48 mb-10">
              <SearchBar orientation="horizontal" />
         </div>
       </div>
 
       {/* Featured Section */}
-      <div id="destaques" className="mx-auto max-w-7xl px-6 pt-12 pb-24 sm:pt-16 sm:pb-32 lg:px-8 bg-gray-50/50 rounded-3xl mb-8">
+      <div id="destaques" className="mx-auto max-w-7xl px-6 pt-10 pb-16 sm:pt-12 sm:pb-20 lg:px-8 bg-gray-50/50 rounded-3xl mb-6">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
             <div className="max-w-2xl">
                 <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Imóveis em destaque</h2>
@@ -86,7 +86,7 @@ export default async function Home() {
       {/* How It Works Section — the same four entries as the "Alugue na hora" dropdown, fed by the
           same array (lib/alugueNaHoraLinks.ts), so the nav and the home page can never list different
           things. The board's sticky note asks where frames 2–4 live: they are the four pages below. */}
-      <div id="como-funciona" className="py-24 sm:py-32">
+      <div id="como-funciona" className="py-14 sm:py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
                 <span className="text-secondary text-base font-bold tracking-wide sm:text-lg">Alugue na Hora</span>
@@ -117,7 +117,7 @@ export default async function Home() {
       </div>
 
        {/* Newsletter/Blog Preview (Dynamic News) */}
-       <div id="noticias" className="bg-slate-50 py-24 sm:py-32 relative overflow-hidden border-t border-gray-100">
+       <div id="noticias" className="bg-slate-50 py-14 sm:py-20 relative overflow-hidden border-t border-gray-100">
          {/* Background accent */}
          <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-5 pointer-events-none">
             <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-secondary blur-[100px]"></div>
