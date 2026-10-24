@@ -1,11 +1,14 @@
 export default ({ env }) => {
   const isProd = env('NODE_ENV', 'development') === 'production';
-  const frontendUrls = [
-    'http://localhost:3000',
-    'http://127.0.0.1:3000',
+  const productionUrls = [
     'https://aluguenahora.com.br',
     'https://www.aluguenahora.com.br'
   ];
+  // Localhost origins are only accepted outside production: a deployed API must
+  // not let a page served from http://localhost:3000 call it with credentials.
+  const frontendUrls = isProd
+    ? productionUrls
+    : ['http://localhost:3000', 'http://127.0.0.1:3000', ...productionUrls];
 
   return [
     'strapi::logger',
