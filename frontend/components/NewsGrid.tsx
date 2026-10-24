@@ -57,11 +57,34 @@ export default function NewsGrid() {
     }
   }
 
-  const getImageUrl = (url?: string) => {
-    if (!url) return null;
-    if (url.startsWith('http')) return url;
-    if (url.startsWith('/uploads/')) return `${API_BASE_URL}${url}`;
-    return url;
+  // The `imagem` relation on /api/noticias can come back null (the media was detached in Strapi), which
+  // used to leave the card with an icon and no photo at all. Fall back in this order: the media from the
+  // API -> the curated photo of the same article in lib/newsData.ts -> a photo for the category. The icon
+  // only stays as the very last resort, for a category we have never illustrated.
+  const FALLBACK_IMAGES: Record<string, string> = {
+    Valorização: '/news/sao-francisco.png',
+    Investimento: '/news/mercado-cg.png',
+    'Alta Demanda': '/news/agronegocio-ms.png',
+  }
+
+  const getImageUrl = (item: NoticiaData) => {
+    const resolve = (url?: string) => {
+      if (!url) return null;
+      if (url.startsWith('http')) return url;
+      if (url.startsWith('/uploads/')) return `${API_BASE_URL}${url}`;
+      return url;
+    };
+
+    const fromApi = resolve(item.imagem?.url);
+    if (fromApi) return fromApi;
+
+    const curated =
+      initialNews.find((n) => n.documentId === item.documentId) ||
+      initialNews.find((n) => n.titulo === item.titulo);
+    const fromCurated = resolve(curated?.imagem?.url);
+    if (fromCurated) return fromCurated;
+
+    return FALLBACK_IMAGES[item.categoria] ?? null;
   }
 
   if (loading) {
@@ -79,7 +102,7 @@ export default function NewsGrid() {
   return (
     <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-12 lg:mx-0 lg:max-w-none lg:grid-cols-3">
       {news.map((item) => {
-        const imageUrl = getImageUrl(item.imagem?.url);
+        const imageUrl = getImageUrl(item);
         const safeExternalLink = item.link && isSafeExternalLink(item.link) ? item.link : null;
         const href = safeExternalLink || `/noticias/${item.documentId}`;
         return (
