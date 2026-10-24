@@ -89,26 +89,30 @@ export default async function Home() {
       <div id="como-funciona" className="py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
-                <span className="text-secondary font-semibold tracking-wide text-sm">Alugue na Hora</span>
+                <span className="text-secondary text-base font-bold tracking-wide sm:text-lg">Alugue na Hora</span>
                 <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Como funciona</h2>
                 <p className="mt-4 text-lg leading-8 text-slate-600">Escolha por onde começar — do primeiro imóvel ao contrato assinado.</p>
             </div>
 
-            <dl className="mx-auto mt-16 grid max-w-xl grid-cols-1 gap-x-8 gap-y-12 sm:mt-20 lg:mt-24 lg:max-w-none lg:grid-cols-2 xl:grid-cols-4">
+            {/* The whole card is the link, not just its title: the icon, the heading and the description all
+                lead to the same page. `group` drives the icon scale and the heading colour on hover. */}
+            <div className="mx-auto mt-16 grid max-w-xl grid-cols-1 gap-x-8 gap-y-12 sm:mt-20 lg:mt-24 lg:max-w-none lg:grid-cols-2 xl:grid-cols-4">
                 {ALUGUE_NA_HORA_LINKS.map((item) => (
-                    <div key={item.id} className="relative pl-16 group">
-                        <dt className="text-lg font-bold leading-7 text-slate-900">
-                            <div className="absolute left-0 top-0 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
-                                <item.icon className="h-6 w-6" aria-hidden="true" />
-                            </div>
-                            <Link href={item.href} className="transition-colors hover:text-primary">
-                                {item.title}
-                            </Link>
-                        </dt>
-                        <dd className="mt-2 text-base leading-7 text-slate-600">{item.description}</dd>
-                    </div>
+                    <Link
+                        key={item.id}
+                        href={item.href}
+                        className="group relative block rounded-2xl pl-16 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                    >
+                        <div className="absolute left-0 top-0 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
+                            <item.icon className="h-6 w-6" aria-hidden="true" />
+                        </div>
+                        <h3 className="text-lg font-bold leading-7 text-slate-900 transition-colors group-hover:text-primary">
+                            {item.title}
+                        </h3>
+                        <p className="mt-2 text-base leading-7 text-slate-600">{item.description}</p>
+                    </Link>
                 ))}
-            </dl>
+            </div>
         </div>
       </div>
 
