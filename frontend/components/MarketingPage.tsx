@@ -40,17 +40,19 @@ export default function MarketingPage({ kicker, title, lead, actions = [], child
 
       <section className="px-6 py-24 sm:py-32 lg:px-8">
         <div className="mx-auto max-w-3xl">
-          {/* Kicker: uppercase, ruled and bold — the same weight family as every heading on the page. */}
+          {/* Kicker: uppercase, ruled and bold — the same weight family as every heading on the page,
+              one step larger than body copy so it reads as a label and not as small print. */}
           <div className="flex items-center gap-3">
             <span aria-hidden="true" className="h-px w-8 bg-secondary" />
-            <span className="text-sm font-bold uppercase tracking-[0.14em] text-secondary sm:text-base">
+            <span className="text-base font-bold uppercase tracking-[0.14em] text-secondary sm:text-lg">
               {kicker}
             </span>
           </div>
 
           {/* One type scale for every Quadro page: bold and tightly tracked, like the section headings
-              below it, so the hero reads as part of the same page instead of a different treatment. */}
-          <h1 className="mt-6 text-[2.65rem] leading-[1.06] font-bold tracking-[-0.03em] text-slate-900 sm:text-6xl sm:leading-[1.04] lg:text-[4.5rem]">
+              below it. 56px at lg: 72px was reported as "very big" (and 60px at normal weight as "smaller
+              than the paragraph"), so the size is steady and the weight is what carries the hierarchy. */}
+          <h1 className="mt-5 text-[2.25rem] leading-[1.1] font-bold tracking-[-0.03em] text-slate-900 sm:text-5xl sm:leading-[1.08] lg:text-[3.5rem]">
             {title}
           </h1>
 
