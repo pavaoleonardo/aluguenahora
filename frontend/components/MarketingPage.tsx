@@ -40,22 +40,21 @@ export default function MarketingPage({ kicker, title, lead, actions = [], child
 
       <section className="px-6 py-24 sm:py-32 lg:px-8">
         <div className="mx-auto max-w-3xl">
-          {/* Kicker: uppercase, tracked and ruled, the same label device /sobre uses. */}
+          {/* Kicker: uppercase, ruled and bold — the same weight family as every heading on the page. */}
           <div className="flex items-center gap-3">
             <span aria-hidden="true" className="h-px w-8 bg-secondary" />
-            <span className="text-xs font-semibold uppercase tracking-[0.25em] text-secondary sm:text-sm">
+            <span className="text-sm font-bold uppercase tracking-[0.14em] text-secondary sm:text-base">
               {kicker}
             </span>
           </div>
 
-          {/* One type scale for every Quadro page: the headline is large, normal-weight and tightly
-              tracked so it always out-weighs the lead below it. The lead is deliberately smaller and
-              muted — growing it back is exactly what made the titles look small the first time. */}
-          <h1 className="mt-8 text-[2.65rem] leading-[1.05] font-normal tracking-[-0.04em] text-slate-900 sm:text-6xl sm:leading-[1.02] lg:text-[4.5rem]">
+          {/* One type scale for every Quadro page: bold and tightly tracked, like the section headings
+              below it, so the hero reads as part of the same page instead of a different treatment. */}
+          <h1 className="mt-6 text-[2.65rem] leading-[1.06] font-bold tracking-[-0.03em] text-slate-900 sm:text-6xl sm:leading-[1.04] lg:text-[4.5rem]">
             {title}
           </h1>
 
-          <p className="mt-8 max-w-2xl text-base leading-7 text-slate-500 sm:mt-9 sm:text-lg sm:leading-8">{lead}</p>
+          <p className="mt-6 text-lg leading-8 text-slate-600">{lead}</p>
 
           {children ? (
             <div className="mt-16 space-y-16 border-t border-slate-100 pt-12 sm:mt-20 sm:space-y-20 sm:pt-16">

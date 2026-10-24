@@ -23,6 +23,10 @@ export default function Navbar() {
   // Bumped on every open so LoginModal remounts with an empty form (React's "reset state with a key").
   const [loginSession, setLoginSession] = useState(0)
   const { user, logout, loading } = useAuth()
+  // Desktop dropdown currently open ('Anunciar Imóveis' | 'Alugue na hora' | null). Driven by hover and
+  // focus, but closed explicitly on click — a CSS-only `group-hover` panel stayed on screen after the
+  // visitor picked an item, because the pointer was still over the panel.
+  const [openMenu, setOpenMenu] = useState<string | null>(null)
 
   const openLoginModal = () => {
     setMobileMenuOpen(false)
@@ -60,10 +64,23 @@ export default function Navbar() {
           {navigation.map((item) => {
             if (item.name === 'Anunciar Imóveis' && !user) {
               return (
-                <div key={item.name} className="group relative">
+                <div
+                  key={item.name}
+                  className="group relative"
+                  onMouseEnter={() => setOpenMenu(item.name)}
+                  onMouseLeave={() => setOpenMenu(null)}
+                  onFocus={() => setOpenMenu(item.name)}
+                  onBlur={(event) => {
+                    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpenMenu(null)
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Escape') setOpenMenu(null)
+                  }}
+                >
                   <button
                     type="button"
                     aria-haspopup="true"
+                    aria-expanded={openMenu === item.name}
                     className="relative inline-flex items-center text-base font-semibold text-gray-900 transition-all duration-300 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-center cursor-pointer"
                   >
                     {item.name}
@@ -74,12 +91,18 @@ export default function Navbar() {
                   </button>
 
                   {/* Hover window with the account profiles (Miro 21/09/26). Sits `mt-6` (24px) below
-                      the button; the `before` strip keeps that gap hoverable so the window never flickers. */}
-                  <div className="invisible absolute left-0 top-full z-10 mt-6 w-72 origin-top-left translate-y-1 rounded-xl bg-white p-2 opacity-0 shadow-lg ring-1 ring-black/5 transition-all duration-200 before:absolute before:-top-6 before:left-0 before:h-6 before:w-full before:content-[''] group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
+                      the button; the `before` strip keeps that gap hoverable so the window never flickers.
+                      Open state is React state, not `group-hover`, so it closes when an item is clicked. */}
+                  <div
+                    className={`absolute left-0 top-full z-10 mt-6 w-72 origin-top-left rounded-xl bg-white p-2 shadow-lg ring-1 ring-black/5 transition-all duration-200 before:absolute before:-top-6 before:left-0 before:h-6 before:w-full before:content-[''] ${
+                      openMenu === item.name ? 'visible translate-y-0 opacity-100' : 'invisible translate-y-1 opacity-0'
+                    }`}
+                  >
                     {USER_PROFILES.map((option) => (
                       <Link
                         key={option.id}
                         href={option.registerHref}
+                        onClick={() => setOpenMenu(null)}
                         className="flex flex-col gap-0.5 rounded-lg px-3 py-2.5 transition-colors hover:bg-gray-50"
                       >
                         <span className="text-sm font-bold text-gray-900">{option.title}</span>
@@ -92,9 +115,23 @@ export default function Navbar() {
             }
             if (item.name === 'Alugue na hora') {
               return (
-                <div key={item.name} className="group relative">
+                <div
+                  key={item.name}
+                  className="group relative"
+                  onMouseEnter={() => setOpenMenu(item.name)}
+                  onMouseLeave={() => setOpenMenu(null)}
+                  onFocus={() => setOpenMenu(item.name)}
+                  onBlur={(event) => {
+                    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpenMenu(null)
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Escape') setOpenMenu(null)
+                  }}
+                >
                   <Link
                     href={item.href}
+                    aria-expanded={openMenu === item.name}
+                    onClick={() => setOpenMenu(null)}
                     className="relative inline-flex items-center text-base font-semibold text-gray-900 transition-all duration-300 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-full after:h-[2px] after:bg-primary after:scale-x-0 group-hover:after:scale-x-100 after:transition-transform after:duration-300 after:origin-center"
                   >
                     {item.name}
@@ -105,15 +142,20 @@ export default function Navbar() {
                   </Link>
 
                   {/* Hover window with the institutional links (Miro 21/09/26: Quadros 1-4).
-                      CSS-only like the ANUNCIAR window, so it stays keyboard-reachable. Same `mt-6`
-                      offset + `before` bridge: a visible gap, no dead zone on the way down. */}
-                  <div className="invisible absolute left-0 top-full z-10 mt-6 w-80 origin-top-left translate-y-1 rounded-xl bg-white p-2 opacity-0 shadow-lg ring-1 ring-black/5 transition-all duration-200 before:absolute before:-top-6 before:left-0 before:h-6 before:w-full before:content-[''] group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
+                      Same `mt-6` offset + `before` bridge: a visible gap, no dead zone on the way down.
+                      Still keyboard-reachable (focus opens it); state-driven so a click closes it. */}
+                  <div
+                    className={`absolute left-0 top-full z-10 mt-6 w-80 origin-top-left rounded-xl bg-white p-2 shadow-lg ring-1 ring-black/5 transition-all duration-200 before:absolute before:-top-6 before:left-0 before:h-6 before:w-full before:content-[''] ${
+                      openMenu === item.name ? 'visible translate-y-0 opacity-100' : 'invisible translate-y-1 opacity-0'
+                    }`}
+                  >
                     {ALUGUE_NA_HORA_LINKS.map((link) => {
                       const Icon = link.icon
                       return (
                         <Link
                           key={link.id}
                           href={link.href}
+                          onClick={() => setOpenMenu(null)}
                           className="group/item flex items-start gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-gray-50"
                         >
                           <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-gray-50 text-gray-500 transition-colors group-hover/item:bg-primary/10 group-hover/item:text-primary">
