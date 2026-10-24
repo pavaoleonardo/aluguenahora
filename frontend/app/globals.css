@@ -71,3 +71,10 @@ body {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+/* Property gallery filmstrip (moved out of an inline <style> tag) */
+.gallery-filmstrip::-webkit-scrollbar { display: none; }
+.gallery-filmstrip { -ms-overflow-style: none; scrollbar-width: none; }
+.gallery-slide { width: 100%; }
+@media (min-width: 640px) { .gallery-slide { width: 50%; } }
+@media (min-width: 1024px) { .gallery-slide { width: 33.333%; } }

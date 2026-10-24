@@ -31,7 +31,7 @@ type PropertyGalleryProps = {
   video_url?: string
 }
 
-export default function PropertyGallery({ fotos = [], foto_fachada, titulo, finalidadeLabel, video_url }: PropertyGalleryProps) {
+export default function PropertyGallery({ fotos = [], foto_fachada, titulo, video_url }: PropertyGalleryProps) {
   const items: GalleryItem[] = useMemo(() => {
     const allItems: GalleryItem[] = []
 
@@ -87,16 +87,6 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
   const total = items.length
 
   // Each slide is ~33.33% of the container width on desktop, 100% on mobile
-  const scrollToIndex = useCallback((index: number) => {
-    if (!sliderRef.current) return
-    const container = sliderRef.current
-    const slideWidth = container.clientWidth / getVisibleSlides()
-    container.scrollTo({
-      left: slideWidth * index,
-      behavior: 'smooth'
-    })
-  }, [])
-
   const getVisibleSlides = () => {
     if (typeof window === 'undefined') return 3
     if (window.innerWidth < 640) return 1
@@ -310,15 +300,6 @@ export default function PropertyGallery({ fotos = [], foto_fachada, titulo, fina
           </div>
         </div>
       )}
-
-      {/* CSS for filmstrip layout */}
-      <style dangerouslySetInnerHTML={{__html: `
-        .gallery-filmstrip::-webkit-scrollbar { display: none; }
-        .gallery-filmstrip { -ms-overflow-style: none; scrollbar-width: none; }
-        .gallery-slide { width: 100%; }
-        @media (min-width: 640px) { .gallery-slide { width: 50%; } }
-        @media (min-width: 1024px) { .gallery-slide { width: 33.333%; } }
-      `}} />
     </>
   )
 }
