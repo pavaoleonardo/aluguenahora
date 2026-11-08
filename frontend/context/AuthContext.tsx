@@ -26,6 +26,15 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+// The cookie is only a hint so the Next.js proxy can gate /dashboard on the server.
+// It is NOT the credential (the JWT in localStorage is), and Strapi enforces auth on
+// every API call. Secure is applied only on HTTPS so http://localhost keeps working.
+function authCookie(value: string, maxAge: number) {
+  const secure =
+    typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : ''
+  return `token=${value}; path=/; max-age=${maxAge}; SameSite=Lax${secure}`
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [token, setToken] = useState<string | null>(null)
@@ -37,8 +46,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const storedUser = localStorage.getItem('user')
 
     if (storedToken && storedUser) {
-      setToken(storedToken)
-      setUser(JSON.parse(storedUser))
+      try {
+        setToken(storedToken)
+        setUser(JSON.parse(storedUser))
+      } catch {
+        // Corrupted payload: drop it instead of crashing on every page load.
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        document.cookie = authCookie('', 0)
+      }
     }
     setLoading(false)
   }, [])
@@ -49,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('token', newToken)
     localStorage.setItem('user', JSON.stringify(newUser))
     // Also set a cookie so Next.js middleware can protect routes server-side
-    document.cookie = `token=${newToken}; path=/; max-age=2592000; SameSite=Lax`
+    document.cookie = authCookie(newToken, 2592000)
   }
 
   const logout = () => {
@@ -58,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     // Clear the cookie too
-    document.cookie = 'token=; path=/; max-age=0'
+    document.cookie = authCookie('', 0)
     router.push('/sair')
     router.refresh()
   }
