@@ -511,62 +511,54 @@ function Field({
   )
 }
 
+/**
+ * The photo panel's slanted edge. The orange seam uses the *same* shape, so the two can never
+ * drift apart.
+ */
+const WEDGE_CLIP = 'polygon(16% 0, 100% 0, 100% 100%, 0 100%)'
+
 function RegisterBanner({ profile }: { profile: RegisterProfile }) {
-  const { eyebrow, titleLead, titleAccent, subtitle, image, imageAlt } = profile.banner
+  const { eyebrow, titleLead, titleAccent, subtitle, image, imageAlt, imagePosition } = profile.banner
 
   return (
     <header className="relative isolate overflow-hidden bg-white">
-      {/* Photo wedge — desktop only; on phones the text keeps the full width. */}
-      <div className="absolute inset-y-0 right-0 hidden w-[58%] lg:block">
-        <div
-          className="relative h-full w-full"
-          style={{ clipPath: 'polygon(24% 0, 100% 0, 100% 100%, 0 100%)' }}
-        >
+      {/*
+        The orange band is the same slanted shape as the photo, pushed 28px to the left with
+        `-translate-x-7` and painted first — so only a constant-width sliver of it shows along the
+        diagonal, behind the photo. That is deliberate: the accent half of the title is orange too,
+        and a solid orange stripe crossing the text column made those letters vanish
+        ("Propr_etário", "Imob_liária"). Never let this shape reach the text column.
+      */}
+      <div className="absolute inset-y-0 right-0 hidden w-[42%] lg:block">
+        <span aria-hidden className="absolute inset-0 -translate-x-7 bg-secondary" style={{ clipPath: WEDGE_CLIP }} />
+        <div className="absolute inset-0" style={{ clipPath: WEDGE_CLIP }}>
           <Image
             src={image}
             alt={imageAlt}
             fill
             priority
-            sizes="(min-width: 1024px) 58vw, 100vw"
+            sizes="42vw"
             className="object-cover"
+            style={{ objectPosition: imagePosition ?? 'center' }}
           />
-          <span aria-hidden className="absolute inset-0 bg-gradient-to-r from-white via-white/30 to-transparent" />
+          <span aria-hidden className="absolute inset-0 bg-gradient-to-r from-white via-white/25 to-transparent" />
         </div>
         <span
           aria-hidden
-          className="absolute bottom-0 left-0 h-20 w-32 bg-primary"
+          className="absolute bottom-0 left-0 h-20 w-36 bg-primary"
           style={{ clipPath: 'polygon(0 100%, 100% 100%, 100% 0)' }}
         />
       </div>
 
-      {/* Orange chevron riding the diagonal. */}
-      <span
-        aria-hidden
-        className="absolute right-[53%] top-0 hidden h-full w-28 bg-secondary lg:block"
-        style={{ clipPath: 'polygon(58% 0, 100% 0, 42% 100%, 0 100%)' }}
-      />
-
-      <div className="relative mx-auto flex max-w-5xl flex-col gap-6 px-4 pb-10 pt-8 sm:px-6 lg:pb-16 lg:pt-10">
-        <Link
-          href="/"
-          className="inline-flex w-fit items-center rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-        >
-          <Image
-            src="/logo.svg"
-            alt="Alugue na Hora"
-            width={200}
-            height={62}
-            className="h-11 w-auto sm:h-12"
-            priority
-          />
-        </Link>
-
-        <div className="max-w-xl">
-          <h1 className="text-3xl font-extrabold leading-[1.1] tracking-tight text-primary sm:text-4xl lg:text-[2.9rem]">
+      {/* No logo here: the site Navbar already renders it, and a second one 60px below read as a
+          duplicated header. */}
+      <div className="relative mx-auto max-w-5xl px-4 pb-10 pt-10 sm:px-6 lg:pb-16 lg:pt-14">
+        <div className="lg:max-w-[30rem]">
+          <p className="text-sm font-bold uppercase tracking-[0.24em] text-slate-500 sm:text-base">{eyebrow}</p>
+          <h1 className="mt-3 text-3xl font-extrabold leading-[1.08] tracking-tight text-primary sm:text-4xl lg:text-[2.75rem]">
             {titleLead} <span className="text-secondary">{titleAccent}</span>
           </h1>
-          <p className="mt-3 text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">{eyebrow}</p>
-          <p className="mt-3 max-w-md text-sm leading-relaxed text-slate-600 sm:text-base">{subtitle}</p>
+          <p className="mt-4 max-w-md text-sm leading-relaxed text-slate-600 sm:text-base">{subtitle}</p>
         </div>
       </div>
     </header>

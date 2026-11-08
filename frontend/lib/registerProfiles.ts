@@ -64,6 +64,8 @@ export interface RegisterProfile {
     subtitle: string
     image: string
     imageAlt: string
+    /** CSS `object-position` for the banner photo, e.g. `'55% 40%'`. Defaults to `center`. */
+    imagePosition?: string
   }
   sections: readonly RegisterSection[]
   consents: readonly RegisterConsent[]
@@ -134,6 +136,7 @@ export const REGISTER_CORRETOR: RegisterProfile = {
       'Preencha seus dados para começar a anunciar e administrar imóveis na plataforma Alugue na Hora.',
     image: '/img-2.jpg',
     imageAlt: 'Corretor de imóveis usando o celular',
+    imagePosition: '45% 32%',
   },
   sections: [
     personalDataSection(1),
@@ -202,6 +205,7 @@ export const REGISTER_IMOBILIARIA: RegisterProfile = {
       'Preencha os dados da sua imobiliária para começar a anunciar e administrar imóveis na plataforma Alugue na Hora.',
     image: '/modern-facade-hero-1280.webp',
     imageAlt: 'Imobiliária parceira do Alugue na Hora',
+    imagePosition: '55% 45%',
   },
   sections: [
     {
@@ -283,8 +287,9 @@ export const REGISTER_PROPRIETARIO: RegisterProfile = {
     titleLead: 'Cadastro de',
     titleAccent: 'Proprietário',
     subtitle: 'Preencha seus dados para começar a anunciar seu imóvel.',
-    image: '/og-default.jpg',
-    imageAlt: 'Casa moderna anunciada no Alugue na Hora',
+    image: '/registro/proprietario.webp',
+    imageAlt: 'Sala de estar de um imóvel anunciado no Alugue na Hora',
+    imagePosition: '65% 50%',
   },
   sections: [
     personalDataSection(1),
