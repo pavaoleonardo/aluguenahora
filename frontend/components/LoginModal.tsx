@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
 import {
   BuildingOffice2Icon,
+  BuildingStorefrontIcon,
   EyeIcon,
   EyeSlashIcon,
   HomeModernIcon,
@@ -16,6 +17,7 @@ import { USER_PROFILES, type UserProfileId } from '@/lib/userProfiles'
 const PROFILE_ICONS: Record<UserProfileId, typeof HomeModernIcon> = {
   proprietario: HomeModernIcon,
   corretor: BuildingOffice2Icon,
+  imobiliaria: BuildingStorefrontIcon,
 }
 
 /**

@@ -7,16 +7,48 @@ sharp.concurrency(1);
 sharp.cache(false);
 
 type BootstrapContext = { strapi: Core.Strapi };
-type RegistrationState = {
-  telefone?: string;
-  celular?: string;
-  cpf?: string;
-  cnpj?: string;
-  creci?: string;
-  nome_imobiliaria?: string;
-  nome_completo?: string;
-  tipo_usuario?: string;
-};
+/**
+ * Custom `up_users` attributes written by the public registration flow.
+ * ONE list on purpose: the Koa middleware that strips them before Strapi's Yup
+ * validation, the `beforeCreate` writer and the boot-time column healer all read
+ * from it, so a new form field is one line here plus the matching attribute in
+ * `src/extensions/users-permissions/content-types/user/schema.json`.
+ * Everything is a string because the healer creates `varchar(255)` columns.
+ */
+const REGISTRATION_FIELDS = [
+  'nome_completo',
+  'cpf',
+  'rg',
+  'data_nascimento',
+  'creci',
+  'creci_uf',
+  'nome_profissional',
+  'vinculo_profissional',
+  'nome_imobiliaria',
+  'creci_imobiliaria',
+  'razao_social',
+  'nome_fantasia',
+  'cnpj',
+  'inscricao_estadual',
+  'data_fundacao',
+  'site',
+  'representante_nome',
+  'representante_cargo',
+  'representante_cpf',
+  'representante_rg',
+  'representante_data_nascimento',
+  'telefone',
+  'celular',
+  'telefone_alternativo',
+  'cep',
+  'logradouro',
+  'numero',
+  'complemento',
+  'bairro',
+  'cidade',
+  'estado',
+  'tipo_usuario',
+] as const;
 
 type BootstrapNewsItem = {
   titulo: string;
@@ -147,19 +179,17 @@ const geocodeAddress = async (
   return null;
 };
 
-const applyRegistrationFields = (data: Record<string, unknown>, custom?: RegistrationState) => {
+const applyRegistrationFields = (data: Record<string, unknown>, custom?: Record<string, unknown>) => {
   if (!custom) {
     return;
   }
 
-  if (custom.telefone) data.telefone = custom.telefone;
-  if (custom.celular) data.celular = custom.celular;
-  if (custom.cpf) data.cpf = custom.cpf;
-  if (custom.cnpj) data.cnpj = custom.cnpj;
-  if (custom.creci) data.creci = custom.creci;
-  if (custom.nome_imobiliaria) data.nome_imobiliaria = custom.nome_imobiliaria;
-  if (custom.nome_completo) data.nome_completo = custom.nome_completo;
-  if (custom.tipo_usuario) data.tipo_usuario = custom.tipo_usuario;
+  for (const field of REGISTRATION_FIELDS) {
+    const value = custom[field];
+    if (typeof value === 'string' && value.length > 0) {
+      data[field] = value;
+    }
+  }
 };
 
 export default {
@@ -176,7 +206,7 @@ export default {
     //    This runs before the router, so the body is clean when Yup validates it.
     //    The custom fields are stashed on ctx.state.customRegistration for the
     //    beforeCreate lifecycle hook to pick up and write to the database.
-    const CUSTOM_FIELDS = ['telefone', 'celular', 'cpf', 'cnpj', 'creci', 'nome_imobiliaria', 'nome_completo', 'tipo_usuario'];
+    const CUSTOM_FIELDS = REGISTRATION_FIELDS;
 
     strapi.server.use(async (ctx: any, next: () => Promise<void>) => {
       if (
@@ -468,7 +498,7 @@ export default {
 
         if (hasTable) {
           // Add missing columns only
-          const customFields = ['telefone', 'celular', 'cpf', 'cnpj', 'creci', 'nome_imobiliaria', 'nome_completo', 'tipo_usuario', 'locale', 'role'];
+          const customFields = [...REGISTRATION_FIELDS, 'locale', 'role'];
           for (const fieldName of customFields) {
             const hasCol = await strapi.db.connection.schema.hasColumn('up_users', fieldName);
             if (!hasCol) {

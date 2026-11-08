@@ -89,7 +89,7 @@ export default function DashboardPage() {
                 Olá{user?.nome_completo ? `, ${user.nome_completo.split(' ')[0]}` : ''}! 👋
               </h1>
               <p className="mt-1 text-sm text-gray-500 font-medium">
-                {user?.tipo_usuario === 'corretor' 
+                {user?.tipo_usuario === 'corretor' || user?.tipo_usuario === 'imobiliaria' 
                   ? `Painel do corretor ${user?.creci ? `(CRECI: ${user.creci})` : ''}`
                   : 'Painel do proprietário'}
               </p>

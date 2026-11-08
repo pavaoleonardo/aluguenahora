@@ -83,13 +83,86 @@
       "type": "enumeration",
       "enum": [
         "proprietario",
-        "corretor"
+        "corretor",
+        "imobiliaria"
       ]
     },
     "creci": {
       "type": "string"
     },
     "nome_imobiliaria": {
+      "type": "string"
+    },
+    "rg": {
+      "type": "string"
+    },
+    "data_nascimento": {
+      "type": "string"
+    },
+    "creci_uf": {
+      "type": "string"
+    },
+    "nome_profissional": {
+      "type": "string"
+    },
+    "vinculo_profissional": {
+      "type": "string"
+    },
+    "creci_imobiliaria": {
+      "type": "string"
+    },
+    "telefone_alternativo": {
+      "type": "string"
+    },
+    "cep": {
+      "type": "string"
+    },
+    "logradouro": {
+      "type": "string"
+    },
+    "numero": {
+      "type": "string"
+    },
+    "complemento": {
+      "type": "string"
+    },
+    "bairro": {
+      "type": "string"
+    },
+    "cidade": {
+      "type": "string"
+    },
+    "estado": {
+      "type": "string"
+    },
+    "razao_social": {
+      "type": "string"
+    },
+    "nome_fantasia": {
+      "type": "string"
+    },
+    "inscricao_estadual": {
+      "type": "string"
+    },
+    "data_fundacao": {
+      "type": "string"
+    },
+    "site": {
+      "type": "string"
+    },
+    "representante_nome": {
+      "type": "string"
+    },
+    "representante_cargo": {
+      "type": "string"
+    },
+    "representante_cpf": {
+      "type": "string"
+    },
+    "representante_rg": {
+      "type": "string"
+    },
+    "representante_data_nascimento": {
       "type": "string"
     }
   }

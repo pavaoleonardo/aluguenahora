@@ -1,8 +1,9 @@
-// Account profiles of Alugue na Hora (2 types only — see SPEC.md §3).
-// Shared by the ANUNCIAR hover window (Navbar) and the ENTRAR modal (LoginModal),
-// which the Miro board (21/09/26 RETOMADA) defines as "the same model".
+// Account profiles of Alugue na Hora (3 types — see SPEC.md §3).
+// Shared by the ANUNCIAR hover window (Navbar), the mobile drawer and the ENTRAR
+// modal (LoginModal): every one of them maps over USER_PROFILES, so adding a
+// profile here is the only edit a new account type needs.
 
-export type UserProfileId = 'proprietario' | 'corretor'
+export type UserProfileId = 'proprietario' | 'corretor' | 'imobiliaria'
 
 export interface UserProfileOption {
   id: UserProfileId
@@ -20,8 +21,14 @@ export const USER_PROFILES: UserProfileOption[] = [
   },
   {
     id: 'corretor',
-    title: 'Sou corretor(a) / imobiliária',
+    title: 'Sou corretor(a)',
     description: 'Anuncie imóveis de seus clientes e gerencie sua carteira',
     registerHref: '/registro/corretor',
+  },
+  {
+    id: 'imobiliaria',
+    title: 'Sou imobiliária',
+    description: 'Cadastre sua imobiliária e administre o portfólio da equipe',
+    registerHref: '/registro/imobiliaria',
   },
 ]

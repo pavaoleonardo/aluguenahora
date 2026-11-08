@@ -9,7 +9,7 @@ interface User {
   username: string
   email: string
   nome_completo?: string
-  tipo_usuario?: 'corretor' | 'proprietario'
+  tipo_usuario?: 'corretor' | 'imobiliaria' | 'proprietario'
   creci?: string
   nome_imobiliaria?: string
   telefone?: string

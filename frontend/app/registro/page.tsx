@@ -59,6 +59,25 @@ export default function RegistroPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Link>
+
+            {/* Opção 3 — Imobiliária (PJ) */}
+            <Link
+              href="/registro/imobiliaria"
+              className="group flex items-center gap-5 w-full p-5 rounded-xl border-2 border-gray-200 hover:border-accent hover:bg-accent/5 transition-all duration-200 cursor-pointer"
+            >
+              <div className="flex-shrink-0 w-14 h-14 rounded-full bg-accent/10 group-hover:bg-accent/20 flex items-center justify-center transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 21h18M5 21V7l7-4 7 4v14M9 10h1m-1 4h1m4-4h1m-1 4h1M10 21v-4h4v4" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <p className="font-bold text-gray-900 group-hover:text-accent transition-colors text-base">Sou imobiliária</p>
+                <p className="text-sm text-gray-500 mt-0.5 leading-snug">Cadastre sua imobiliária, organize o portfólio da equipe e anuncie todos os imóveis em um só lugar.</p>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400 group-hover:text-accent ml-auto flex-shrink-0 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
           </div>
 
           <p className="shrink text-gray-500 text-center text-sm md:text-base mt-10">
