@@ -66,7 +66,10 @@ export default ({ env }) => ({
     encryptionKey: env('ENCRYPTION_KEY'),
   },
   flags: {
-    nps: env.bool('FLAG_NPS', true),
-    promoteEE: env.bool('FLAG_PROMOTE_EE', true),
+    nps: env.bool('FLAG_NPS', false),
+    // promoteEE = the "upgrade to Growth / EE" nudges in the admin. The licence behind
+    // them belongs to a cancelled subscription that can no longer be validated, so the
+    // prompts only ever show a broken "Unknown" state (see config/plugins.ts).
+    promoteEE: env.bool('FLAG_PROMOTE_EE', false),
   },
 });
