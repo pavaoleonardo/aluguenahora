@@ -53,12 +53,6 @@ export const metadata: Metadata = {
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-// The maintenance shield is BACK ON (re-enabled 2026-10-02 at the owner's request; the same two lines
-// `0bd967b` removed). It is a client-only component: it returns null once `useAuth().user` exists, so a
-// signed-in visitor never sees it, and it lets `/login*` through so there is always a way in. Because it
-// only renders after mount, the server HTML — and therefore every OG / link-preview crawler — is
-// unaffected (see SPEC.md §3 drift #3 and AGENTS.md D12).
-import MaintenanceOverlay from "@/components/MaintenanceOverlay";
 import { AuthProvider } from "@/context/AuthContext";
 
 export default function RootLayout({
@@ -72,23 +66,11 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
         <meta httpEquiv="content-language" content="pt" />
         <meta name="google" content="translate" />
-        {/* MaintenanceOverlay is client-only, so its <Image> is only discovered *after* hydration:
-            that serialisation — not the file size — is why the banner's mascot appeared seconds late.
-            Preloading the exact URL the component requests (a static, already-resized WebP that never
-            goes through /_next/image) starts the download alongside the HTML and the JS instead of
-            behind them. ~9 KB, cached for a week by the header rule in next.config.ts. */}
-        <link
-          rel="preload"
-          as="image"
-          href="/mascot-construction-branded.webp"
-          type="image/webp"
-        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen overflow-x-clip`}
       >
         <AuthProvider>
-          <MaintenanceOverlay />
           <Navbar />
           <main className="flex-1 w-full max-w-full overflow-x-clip">
             {children}
