@@ -108,7 +108,7 @@ const addressSection = (step: number, title: string): RegisterSection => ({
 
 const passwordSection = (step: number): RegisterSection => ({
   step,
-  title: 'Segurança da conta',
+  title: 'Segurança da Conta',
   fields: [
     { name: 'password', label: 'Criar senha', type: 'password', icon: 'lock', required: true, placeholder: 'Digite sua senha', span: 3 },
     { name: 'confirmar_senha', label: 'Confirmar senha', type: 'password', icon: 'lock', required: true, placeholder: 'Confirme sua senha', span: 3 },
@@ -117,7 +117,7 @@ const passwordSection = (step: number): RegisterSection => ({
 
 const personalDataSection = (step: number): RegisterSection => ({
   step,
-  title: 'Dados pessoais',
+  title: 'Dados Pessoais',
   fields: [
     { name: 'nome_completo', label: 'Nome completo', icon: 'user', required: true, placeholder: 'Digite seu nome completo', span: 3 },
     { name: 'cpf', label: 'CPF', mask: 'cpf', icon: 'id', required: true, placeholder: '000.000.000-00', span: 3 },
@@ -142,7 +142,7 @@ export const REGISTER_CORRETOR: RegisterProfile = {
     personalDataSection(1),
     {
       step: 2,
-      title: 'Dados profissionais',
+      title: 'Dados Profissionais',
       fields: [
         { name: 'creci', label: 'Número do CRECI', icon: 'id', required: true, placeholder: 'Digite seu número de registro', span: 3 },
         { name: 'creci_uf', label: 'UF do CRECI', icon: 'map', type: 'select', required: true, placeholder: 'Selecione a UF', options: UF_LIST, span: 3 },
@@ -152,10 +152,10 @@ export const REGISTER_CORRETOR: RegisterProfile = {
         { name: 'creci_imobiliaria', label: 'CRECI da imobiliária (se vinculado)', icon: 'id', placeholder: 'Número do CRECI da imobiliária (opcional)', span: 3 },
       ],
     },
-    addressSection(3, 'Endereço residencial'),
+    addressSection(3, 'Endereço Residencial'),
     {
       step: 4,
-      title: 'Informações de contato',
+      title: 'Informações de Contato',
       fields: [
         { name: 'email', label: 'E-mail', type: 'email', icon: 'mail', required: true, placeholder: 'seu@email.com', span: 2 },
         { name: 'celular', label: 'Telefone celular / WhatsApp', mask: 'phone', icon: 'phone', required: true, placeholder: '(00) 00000-0000', span: 2 },
@@ -210,7 +210,7 @@ export const REGISTER_IMOBILIARIA: RegisterProfile = {
   sections: [
     {
       step: 1,
-      title: 'Dados da empresa',
+      title: 'Dados da Empresa',
       fields: [
         { name: 'razao_social', label: 'Razão Social', icon: 'building', required: true, placeholder: 'Digite a razão social da empresa', span: 3 },
         { name: 'nome_fantasia', label: 'Nome Fantasia (opcional)', icon: 'building', placeholder: 'Digite o nome fantasia', span: 3 },
@@ -220,7 +220,7 @@ export const REGISTER_IMOBILIARIA: RegisterProfile = {
     },
     {
       step: 2,
-      title: 'Dados profissionais',
+      title: 'Dados Profissionais',
       fields: [
         { name: 'creci', label: 'CRECI PJ', icon: 'id', required: true, placeholder: 'Número do CRECI da imobiliária', span: 3 },
         { name: 'creci_uf', label: 'UF do CRECI', icon: 'map', type: 'select', required: true, placeholder: 'Selecione a UF', options: UF_LIST, span: 3 },
@@ -230,7 +230,7 @@ export const REGISTER_IMOBILIARIA: RegisterProfile = {
     },
     {
       step: 3,
-      title: 'Representante legal / responsável',
+      title: 'Representante Legal / Responsável',
       fields: [
         { name: 'representante_nome', label: 'Nome completo', icon: 'user', required: true, placeholder: 'Digite o nome completo', span: 3 },
         { name: 'representante_cargo', label: 'Cargo / Função', icon: 'briefcase', required: true, placeholder: 'Ex.: Sócio, Diretor, Administrador', span: 3 },
@@ -239,10 +239,10 @@ export const REGISTER_IMOBILIARIA: RegisterProfile = {
         { name: 'representante_data_nascimento', label: 'Data de nascimento (opcional)', type: 'date', icon: 'calendar', span: 2 },
       ],
     },
-    addressSection(4, 'Endereço comercial'),
+    addressSection(4, 'Endereço Comercial'),
     {
       step: 5,
-      title: 'Informações de contato',
+      title: 'Informações de Contato',
       fields: [
         { name: 'email', label: 'E-mail', type: 'email', icon: 'mail', required: true, placeholder: 'seu@empresa.com.br', span: 2 },
         { name: 'telefone', label: 'Telefone comercial', mask: 'phone', icon: 'phone', required: true, placeholder: '(00) 0000-0000', span: 2 },
@@ -286,17 +286,17 @@ export const REGISTER_PROPRIETARIO: RegisterProfile = {
     eyebrow: 'Pessoa física',
     titleLead: 'Cadastro de',
     titleAccent: 'Proprietário',
-    subtitle: 'Preencha seus dados para começar a anunciar seu imóvel.',
+    subtitle: 'Preencha seus dados para criar sua conta e começar a anunciar seu imóvel.',
     image: '/registro/proprietario.webp',
     imageAlt: 'Sala de estar de um imóvel anunciado no Alugue na Hora',
     imagePosition: '65% 50%',
   },
   sections: [
     personalDataSection(1),
-    addressSection(2, 'Endereço residencial'),
+    addressSection(2, 'Endereço Residencial'),
     {
       step: 3,
-      title: 'Informações de contato',
+      title: 'Informações de Contato',
       fields: [
         { name: 'email', label: 'E-mail', type: 'email', icon: 'mail', required: true, placeholder: 'seu@email.com', span: 2 },
         { name: 'celular', label: 'Telefone celular / WhatsApp', mask: 'phone', icon: 'phone', required: true, placeholder: '(00) 00000-0000', span: 2 },

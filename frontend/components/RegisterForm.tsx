@@ -1,6 +1,13 @@
 'use client'
 
-import { useCallback, useMemo, useState, type ClipboardEvent as ReactClipboardEvent, type FormEvent } from 'react'
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type ClipboardEvent as ReactClipboardEvent,
+  type FormEvent,
+} from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import {
@@ -8,6 +15,7 @@ import {
   BuildingOffice2Icon,
   CalendarDaysIcon,
   CheckCircleIcon,
+  ChevronDownIcon,
   DocumentTextIcon,
   EnvelopeIcon,
   EyeIcon,
@@ -15,11 +23,14 @@ import {
   GlobeAltIcon,
   HomeIcon,
   IdentificationIcon,
+  InformationCircleIcon,
   LockClosedIcon,
   MagnifyingGlassIcon,
   MapIcon,
   MapPinIcon,
   PhoneIcon,
+  ShieldCheckIcon,
+  UserGroupIcon,
   UserIcon,
   UserPlusIcon,
 } from '@heroicons/react/24/outline'
@@ -133,9 +144,10 @@ function validatePassword(password: string): string | null {
  * Miro board 11/11/2026, "Exemplos de Validações": the messages live **under the field** that
  * failed, not only in the banner at the top. Wording is the client's, verbatim.
  */
-const CPF_MESSAGE = 'Informe um CPF válido (11 dígitos).'
+/* "(11 números)", not "(11 dígitos)": that is the wording the board's CPF example prints. */
+const CPF_MESSAGE = 'Informe um CPF válido (11 números).'
 const CPF_INVALID_MESSAGE = 'Informe um CPF válido.'
-const CNPJ_MESSAGE = 'Informe um CNPJ válido (14 dígitos).'
+const CNPJ_MESSAGE = 'Informe um CNPJ válido (14 números).'
 const CNPJ_INVALID_MESSAGE = 'Informe um CNPJ válido.'
 const REQUIRED_MESSAGE = 'Campo obrigatório.'
 const PASSWORD_MISMATCH_MESSAGE = 'As senhas não coincidem.'
@@ -202,6 +214,15 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
   const [success, setSuccess] = useState(false)
   const [pendingConfirmation, setPendingConfirmation] = useState(false)
   const [loading, setLoading] = useState(false)
+  /*
+   * Mobile accordion: the board's phone mock shows the five sections as collapsible rows with
+   * chevrons. Section 1 starts open so a phone does not land on a form with nothing to fill;
+   * desktop ignores this state entirely (every body carries `lg:block`).
+   */
+  const [openSections, setOpenSections] = useState<number[]>(() => [1])
+
+  const toggleSection = (step: number) =>
+    setOpenSections((prev) => (prev.includes(step) ? prev.filter((value) => value !== step) : [...prev, step]))
 
   const fieldsByName = useMemo(() => {
     const map: Record<string, RegisterField> = {}
@@ -211,37 +232,91 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
     return map
   }, [profile.sections])
 
+  /** Field name -> its section step, so a failed submit can open the collapsed block it lives in. */
+  const stepByField = useMemo(() => {
+    const map: Record<string, number> = {}
+    for (const section of profile.sections) {
+      for (const field of section.fields) map[field.name] = section.step
+    }
+    return map
+  }, [profile.sections])
+
+  /**
+   * Fields the visitor has already left at least once. From that moment on they re-check on every
+   * keystroke — the board's "Exibir mensagens de validação em tempo real".
+   */
+  const touched = useRef<Set<string>>(new Set())
+
+  /**
+   * One field's message from an **explicit** value snapshot: reading `values` from the closure
+   * would lag one keystroke behind when called from `setField`. `null` = nothing to report, and
+   * empty fields stay silent outside submit on purpose — otherwise tabbing through the form on a
+   * phone paints every field red.
+   */
+  const fieldMessage = useCallback(
+    (name: string, raw: string, snapshot: Record<string, string>): string | null => {
+      const field = fieldsByName[name]
+      if (!field) return null
+      const value = raw.trim()
+      if (!value) return null
+      if (field.type === 'password') {
+        if (name === 'confirmar_senha') {
+          return snapshot.password !== snapshot.confirmar_senha ? PASSWORD_MISMATCH_MESSAGE : null
+        }
+        return validatePassword(value)
+      }
+      return maskError(field, value)
+    },
+    [fieldsByName],
+  )
+
   const setField = (name: string, value: string) => {
     const field = fieldsByName[name]
-    setValues((prev) => ({ ...prev, [name]: field ? applyMask(field, value) : value }))
-    // Typing clears the red mark on that field only — the rest of the form keeps its messages.
+    const nextValue = field ? applyMask(field, value) : value
+    const snapshot = { ...values, [name]: nextValue }
+    setValues(snapshot)
+
+    /*
+     * Real-time validation, part two: once a field has been left, every keystroke re-evaluates it,
+     * so a wrong value stops being wrong the instant it is corrected (and vice versa). Fields the
+     * visitor has not reached yet are only cleared, never newly marked.
+     */
+    const updates: Record<string, string | null> = {
+      [name]: touched.current.has(name) ? fieldMessage(name, nextValue, snapshot) : null,
+    }
+    // The two password fields depend on each other: fixing one re-checks the other.
+    if (name === 'password' && touched.current.has('confirmar_senha')) {
+      updates.confirmar_senha = fieldMessage('confirmar_senha', snapshot.confirmar_senha ?? '', snapshot)
+    }
+    if (name === 'confirmar_senha' && touched.current.has('password')) {
+      updates.password = fieldMessage('password', snapshot.password ?? '', snapshot)
+    }
+
     setFieldErrors((prev) => {
-      if (!prev[name]) return prev
-      const next = { ...prev }
-      delete next[name]
-      return next
+      let changed = false
+      const updated = { ...prev }
+      for (const [key, message] of Object.entries(updates)) {
+        if (message) {
+          if (updated[key] !== message) {
+            updated[key] = message
+            changed = true
+          }
+        } else if (updated[key]) {
+          delete updated[key]
+          changed = true
+        }
+      }
+      return changed ? updated : prev
     })
   }
 
   /*
    * Live validation (board `11/11/2026`, *Exemplos de Validações*): leaving a field that has
-   * something in it prints the message immediately, without waiting for the button. Empty fields
-   * stay silent on purpose — otherwise tabbing through the form on a phone paints it all red.
+   * something in it prints the message immediately, without waiting for the button.
    */
   const validateOnBlur = (name: string) => {
-    const field = fieldsByName[name]
-    if (!field) return
-    const raw = (values[name] ?? '').trim()
-    let message: string | null = null
-    if (field.type === 'password') {
-      if (name === 'confirmar_senha') {
-        if (raw && values.password !== values.confirmar_senha) message = PASSWORD_MISMATCH_MESSAGE
-      } else if (raw) {
-        message = validatePassword(raw)
-      }
-    } else if (raw) {
-      message = maskError(field, raw)
-    }
+    touched.current.add(name)
+    const message = fieldMessage(name, values[name] ?? '', values)
     setFieldErrors((prev) => {
       if (message) return prev[name] === message ? prev : { ...prev, [name]: message }
       if (!prev[name]) return prev
@@ -277,7 +352,7 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
 
   /*
    * Miro board 11/11/2026, "Exemplos de Validações" → the third example is the *positive* one:
-   * a green "Senhas seguras" tick once the password meets the rule and both fields agree. It is
+   * a green "Senhas iguais." tick once the password meets the rule and both fields agree. It is
    * evaluated while typing, so the visitor sees the form react before pressing the button.
    */
   const passwordsSecure =
@@ -323,12 +398,19 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
         .flatMap((section) => section.fields)
         .find((field) => nextFieldErrors[field.name])
       if (firstInvalid) {
-        document.getElementById(firstInvalid.name)?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+        // Same reason: the failing field may be inside a collapsed mobile section.
+        const step = stepByField[firstInvalid.name]
+        if (step) setOpenSections((prev) => (prev.includes(step) ? prev : [...prev, step]))
+        window.requestAnimationFrame(() => {
+          document.getElementById(firstInvalid.name)?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+        })
       }
       return
     }
 
     if (missingConsent) {
+      // The consent block is a collapsible section on a phone: open it, or the message has nowhere to land.
+      setOpenSections((prev) => (prev.includes(consentStep) ? prev : [...prev, consentStep]))
       setError('Você deve aceitar todas as declarações obrigatórias.')
       return
     }
@@ -419,8 +501,9 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
           <p className="mt-3 text-sm leading-relaxed text-slate-600">
             Suas informações foram enviadas para análise.
           </p>
-          <p className="mt-1 text-sm leading-relaxed text-slate-600">
-            Nossa equipe entrará em contato em até 24 horas.
+          <p className="mt-4 flex items-start gap-2 rounded-xl bg-primary/5 px-4 py-3 text-left text-sm leading-relaxed text-slate-600">
+            <InformationCircleIcon className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <span>Nossa equipe entrará em contato em até 24 horas.</span>
           </p>
           {pendingConfirmation && (
             <p className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-xs leading-relaxed text-slate-500">
@@ -466,21 +549,82 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
           </div>
         )}
 
-        {profile.sections.map((section) => (
-          <section
-            key={section.step}
-            className="rounded-2xl border border-slate-100 bg-white p-5 shadow-[0_6px_24px_rgba(15,23,42,0.06)] sm:p-7"
-          >
-            <header className="mb-5 flex items-center gap-4">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-secondary text-lg font-bold text-white">
-                {section.step}
+        {/*
+          Board 11/11/2026 desktop mock: three reassurance cards sit beside the personal-data block.
+          Copy verbatim, except the board's "Sua informações" — an obvious typo, rendered as "Suas".
+        */}
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {[
+            {
+              icon: ShieldCheckIcon,
+              title: 'Cadastro seguro',
+              text: 'Seus dados são tratados com segurança.',
+            },
+            {
+              icon: LockClosedIcon,
+              title: 'Dados protegidos',
+              text: 'Suas informações não são compartilhadas.',
+            },
+            {
+              icon: UserGroupIcon,
+              title: 'Análise pela equipe',
+              text: 'Seu cadastro será avaliado por nossa equipe.',
+            },
+          ].map((item) => (
+            <li
+              key={item.title}
+              className="flex items-start gap-3 rounded-xl border border-slate-100 bg-white px-4 py-3 shadow-[0_4px_16px_rgba(15,23,42,0.05)]"
+            >
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary/5">
+                <item.icon className="h-5 w-5 text-primary" aria-hidden="true" />
               </span>
-              <h2 className="text-base font-extrabold uppercase tracking-wide text-primary sm:text-xl">
-                {section.title}
-              </h2>
-            </header>
+              <div>
+                <p className="text-sm font-bold text-primary">{item.title}</p>
+                <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{item.text}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
+        {profile.sections.map((section) => {
+          const isOpen = openSections.includes(section.step)
+          const bodyId = `section-${section.step}`
+          return (
+            <section
+              key={section.step}
+              className="rounded-2xl border border-slate-100 bg-white p-5 shadow-[0_6px_24px_rgba(15,23,42,0.06)] sm:p-7"
+            >
+              {/*
+                Board 11/11/2026: `01 Dados Pessoais` — a small orange number beside the title, and on
+                the phone each block is a collapsible row with a chevron (that is the phone mock). The
+                desktop mock shows every section open, so the collapsed body carries `lg:block` and the
+                toggle simply cannot hide anything on a wide screen.
+              */}
+              <header className={isOpen ? 'mb-5' : 'lg:mb-5'}>
+                <h2>
+                  <button
+                    type="button"
+                    onClick={() => toggleSection(section.step)}
+                    aria-expanded={isOpen}
+                    aria-controls={bodyId}
+                    className="flex w-full items-center gap-3 text-left"
+                  >
+                    <span className="text-sm font-extrabold tracking-[0.08em] text-secondary">
+                      {String(section.step).padStart(2, '0')}
+                    </span>
+                    <span className="text-base font-extrabold text-primary sm:text-lg">{section.title}</span>
+                    <ChevronDownIcon
+                      aria-hidden="true"
+                      className={`ml-auto h-5 w-5 shrink-0 text-slate-400 transition-transform lg:hidden ${
+                        isOpen ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                </h2>
+              </header>
+
+              <div id={bodyId} className={isOpen ? 'block' : 'hidden lg:block'}>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
               {section.fields.map((field) => (
                 <Field
                   key={field.name}
@@ -495,69 +639,95 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
                   onTogglePassword={() => setShowPassword((prev) => !prev)}
                 />
               ))}
-            </div>
+                </div>
 
-            {section.fields.some((field) => field.type === 'password') && (
-              <div className="mt-4 space-y-2">
-                <p className="flex items-start gap-2 text-xs leading-relaxed text-slate-500 sm:text-sm">
-                  <LockClosedIcon className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" aria-hidden="true" />
-                  <span>Use uma senha longa e exclusiva. Recomendamos pelo menos 15 caracteres.</span>
-                </p>
-                {passwordsSecure && (
-                  <p
-                    role="status"
-                    className="flex items-center gap-2 text-xs font-bold text-emerald-600 sm:text-sm"
-                  >
-                    <CheckCircleIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
-                    Senhas seguras
-                  </p>
+                {section.fields.some((field) => field.type === 'password') && (
+                  <div className="mt-4 space-y-2">
+                    {/* The board puts this tip behind an ⓘ, not a padlock. */}
+                    <p className="flex items-start gap-2 text-xs leading-relaxed text-slate-500 sm:text-sm">
+                      <InformationCircleIcon
+                        className="mt-0.5 h-4 w-4 shrink-0 text-slate-400"
+                        aria-hidden="true"
+                      />
+                      <span>Use uma senha longa e exclusiva. Recomendamos pelo menos 15 caracteres.</span>
+                    </p>
+                    {/* Board's third example, the positive one: green check + "Senhas iguais." */}
+                    {passwordsSecure && (
+                      <p
+                        role="status"
+                        className="flex items-center gap-2 text-xs font-bold text-emerald-600 sm:text-sm"
+                      >
+                        <CheckCircleIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                        Senhas iguais.
+                      </p>
+                    )}
+                  </div>
                 )}
               </div>
-            )}
-          </section>
-        ))}
+            </section>
+          )
+        })}
 
         <section className="rounded-2xl border border-slate-100 bg-white p-5 shadow-[0_6px_24px_rgba(15,23,42,0.06)] sm:p-7">
-          <header className="mb-5 flex items-center gap-4">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-secondary text-lg font-bold text-white">
-              {consentStep}
-            </span>
-            <h2 className="text-base font-extrabold uppercase tracking-wide text-primary sm:text-xl">
-              Confirmações e autorizações
+          <header className={openSections.includes(consentStep) ? 'mb-5' : 'lg:mb-5'}>
+            <h2>
+              <button
+                type="button"
+                onClick={() => toggleSection(consentStep)}
+                aria-expanded={openSections.includes(consentStep)}
+                aria-controls={`section-${consentStep}`}
+                className="flex w-full items-center gap-3 text-left"
+              >
+                <span className="text-sm font-extrabold tracking-[0.08em] text-secondary">
+                  {String(consentStep).padStart(2, '0')}
+                </span>
+                <span className="text-base font-extrabold text-primary sm:text-lg">Confirmações</span>
+                <ChevronDownIcon
+                  aria-hidden="true"
+                  className={`ml-auto h-5 w-5 shrink-0 text-slate-400 transition-transform lg:hidden ${
+                    openSections.includes(consentStep) ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
             </h2>
           </header>
 
-          <ul className="space-y-3">
-            {profile.consents.map((consent) => (
-              <li key={consent.name}>
-                <label className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-slate-600">
-                  <input
-                    type="checkbox"
-                    checked={consents[consent.name] ?? false}
-                    onChange={(event) =>
-                      setConsents((prev) => ({ ...prev, [consent.name]: event.target.checked }))
-                    }
-                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-secondary focus:ring-secondary"
-                  />
-                  <span>
-                    {consent.parts.map((part, index) =>
-                      typeof part === 'string' ? (
-                        <span key={`${consent.name}-${index}`}>{part}</span>
-                      ) : (
-                        <Link
-                          key={`${consent.name}-${index}`}
-                          href={part.href}
-                          className="font-semibold text-primary underline decoration-primary/30 underline-offset-2 hover:decoration-primary"
-                        >
-                          {part.label}
-                        </Link>
-                      ),
-                    )}
-                  </span>
-                </label>
-              </li>
-            ))}
-          </ul>
+          <div
+            id={`section-${consentStep}`}
+            className={openSections.includes(consentStep) ? 'block' : 'hidden lg:block'}
+          >
+            <ul className="space-y-3">
+              {profile.consents.map((consent) => (
+                <li key={consent.name}>
+                  <label className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-slate-600">
+                    <input
+                      type="checkbox"
+                      checked={consents[consent.name] ?? false}
+                      onChange={(event) =>
+                        setConsents((prev) => ({ ...prev, [consent.name]: event.target.checked }))
+                      }
+                      className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-secondary focus:ring-secondary"
+                    />
+                    <span>
+                      {consent.parts.map((part, index) =>
+                        typeof part === 'string' ? (
+                          <span key={`${consent.name}-${index}`}>{part}</span>
+                        ) : (
+                          <Link
+                            key={`${consent.name}-${index}`}
+                            href={part.href}
+                            className="font-semibold text-primary underline decoration-primary/30 underline-offset-2 hover:decoration-primary"
+                          >
+                            {part.label}
+                          </Link>
+                        ),
+                      )}
+                    </span>
+                  </label>
+                  </li>
+              ))}
+            </ul>
+          </div>
         </section>
 
         <button
@@ -569,7 +739,11 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
           {loading ? 'Enviando...' : profile.submitLabel}
         </button>
 
-        <p className="text-center text-xs leading-relaxed text-slate-500">{profile.footerNote}</p>
+        {/* Board: the 24-hour note sits behind an ⓘ inside a soft box, under the button. */}
+        <p className="flex items-start justify-center gap-2 rounded-xl bg-primary/5 px-4 py-3 text-xs leading-relaxed text-slate-600">
+          <InformationCircleIcon className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+          <span>{profile.footerNote}</span>
+        </p>
 
         <p className="text-center text-sm text-slate-500">
           Já tem uma conta?{' '}
@@ -736,11 +910,16 @@ function Field({
           </button>
         )}
       </div>
-      {error && (
+      {error ? (
         <p id={errorId} role="alert" className="mt-1.5 text-xs font-semibold text-red-600">
           {error}
         </p>
-      )}
+      ) : isCep ? (
+        /* Board 11/11/2026, green arrow #3: the hint sits under the CEP field itself. */
+        <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
+          Digite o CEP para preencher o endereço automaticamente.
+        </p>
+      ) : null}
     </div>
   )
 }
@@ -795,9 +974,12 @@ function RegisterBanner({ profile }: { profile: RegisterProfile }) {
           <p className="mt-4 max-w-md text-sm leading-relaxed text-slate-600 sm:text-base">{subtitle}</p>
           {/* Miro board 11/11/2026 — the green arrow under the title ("fazer as inclusões nas setas
               verde") points at this line, and the mobile mock carries it too. */}
-          <p className="mt-2 text-xs leading-relaxed text-slate-500 sm:text-sm">
-            Os campos com <span className="font-bold text-secondary">*</span> são obrigatórios. Leva apenas alguns
-            minutos.
+          <p className="mt-2 flex items-start gap-2 text-xs leading-relaxed text-slate-500 sm:text-sm">
+            <InformationCircleIcon className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" aria-hidden="true" />
+            <span>
+              Os campos com <span className="font-bold text-secondary">*</span> são obrigatórios. Leva apenas
+              alguns minutos.
+            </span>
           </p>
         </div>
       </div>
