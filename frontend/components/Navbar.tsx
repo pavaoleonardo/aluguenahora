@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Dialog, DialogPanel } from '@headlessui/react'
@@ -27,11 +27,53 @@ export default function Navbar() {
   // focus, but closed explicitly on click — a CSS-only `group-hover` panel stayed on screen after the
   // visitor picked an item, because the pointer was still over the panel.
   const [openMenu, setOpenMenu] = useState<string | null>(null)
+  // Mobile drawer sub-panels ('Anunciar Imóveis' | 'Alugue na hora' | null). Deliberately separate from
+  // `openMenu`: the drawer only exists below `lg`, and reusing the desktop state would let a hover on a
+  // wide screen decide what the phone panel shows.
+  const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(null)
+
+  const openMobileMenu = () => {
+    setOpenMobileGroup(null)
+    setMobileMenuOpen(true)
+  }
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false)
+    setOpenMobileGroup(null)
+  }
 
   const openLoginModal = () => {
-    setMobileMenuOpen(false)
+    closeMobileMenu()
     setLoginSession((session) => session + 1)
     setLoginOpen(true)
+  }
+
+  // Mobile drawer accordion row. Until this change the two sub-lists were printed unconditionally, so the
+  // drawer opened with every link already expanded; the label now toggles the panel (and nothing
+  // navigates away), matching the click-to-open behaviour the desktop panels use (D20). A closed panel is
+  // `hidden` rather than unmounted so `aria-controls` always points at a real node.
+  const mobileGroupRow = (name: string, panelId: string, links: ReactNode) => {
+    const isOpen = openMobileGroup === name
+    return (
+      <div key={name} className="-mx-3">
+        <button
+          type="button"
+          onClick={() => setOpenMobileGroup(isOpen ? null : name)}
+          aria-expanded={isOpen}
+          aria-controls={panelId}
+          className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-base/7 font-semibold text-gray-900 hover:bg-gray-50 transition-colors"
+        >
+          {name}
+          <ChevronDownIcon
+            aria-hidden="true"
+            className={`size-5 shrink-0 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          />
+        </button>
+        <div id={panelId} className={isOpen ? 'space-y-1 pb-2 pl-6' : 'hidden'}>
+          {links}
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -53,7 +95,7 @@ export default function Navbar() {
         <div className="flex lg:hidden">
           <button
             type="button"
-            onClick={() => setMobileMenuOpen(true)}
+            onClick={openMobileMenu}
             className="inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
           >
             <span className="sr-only">Open main menu</span>
@@ -216,7 +258,7 @@ export default function Navbar() {
           )}
         </div>
       </nav>
-      <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
+      <Dialog open={mobileMenuOpen} onClose={closeMobileMenu} className="lg:hidden">
         <div className="fixed inset-0 z-50" />
         <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">
@@ -232,7 +274,7 @@ export default function Navbar() {
             </Link>
             <button
               type="button"
-              onClick={() => setMobileMenuOpen(false)}
+              onClick={closeMobileMenu}
               className="-m-2.5 rounded-md p-2.5 text-gray-700"
             >
               <span className="sr-only">Close menu</span>
@@ -244,60 +286,46 @@ export default function Navbar() {
               <div className="space-y-2 py-6">
                 {navigation.map((item) => {
                   if (item.name === 'Anunciar Imóveis' && !user) {
-                    return (
-                      <div key={item.name} className="-mx-3">
-                        <div className="px-3 py-2 text-base/7 font-semibold text-gray-900">
-                          {item.name}
-                        </div>
-                        <div className="pl-6 space-y-1 pb-2">
-                          {USER_PROFILES.map((option) => (
-                            <Link
-                              key={option.id}
-                              href={option.registerHref}
-                              onClick={() => setMobileMenuOpen(false)}
-                              className="block rounded-lg px-3 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
-                            >
-                              {option.title}
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
+                    return mobileGroupRow(
+                      item.name,
+                      'mobile-anunciar-imoveis',
+                      USER_PROFILES.map((option) => (
+                        <Link
+                          key={option.id}
+                          href={option.registerHref}
+                          onClick={closeMobileMenu}
+                          className="block rounded-lg px-3 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                        >
+                          {option.title}
+                        </Link>
+                      )),
                     )
                   }
                   if (item.name === 'Alugue na hora') {
-                    return (
-                      <div key={item.name} className="-mx-3">
-                        <Link
-                          href={item.href}
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="block px-3 py-2 text-base/7 font-semibold text-gray-900 hover:text-primary transition-colors"
-                        >
-                          {item.name}
-                        </Link>
-                        <div className="space-y-1 pb-2 pl-6">
-                          {ALUGUE_NA_HORA_LINKS.map((link) => {
-                            const Icon = link.icon
-                            return (
-                              <Link
-                                key={link.id}
-                                href={link.href}
-                                onClick={() => setMobileMenuOpen(false)}
-                                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
-                              >
-                                <Icon aria-hidden="true" className="size-4 shrink-0 text-gray-400" />
-                                {link.title}
-                              </Link>
-                            )
-                          })}
-                        </div>
-                      </div>
+                    return mobileGroupRow(
+                      item.name,
+                      'mobile-alugue-na-hora',
+                      ALUGUE_NA_HORA_LINKS.map((link) => {
+                        const Icon = link.icon
+                        return (
+                          <Link
+                            key={link.id}
+                            href={link.href}
+                            onClick={closeMobileMenu}
+                            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                          >
+                            <Icon aria-hidden="true" className="size-4 shrink-0 text-gray-400" />
+                            {link.title}
+                          </Link>
+                        )
+                      }),
                     )
                   }
                   return (
                     <Link
                       key={item.name}
                       href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
+                      onClick={closeMobileMenu}
                       className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50 hover:text-gray-900 transition-colors"
                     >
                       {item.name}
@@ -312,7 +340,7 @@ export default function Navbar() {
                       <div className="flex flex-wrap items-center gap-2 rounded-full border border-gray-200 bg-gray-100 px-4 py-2 text-sm text-gray-700">
                         <Link
                           href="/dashboard"
-                          onClick={() => setMobileMenuOpen(false)}
+                          onClick={closeMobileMenu}
                           className="font-semibold text-gray-900 hover:text-primary transition-colors"
                         >
                           Painel
@@ -323,7 +351,7 @@ export default function Navbar() {
                         <button
                           onClick={() => {
                             logout()
-                            setMobileMenuOpen(false)
+                            closeMobileMenu()
                           }}
                           className="font-semibold text-red-600 hover:text-red-700 transition-colors"
                         >
@@ -335,7 +363,7 @@ export default function Navbar() {
                     <>
                       <Link
                         href="/registro"
-                        onClick={() => setMobileMenuOpen(false)}
+                        onClick={closeMobileMenu}
                         className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold text-gray-900 hover:bg-gray-50 transition-colors"
                       >
                         Cadastrar
