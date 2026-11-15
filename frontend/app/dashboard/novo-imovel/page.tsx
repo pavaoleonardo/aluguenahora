@@ -54,12 +54,12 @@ const VIDEO_MAX_MB = 60;
 const SECTIONS = [
   {
     step: 1,
-    title: 'Tipo e finalidade',
+    title: 'Tipo e endereço',
     hint: 'O que você anuncia, onde o imóvel fica e o endereço usado no mapa.',
   },
   {
     step: 2,
-    title: 'Características e medidas',
+    title: 'Características do imóvel',
     hint: 'Como o imóvel aparece na busca: título, descrição, cômodos, áreas e características.',
   },
   {
@@ -85,6 +85,9 @@ const SECTIONS = [
 ] as const
 
 const TOTAL_STEPS = SECTIONS.length
+
+/** Stepper labels — the short names the Miro frame prints inside the six pills. */
+const STEP_LABELS = ['Localização', 'Características', 'Valores', 'Fotos', 'Vídeo', 'Revisão'] as const
 
 type FormState = PropertyDraftForm
 
@@ -118,15 +121,21 @@ const EDITABLE_FIELDS = [
   'estado', 'tamanho', 'area_total', 'endereco', 'video_url', 'vagas', 'tipo',
 ] as const
 
-const LABEL_CLASS = 'block text-sm font-bold leading-6 text-gray-900'
+const LABEL_CLASS = 'block text-[13px] font-bold leading-5 text-brand-navy'
 const INPUT_CLASS =
-  'mt-2 block w-full rounded-md border-0 py-2.5 pl-3 pr-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm'
+  'mt-1.5 block w-full rounded-lg border border-brand-line bg-white px-3 py-2.5 text-slate-900 placeholder:text-slate-400 shadow-[0_1px_2px_rgba(20,30,102,0.04)] outline-none transition-colors focus:border-brand-navy focus:ring-2 focus:ring-brand-navy/15 text-base sm:text-sm'
 const SELECT_CLASS = `${INPUT_CLASS} appearance-none bg-white pr-10`
-/** Same box as INPUT_CLASS, with room for the "R$" affix. */
+/** Same box as INPUT_CLASS, with room for the "R$" affix (no outer margin: the wrapper owns it). */
 const PRICE_INPUT_CLASS =
-  'mt-2 block w-full rounded-md border-0 py-2.5 pl-10 pr-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-primary text-base sm:text-sm'
+  'block w-full rounded-lg border border-brand-line bg-white py-2.5 pl-10 pr-3 text-slate-900 placeholder:text-slate-400 shadow-[0_1px_2px_rgba(20,30,102,0.04)] outline-none transition-colors focus:border-brand-navy focus:ring-2 focus:ring-brand-navy/15 text-base sm:text-sm'
 const CARD_CLASS =
-  'rounded-2xl border border-slate-100 bg-white p-5 shadow-[0_6px_24px_rgba(15,23,42,0.06)] sm:p-7'
+  'rounded-2xl border border-brand-line bg-white p-5 shadow-[0_10px_30px_rgba(20,30,102,0.05)] sm:p-7'
+/** Filled brand-orange CTA — the frame's "ENVIAR PARA APROVAÇÃO" / "CRIAR MINHA CONTA" pill. */
+const PRIMARY_BUTTON_CLASS =
+  'inline-flex items-center justify-center gap-2 rounded-full bg-secondary px-6 py-3 text-sm font-bold uppercase tracking-wide text-white shadow-[0_6px_16px_rgba(249,115,22,0.28)] transition-colors hover:bg-secondary/90 disabled:cursor-not-allowed disabled:opacity-60'
+/** Secondary pill on the periwinkle surface — the frame's "SALVAR RASCUNHO". */
+const GHOST_BUTTON_CLASS =
+  'inline-flex items-center justify-center gap-2 rounded-full bg-brand-mist px-6 py-3 text-sm font-bold uppercase tracking-wide text-brand-navy transition-colors hover:bg-brand-mist/70 disabled:cursor-not-allowed disabled:opacity-40'
 
 function StepHeader({
   step,
@@ -140,18 +149,18 @@ function StepHeader({
   headingId: string
 }) {
   return (
-    <div className="mb-5 flex items-start gap-3">
+    <div className="mb-5 flex items-start gap-3 border-b border-brand-line pb-4">
       <span
         aria-hidden="true"
-        className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary text-sm font-bold text-white"
+        className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-secondary text-sm font-bold text-white"
       >
-        {String(step).padStart(2, '0')}
+        {step}
       </span>
-      <div>
-        <h2 id={headingId} className="text-lg font-bold leading-7 text-slate-900 sm:text-xl">
+      <div className="-mt-0.5">
+        <h2 id={headingId} className="text-lg font-bold leading-6 text-brand-navy sm:text-xl">
           {title}
         </h2>
-        <p className="mt-1 text-sm leading-relaxed text-slate-500">{hint}</p>
+        <p className="mt-1 text-[13px] leading-relaxed text-slate-500">{hint}</p>
       </div>
     </div>
   )
@@ -616,66 +625,104 @@ export default function NewPropertyPage() {
     }
   }
 
+  /**
+   * "Anunciar um novo imóvel" — the frame's success screen offers a second, immediate path back
+   * to an empty form without leaving the page (the route is the same, so a Link would be a no-op).
+   */
+  const handleNewProperty = () => {
+    setFormData(EMPTY_FORM)
+    setFotos([])
+    setVideoFile(null)
+    setErrors([])
+    setBuscaCaracteristica('')
+    setDraftNoticeDismissed(false)
+    setSubmitted(false)
+    setStep(1)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   if (submitted) {
     return (
-      <div className="force-light min-h-screen bg-gradient-to-b from-[#eef4fd] via-[#f7fafe] to-white px-4 py-16">
-        <div className="mx-auto max-w-2xl rounded-2xl border border-emerald-100 bg-white p-8 text-center shadow-[0_6px_24px_rgba(15,23,42,0.08)]">
-          <div className="mx-auto mb-5 grid h-14 w-14 place-items-center rounded-full bg-emerald-50">
-            <CheckCircleIcon className="h-8 w-8 text-emerald-600" />
+      <div className="force-light min-h-screen bg-[#f1f5fc] px-4 py-16 sm:px-6">
+        <div className="mx-auto max-w-2xl">
+          <div className="rounded-2xl border border-brand-line bg-white px-6 py-10 text-center shadow-[0_10px_30px_rgba(20,30,102,0.08)] sm:px-10">
+            <div className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-full bg-[#12a31d]">
+              <CheckCircleIcon className="h-9 w-9 text-white" aria-hidden="true" />
+            </div>
+            {/* "Tela de sucesso", verbatim from the board's Anunciar Imóvel frame. */}
+            <h1 className="text-xl font-bold text-[#0f8a17] sm:text-2xl">Cadastro recebido!</h1>
+            <p className="mt-3 text-sm leading-relaxed text-slate-600">
+              Suas informações foram enviadas para análise.
+            </p>
+            <p className="mx-auto mt-5 flex max-w-md items-center gap-2 rounded-lg bg-brand-mist px-4 py-3 text-left text-sm leading-relaxed text-brand-navy">
+              <InformationCircleIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
+              <span>Nossa equipe entrará em contato em até 24 horas.</span>
+            </p>
+            <div className="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center">
+              <button type="button" onClick={handleNewProperty} className={PRIMARY_BUTTON_CLASS}>
+                Anunciar um novo imóvel
+              </button>
+              <Link href="/dashboard" className={GHOST_BUTTON_CLASS}>
+                Ir para o meu painel
+              </Link>
+            </div>
           </div>
-          {/* "Tela de sucesso", verbatim from the board's Anunciar Imóvel frame. */}
-          <h1 className="text-xl font-bold text-slate-900">Cadastro recebido!</h1>
-          <p className="mt-3 text-sm leading-relaxed text-slate-600">
-            Suas informações foram enviadas para análise.
-          </p>
-          <p className="mt-4 flex items-start gap-2 rounded-xl bg-primary/5 px-4 py-3 text-left text-sm leading-relaxed text-slate-600">
-            <InformationCircleIcon className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-            <span>Nossa equipe entrará em contato em até 24 horas.</span>
-          </p>
-          <Link
-            href="/dashboard"
-            className="mt-8 inline-flex rounded-xl bg-secondary px-6 py-3 text-sm font-bold uppercase tracking-wide text-white hover:bg-secondary/90"
-          >
-            Ir para o meu painel
-          </Link>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="force-light bg-slate-50 px-4 py-8 sm:px-6 lg:px-8">
+    <div className="force-light bg-[#f1f5fc] px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       <div className="mx-auto max-w-3xl">
         <div ref={trackRef} className="scroll-mt-24">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Anunciar imóvel</h1>
-          <p className="mt-2 text-sm leading-relaxed text-slate-600">
+          <h1 className="text-2xl font-bold tracking-tight text-brand-navy sm:text-[2rem]">Anunciar imóvel</h1>
+          <p className="mt-1.5 text-[13px] leading-relaxed text-slate-500 sm:text-sm">
             Seis etapas rápidas. No celular, deslize para o lado — ou use{' '}
-            <span className="font-bold">Continuar</span> — para avançar; no computador as seis aparecem na
-            mesma página.
+            <span className="font-bold text-brand-navy">Continuar</span> — para avançar; no computador as
+            seis aparecem na mesma página.
           </p>
         </div>
 
+        {/* Stepper — the six pills of the Miro `Página Anunciar Imóvel` frame. Scrolls sideways on
+            phones instead of wrapping, so the active pill never ends up on a second line. */}
+        <nav aria-label="Etapas do anúncio" className="mt-5">
+          <ol className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {SECTIONS.map((section, index) => {
+              const active = section.step === step
+              return (
+                <li key={section.step} className="shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => goToStep(section.step)}
+                    aria-current={active ? 'step' : undefined}
+                    className={`whitespace-nowrap rounded-full px-3.5 py-2 text-xs font-bold transition-colors sm:text-sm ${
+                      active
+                        ? 'bg-secondary text-white shadow-[0_6px_16px_rgba(249,115,22,0.28)]'
+                        : 'bg-brand-mist text-brand-navy hover:bg-white'
+                    }`}
+                  >
+                    {section.step}. {STEP_LABELS[index]}
+                  </button>
+                </li>
+              )
+            })}
+          </ol>
+        </nav>
+
         {/* Orientation 12 — recovering a draft saved in this browser. */}
         {restorableDraft && (
-          <div className="mt-5 rounded-2xl border border-secondary/30 bg-secondary/5 p-4 sm:p-5">
-            <p className="text-sm font-bold text-slate-900">Você tem um rascunho salvo</p>
-            <p className="mt-1 text-xs leading-relaxed text-slate-600">
+          <div className="mt-4 rounded-2xl border border-brand-line bg-white p-4 shadow-[0_10px_30px_rgba(20,30,102,0.05)] sm:p-5">
+            <p className="text-sm font-bold text-brand-navy">Você tem um rascunho salvo</p>
+            <p className="mt-1 text-xs leading-relaxed text-slate-500">
               Salvo em {formatDraftMoment(restorableDraft.savedAt)} neste navegador. As fotos e o vídeo
               precisam ser escolhidos novamente.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={handleRestoreDraft}
-                className="rounded-xl bg-secondary px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-secondary/90"
-              >
+              <button type="button" onClick={handleRestoreDraft} className={`${PRIMARY_BUTTON_CLASS} px-4 py-2`}>
                 Continuar de onde parei
               </button>
-              <button
-                type="button"
-                onClick={handleDiscardDraft}
-                className="rounded-xl bg-white px-4 py-2 text-sm font-bold text-slate-700 ring-1 ring-inset ring-slate-200 transition-colors hover:bg-slate-50"
-              >
+              <button type="button" onClick={handleDiscardDraft} className={`${GHOST_BUTTON_CLASS} px-4 py-2`}>
                 Começar do zero
               </button>
             </div>
@@ -693,39 +740,22 @@ export default function NewPropertyPage() {
           </div>
         )}
 
-        {/* Phones: which block is on screen. Hidden from `lg` up, where all six are stacked. */}
-        <div className="mt-6 lg:hidden">
-          <div className="flex items-center justify-between gap-3 text-xs font-bold text-slate-500">
-            <span>
-              Etapa {String(step).padStart(2, '0')} de {TOTAL_STEPS}
-            </span>
-            <span className="truncate text-right text-slate-600">{SECTIONS[step - 1].title}</span>
-          </div>
-          <div
-            className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-200"
-            role="progressbar"
-            aria-valuemin={1}
-            aria-valuemax={TOTAL_STEPS}
-            aria-valuenow={step}
-            aria-label="Progresso do cadastro do imóvel"
-          >
-            <div
-              className="h-full rounded-full bg-secondary transition-all"
-              style={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
-            />
-          </div>
-        </div>
+        {/* Phones: the stepper above cannot show all six pills, so name the block on screen. */}
+        <p className="mt-3 text-xs font-bold text-slate-500 lg:hidden">
+          Etapa {String(step).padStart(2, '0')} de {TOTAL_STEPS} ·{' '}
+          <span className="text-brand-navy">{SECTIONS[step - 1].title}</span>
+        </p>
 
-        {/* The clip box must live on this static ancestor, never on the track itself: a track that
-            both translates and clips hides its own active panel (and its touch targets) once shifted. */}
-        <form onSubmit={handleSubmit} noValidate className="mt-4 overflow-x-clip">
+        {/* Phones lay out one block at a time (see `.property-steps` in globals.css); from `lg`
+            up the same six sections are a plain vertical stack. The swipe handlers stay on the
+            track so the gesture keeps working in both layouts. */}
+        <form onSubmit={handleSubmit} noValidate className="mt-4">
           <div
             className="property-steps lg:space-y-5"
-            style={{ '--ahn-step-shift': `${-(step - 1) * 100}%` } as React.CSSProperties}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
-            <section className={`${CARD_CLASS} w-full shrink-0`} aria-labelledby="etapa-1">
+            <section className={`${CARD_CLASS} w-full shrink-0`} data-active={step === 1} aria-labelledby="etapa-1">
               <StepHeader
                 step={SECTIONS[0].step}
                 title={SECTIONS[0].title}
@@ -789,7 +819,7 @@ export default function NewPropertyPage() {
                     value={formData.finalidade}
                     onChange={handleChange}
                     disabled
-                    className={`${SELECT_CLASS} cursor-not-allowed bg-gray-100`}
+                    className={`${SELECT_CLASS} cursor-not-allowed bg-brand-mist/60`}
                   >
                     <option value="aluguel">Aluguel</option>
                   </select>
@@ -813,7 +843,7 @@ export default function NewPropertyPage() {
                     className={INPUT_CLASS}
                   />
                   {showBairroSuggestions && bairroSuggestions.length > 0 && (
-                    <div className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-md border border-gray-200 bg-white py-1 shadow-lg">
+                    <div className="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-lg border border-brand-line bg-white py-1 shadow-lg">
                       {bairroSuggestions.map((suggestion) => (
                         <button
                           key={suggestion}
@@ -822,7 +852,7 @@ export default function NewPropertyPage() {
                             setFormData((prev) => ({ ...prev, bairro: suggestion }))
                             setShowBairroSuggestions(false)
                           }}
-                          className="w-full px-3 py-2 text-left text-sm text-gray-700 transition-colors hover:bg-primary hover:text-white"
+                          className="w-full px-3 py-2 text-left text-sm text-slate-700 transition-colors hover:bg-brand-mist hover:text-brand-navy"
                         >
                           {suggestion}
                         </button>
@@ -840,7 +870,7 @@ export default function NewPropertyPage() {
                     type="text"
                     value="Campo Grande - MS"
                     disabled
-                    className={`${INPUT_CLASS} cursor-not-allowed bg-gray-100`}
+                    className={`${INPUT_CLASS} cursor-not-allowed bg-brand-mist/60`}
                   />
                 </div>
 
@@ -857,7 +887,7 @@ export default function NewPropertyPage() {
                     onChange={handleChange}
                     className={INPUT_CLASS}
                   />
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-slate-500">
                     O endereço é usado para posicionar o imóvel no mapa.
                   </p>
                 </div>
@@ -865,7 +895,7 @@ export default function NewPropertyPage() {
             </section>
 
             {/* 02 — Características e medidas */}
-            <section className={`${CARD_CLASS} w-full shrink-0`} aria-labelledby="etapa-2">
+            <section className={`${CARD_CLASS} w-full shrink-0`} data-active={step === 2} aria-labelledby="etapa-2">
               <StepHeader
                 step={SECTIONS[1].step}
                 title={SECTIONS[1].title}
@@ -887,7 +917,7 @@ export default function NewPropertyPage() {
                     onChange={handleChange}
                     className={INPUT_CLASS}
                   />
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-slate-500">
                     Um título curto e específico aparece melhor nos resultados de busca.
                   </p>
                 </div>
@@ -1002,10 +1032,10 @@ export default function NewPropertyPage() {
               </div>
 
               {/* Orientation 08: the full list stays, with a search box on top so it is findable. */}
-              <div className="mt-6 rounded-xl border border-slate-100 bg-slate-50/70 p-4">
+              <div className="mt-6 rounded-lg border border-brand-line bg-brand-mist/50 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-bold text-gray-900">Características do imóvel</p>
-                  <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+                  <p className="text-sm font-bold text-brand-navy">Características do imóvel</p>
+                  <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-brand-navy">
                     {formData.caracteristicas.length} selecionada
                     {formData.caracteristicas.length === 1 ? '' : 's'}
                   </span>
@@ -1031,7 +1061,7 @@ export default function NewPropertyPage() {
                         type="checkbox"
                         checked={formData.caracteristicas.includes(item)}
                         onChange={() => handleCharacteristicToggle(item)}
-                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                        className="h-4 w-4 rounded border-brand-line text-secondary focus:ring-secondary"
                       />
                       <span className="truncate">{item}</span>
                     </label>
@@ -1044,7 +1074,7 @@ export default function NewPropertyPage() {
                   <button
                     type="button"
                     onClick={() => setFormData((prev) => ({ ...prev, caracteristicas: [] }))}
-                    className="mt-3 text-xs font-bold text-slate-500 underline-offset-2 hover:text-primary hover:underline"
+                    className="mt-3 text-xs font-bold text-slate-500 underline-offset-2 hover:text-brand-navy hover:underline"
                   >
                     Limpar seleção
                   </button>
@@ -1053,7 +1083,7 @@ export default function NewPropertyPage() {
             </section>
 
             {/* 03 — Valores e condições */}
-            <section className={`${CARD_CLASS} w-full shrink-0`} aria-labelledby="etapa-3">
+            <section className={`${CARD_CLASS} w-full shrink-0`} data-active={step === 3} aria-labelledby="etapa-3">
               <StepHeader
                 step={SECTIONS[2].step}
                 title={SECTIONS[2].title}
@@ -1065,8 +1095,8 @@ export default function NewPropertyPage() {
                   <label className={LABEL_CLASS} htmlFor="preco">
                     Valor do aluguel (R$)
                   </label>
-                  <div className="relative mt-2">
-                    <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-gray-500">
+                  <div className="relative mt-1.5">
+                    <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm font-bold text-brand-navy/60">
                       R$
                     </span>
                     <input
@@ -1086,8 +1116,8 @@ export default function NewPropertyPage() {
                   <label className={LABEL_CLASS} htmlFor="condominio">
                     Condomínio (R$)
                   </label>
-                  <div className="relative mt-2">
-                    <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-gray-500">
+                  <div className="relative mt-1.5">
+                    <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm font-bold text-brand-navy/60">
                       R$
                     </span>
                     <input
@@ -1107,8 +1137,8 @@ export default function NewPropertyPage() {
                   <label className={LABEL_CLASS} htmlFor="iptu">
                     IPTU mensal (R$)
                   </label>
-                  <div className="relative mt-2">
-                    <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm text-gray-500">
+                  <div className="relative mt-1.5">
+                    <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sm font-bold text-brand-navy/60">
                       R$
                     </span>
                     <input
@@ -1126,19 +1156,17 @@ export default function NewPropertyPage() {
               </div>
 
               {/* Orientation 03 — the monthly cost the visitor sees is the sum of the three. */}
-              <div className="mt-5 rounded-xl border border-primary/20 bg-primary/5 p-4">
-                <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">
-                  Custo mensal estimado
-                </p>
-                <p className="mt-1 text-xl font-bold text-slate-900">{formatCurrency(custoMensal)}</p>
-                <p className="mt-1 text-xs leading-relaxed text-slate-600">
-                  Aluguel + condomínio + IPTU informados acima. É o valor que o inquilino vê primeiro.
-                </p>
+              <div className="mt-5 flex items-center justify-between gap-3 rounded-lg bg-brand-mist px-4 py-3">
+                <p className="text-sm font-bold text-brand-navy">Custo mensal estimado</p>
+                <p className="text-base font-bold text-secondary">{formatCurrency(custoMensal)}</p>
               </div>
+              <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
+                Aluguel + condomínio + IPTU informados acima. É o valor que o inquilino vê primeiro.
+              </p>
             </section>
 
             {/* 04 — Fotos do imóvel */}
-            <section className={`${CARD_CLASS} w-full shrink-0`} aria-labelledby="etapa-4">
+            <section className={`${CARD_CLASS} w-full shrink-0`} data-active={step === 4} aria-labelledby="etapa-4">
               <StepHeader
                 step={SECTIONS[3].step}
                 title={SECTIONS[3].title}
@@ -1153,101 +1181,97 @@ export default function NewPropertyPage() {
                 onChange={handleFotosChange}
                 className="sr-only"
               />
-              <label
-                htmlFor={fileInputId}
-                className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center transition-colors hover:border-primary hover:bg-primary/5"
-              >
-                <span className="grid h-11 w-11 place-items-center rounded-full bg-primary/10">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={1.6}
-                    aria-hidden="true"
-                    className="h-6 w-6 text-primary"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M18 9.75h.008v.008H18V9.75zM3.75 5.25h16.5a1.5 1.5 0 011.5 1.5v10.5a1.5 1.5 0 01-1.5 1.5H3.75a1.5 1.5 0 01-1.5-1.5V6.75a1.5 1.5 0 011.5-1.5z"
-                    />
-                  </svg>
-                </span>
-                <span className="mt-2 text-sm font-bold text-slate-700">
-                  {fotos.length === 0 ? 'Selecionar fotos' : 'Adicionar mais fotos'}
-                </span>
-                <span className="mt-1 text-xs text-slate-500">
-                  JPG, PNG ou WebP — até {MAX_FOTOS_POR_IMOVEL} fotos
-                </span>
-              </label>
 
-              {fotos.length > 0 && (
-                <>
-                  <p className="mt-3 text-xs font-bold text-slate-500">
-                    {fotos.length} de {MAX_FOTOS_POR_IMOVEL} fotos — a primeira é usada como capa
-                  </p>
-                  <ul className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                    {fotos.map((file, index) => (
-                      <li
-                        key={`${file.name}-${file.lastModified}-${index}`}
-                        className="overflow-hidden rounded-xl border border-slate-200 bg-white"
-                      >
-                        <div className="relative aspect-[4/3] w-full bg-slate-100">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={previewUrls[index] ?? ''}
-                            alt={`Pré-visualização da foto ${index + 1}`}
-                            className="h-full w-full object-cover"
-                          />
-                          {index === 0 && (
-                            <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
-                              <StarIcon className="h-3 w-3" aria-hidden="true" />
-                              Capa
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center justify-between gap-1 p-2">
-                          {index === 0 ? (
-                            <span className="text-[11px] text-slate-400">Primeira foto</span>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => handleMoveFotoToCapa(index)}
-                              className="text-[11px] font-bold text-secondary hover:underline"
-                            >
-                              Definir capa
-                            </button>
-                          )}
+              <p className="flex flex-wrap items-center justify-between gap-1 text-xs font-bold text-slate-500">
+                <span>
+                  {fotos.length} de {MAX_FOTOS_POR_IMOVEL} fotos
+                </span>
+                <span className="font-normal">A primeira é usada como capa</span>
+              </p>
+
+              {/* Miro frame: a 4-up grid of periwinkle tiles, the first one being the upload target. */}
+              <ul className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <li>
+                  <label
+                    htmlFor={fileInputId}
+                    className="flex aspect-[4/3] cursor-pointer flex-col items-center justify-center gap-1 rounded-lg bg-brand-mist px-2 text-center transition-colors hover:bg-brand-mist/70"
+                  >
+                    <span className="text-xl font-bold leading-none text-secondary" aria-hidden="true">
+                      +
+                    </span>
+                    <span className="text-[11px] font-bold uppercase leading-tight tracking-wide text-brand-navy">
+                      {fotos.length === 0 ? 'Adicionar fotos' : 'Adicionar mais'}
+                    </span>
+                    <span className="text-[10px] leading-tight text-slate-500">
+                      Máximo {MAX_FOTOS_POR_IMOVEL} · JPG, PNG
+                    </span>
+                  </label>
+                </li>
+                {fotos.map((file, index) => (
+                  <li
+                    key={`${file.name}-${file.lastModified}-${index}`}
+                    className="overflow-hidden rounded-lg border border-brand-line bg-white"
+                  >
+                    <div className="relative aspect-[4/3] w-full bg-brand-mist">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={previewUrls[index] ?? ''}
+                        alt={`Pré-visualização da foto ${index + 1}`}
+                        className="h-full w-full object-cover"
+                      />
+                      {index === 0 && (
+                        <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                          <StarIcon className="h-3 w-3" aria-hidden="true" />
+                          Capa
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between gap-1 border-t border-brand-line px-2 py-1.5">
+                      <span className="truncate text-[11px] font-bold text-brand-navy">
+                        Foto {String(index + 1).padStart(2, '0')}
+                      </span>
+                      <div className="flex shrink-0 items-center gap-2">
+                        {index > 0 && (
                           <button
                             type="button"
-                            onClick={() => handleRemoveFoto(index)}
-                            className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-500 transition-colors hover:text-red-600"
+                            onClick={() => handleMoveFotoToCapa(index)}
+                            className="text-[11px] font-bold text-secondary hover:underline"
                           >
-                            <TrashIcon className="h-3.5 w-3.5" aria-hidden="true" />
-                            Remover
+                            Capa
                           </button>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                  <button
-                    type="button"
-                    onClick={() => setFotos([])}
-                    className="mt-3 text-xs font-bold text-slate-500 underline-offset-2 hover:text-primary hover:underline"
-                  >
-                    Remover todas as fotos
-                  </button>
-                </>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveFoto(index)}
+                          aria-label={`Remover a foto ${index + 1}`}
+                          className="inline-flex items-center text-slate-400 transition-colors hover:text-red-600"
+                        >
+                          <TrashIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                        </button>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              {fotos.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setFotos([])}
+                  className="mt-3 text-xs font-bold text-slate-500 underline-offset-2 hover:text-brand-navy hover:underline"
+                >
+                  Remover todas as fotos
+                </button>
               )}
 
-              <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-800">
+              <p className="mt-4 rounded-lg bg-brand-mist/60 px-3 py-2 text-xs leading-relaxed text-brand-navy">
                 As fotos não ficam no rascunho salvo: se você sair da página, será preciso escolhê-las
                 novamente.
               </p>
             </section>
 
             {/* 05 — Vídeo do imóvel */}
-            <section className={`${CARD_CLASS} w-full shrink-0`} aria-labelledby="etapa-5">
+            <section className={`${CARD_CLASS} w-full shrink-0`} data-active={step === 5} aria-labelledby="etapa-5">
               <StepHeader
                 step={SECTIONS[4].step}
                 title={SECTIONS[4].title}
@@ -1264,16 +1288,16 @@ export default function NewPropertyPage() {
               />
               <label
                 htmlFor={videoInputId}
-                className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center transition-colors hover:border-primary hover:bg-primary/5"
+                className="flex cursor-pointer flex-col items-center justify-center rounded-lg bg-brand-mist px-4 py-7 text-center transition-colors hover:bg-brand-mist/70"
               >
-                <span className="grid h-11 w-11 place-items-center rounded-full bg-primary/10">
+                <span className="grid h-10 w-10 place-items-center rounded-full bg-white">
                   <svg
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth={1.6}
                     aria-hidden="true"
-                    className="h-6 w-6 text-primary"
+                    className="h-5 w-5 text-secondary"
                   >
                     <path
                       strokeLinecap="round"
@@ -1282,33 +1306,31 @@ export default function NewPropertyPage() {
                     />
                   </svg>
                 </span>
-                <span className="mt-2 text-sm font-bold text-slate-700">
-                  {videoFile ? 'Trocar vídeo selecionado' : 'Selecionar vídeo'}
+                <span className="mt-2 text-[11px] font-bold uppercase tracking-wide text-brand-navy">
+                  {videoFile ? 'Trocar vídeo' : '+ Selecionar vídeo'}
                 </span>
-                <span className="mt-1 text-xs text-slate-500">
-                  MP4 ou MOV — até {VIDEO_MAX_MB} MB
+                <span className="mt-1 text-[10px] leading-tight text-slate-500">
+                  Máximo {VIDEO_MAX_MB} MB · MP4, MOV
                 </span>
               </label>
 
               {videoFile && (
-                <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
-                  <p className="truncate text-sm font-bold text-slate-700">{videoFile.name}</p>
-                  <p className="text-xs text-slate-500">
-                    {(videoFile.size / (1024 * 1024)).toFixed(1)} MB
-                  </p>
+                <div className="mt-3 rounded-lg border border-brand-line bg-brand-mist/50 p-3">
+                  <p className="truncate text-sm font-bold text-brand-navy">{videoFile.name}</p>
+                  <p className="text-xs text-slate-500">{(videoFile.size / (1024 * 1024)).toFixed(1)} MB</p>
                   <div className="mt-2 flex flex-wrap gap-2">
                     <button
                       type="button"
                       onClick={handleVideoUpload}
                       disabled={uploadingVideo}
-                      className="rounded-xl bg-secondary px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-secondary/90 disabled:cursor-not-allowed disabled:opacity-60"
+                      className={`${PRIMARY_BUTTON_CLASS} px-4 py-2`}
                     >
                       {uploadingVideo ? 'Enviando vídeo...' : 'Enviar vídeo'}
                     </button>
                     <button
                       type="button"
                       onClick={() => setVideoFile(null)}
-                      className="rounded-xl bg-white px-4 py-2 text-sm font-bold text-slate-700 ring-1 ring-inset ring-slate-200 transition-colors hover:bg-slate-50"
+                      className={`${GHOST_BUTTON_CLASS} px-4 py-2`}
                     >
                       Descartar arquivo
                     </button>
@@ -1329,19 +1351,19 @@ export default function NewPropertyPage() {
                   onChange={handleChange}
                   className={INPUT_CLASS}
                 />
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-slate-500">
                   YouTube, Vimeo ou um arquivo já enviado. O último valor informado é o que vale.
                 </p>
               </div>
 
-              <p className="mt-4 rounded-lg bg-slate-50 px-3 py-2 text-xs leading-relaxed text-slate-600">
+              <p className="mt-4 rounded-lg bg-brand-mist/60 px-3 py-2 text-xs leading-relaxed text-brand-navy">
                 O vídeo é opcional e <span className="font-bold">não substitui as fotos</span> —
                 anúncios com boas fotos recebem mais contato.
               </p>
             </section>
 
             {/* 06 — Revisar e enviar */}
-            <section className={`${CARD_CLASS} w-full shrink-0`} aria-labelledby="etapa-6">
+            <section className={`${CARD_CLASS} w-full shrink-0`} data-active={step === 6} aria-labelledby="etapa-6">
               <StepHeader
                 step={SECTIONS[5].step}
                 title={SECTIONS[5].title}
@@ -1371,18 +1393,18 @@ export default function NewPropertyPage() {
                   ['Vídeo', formData.video_url ? 'Informado' : 'Não informado'],
                   ['Características', `${formData.caracteristicas.length} selecionada(s)`],
                 ].map(([label, value]) => (
-                  <div key={label} className="rounded-xl bg-slate-50 px-3 py-2">
-                    <dt className="text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                  <div key={label} className="rounded-lg bg-brand-mist/60 px-3 py-2">
+                    <dt className="text-[11px] font-bold uppercase tracking-wide text-brand-navy/70">
                       {label}
                     </dt>
-                    <dd className="mt-0.5 truncate text-sm font-bold text-slate-800">{value}</dd>
+                    <dd className="mt-0.5 truncate text-sm font-bold text-brand-navy">{value}</dd>
                   </div>
                 ))}
               </dl>
               <button
                 type="submit"
                 disabled={loading}
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-4 text-base font-bold uppercase tracking-wide text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+                className={`${PRIMARY_BUTTON_CLASS} mt-6 w-full py-3.5 text-base`}
               >
                 {loading
                   ? compressing
@@ -1390,13 +1412,13 @@ export default function NewPropertyPage() {
                     : geocoding
                       ? 'Localizando endereço...'
                       : 'Enviando...'
-                  : 'Enviar para revisão'}
+                  : 'Enviar para aprovação'}
               </button>
 
               <button
                 type="button"
                 onClick={handleSaveDraft}
-                className="mt-3 w-full rounded-2xl bg-white px-6 py-3 text-sm font-bold text-slate-700 ring-1 ring-inset ring-slate-200 transition-colors hover:bg-slate-50"
+                className={`${GHOST_BUTTON_CLASS} mt-3 w-full`}
               >
                 Salvar rascunho
               </button>
@@ -1404,7 +1426,6 @@ export default function NewPropertyPage() {
               <p className="mt-3 text-center text-xs leading-relaxed text-slate-500">
                 Todo anúncio passa por uma revisão da equipe antes de ficar público.
               </p>
-
             </section>
           </div>
 
@@ -1415,7 +1436,7 @@ export default function NewPropertyPage() {
                 type="button"
                 onClick={goToPrevious}
                 disabled={step === 1}
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-bold text-slate-700 ring-1 ring-inset ring-slate-200 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className={`${GHOST_BUTTON_CLASS} flex-1 px-4 py-3`}
               >
                 <ArrowLeftIcon className="h-4 w-4" aria-hidden="true" />
                 Voltar
@@ -1424,21 +1445,21 @@ export default function NewPropertyPage() {
                 <button
                   type="button"
                   onClick={goToNext}
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-secondary px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-secondary/90"
+                  className={`${PRIMARY_BUTTON_CLASS} flex-1 px-4 py-3`}
                 >
                   Continuar
                   <ArrowRightIcon className="h-4 w-4" aria-hidden="true" />
                 </button>
               ) : (
                 <span className="flex-1 text-center text-xs font-bold leading-snug text-slate-500">
-                  Revise o resumo e toque em Enviar para revisão
+                  Revise o resumo e toque em Enviar para aprovação
                 </span>
               )}
             </div>
             <button
               type="button"
               onClick={handleSaveDraft}
-              className="w-full rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-200"
+              className={`${GHOST_BUTTON_CLASS} w-full px-4 py-2.5 text-xs`}
             >
               Salvar rascunho
             </button>

@@ -5,6 +5,10 @@
   --color-primary-hover: #1f1c60;
   --color-secondary: #f97316; /* Orange (replacing Yellow) */
   --color-accent: #ea580c; /* Darker Orange */
+  /* Miro `Página Anunciar Imóvel`: deep navy text/bars + periwinkle surfaces and hairlines. */
+  --color-brand-navy: #141e66;
+  --color-brand-mist: #e8eefb;
+  --color-brand-line: #dbe4f7;
   
   --font-sans: var(--font-geist-sans), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
@@ -80,30 +84,25 @@ body {
 @media (min-width: 1024px) { .gallery-slide { width: 33.333%; } }
 
 /*
- * "Anunciar imóvel" step track (Miro, Página Anunciar Imóvel — orientation 09: on the phone
- * the blocks slide sideways instead of stacking into one long scroll).
+ * "Anunciar imóvel" step track (Miro, Página Anunciar Imóvel).
  *
- * Below 1024px the six blocks are one row moved by `--ahn-step-shift`, which the page sets
- * inline per step. From 1024px up the same children become a plain vertical stack with no
- * transform at all, so the desktop page keeps every block open — the board's desktop mock.
- * The shift lives in CSS (not an inline `transform`) precisely so the media query can win:
- * an inline style would outrank it. The track must carry **no `gap`**: the shift is a
- * percentage of the track's own width, so a gap would misalign every step by (gap x index).
+ * Above 1024px the six blocks are a plain vertical stack, so the desktop page keeps every
+ * block open — the board's desktop mock. Below it exactly one block is laid out at a time:
+ * the page used to keep all six in a side-by-side translating row, which stretched every
+ * card to the height of the tallest sibling and turned block 01 into a mostly empty white
+ * box taller than the screen. `data-active` comes from the `step` state; the swipe handlers
+ * on the track still flip steps, and `goToStep` scrolls the track back into view.
  */
 .property-steps {
-  display: flex;
-  transition: translate 300ms ease-out;
-  translate: var(--ahn-step-shift, 0%) 0;
+  display: block;
 }
 
-@media (min-width: 1024px) {
-  .property-steps {
-    display: block;
-    transition: none;
-    translate: none;
+@media (max-width: 1023px) {
+  .property-steps > section {
+    display: none;
   }
-}
 
-@media (prefers-reduced-motion: reduce) {
-  .property-steps { transition: none; }
+  .property-steps > section[data-active='true'] {
+    display: block;
+  }
 }
