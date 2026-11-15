@@ -1,9 +1,8 @@
 'use client'
 
-import { useCallback, useMemo, useState, type FormEvent } from 'react'
+import { useCallback, useMemo, useState, type ClipboardEvent as ReactClipboardEvent, type FormEvent } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
 import {
   BriefcaseIcon,
   BuildingOffice2Icon,
@@ -130,8 +129,18 @@ function validatePassword(password: string): string | null {
   return null
 }
 
+/**
+ * Miro board 11/11/2026, "Exemplos de Validações": the messages live **under the field** that
+ * failed, not only in the banner at the top. Wording is the client's, verbatim.
+ */
+const CPF_MESSAGE = 'Informe um CPF válido (11 dígitos).'
+const REQUIRED_MESSAGE = 'Campo obrigatório.'
+const PASSWORD_MISMATCH_MESSAGE = 'As senhas não coincidem.'
+
+/** "Controle de caracteres no campo de texto" — one cap for every free-text input. */
+const MAX_FIELD_LENGTH = 160
+
 export default function RegisterForm({ profile }: { profile: RegisterProfile }) {
-  const router = useRouter()
   const [values, setValues] = useState<Record<string, string>>({})
   const [consents, setConsents] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(profile.consents.map((consent) => [consent.name, false])),
@@ -139,8 +148,10 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
   const [showPassword, setShowPassword] = useState(false)
   const [cepLoading, setCepLoading] = useState(false)
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [emailTaken, setEmailTaken] = useState(false)
-  const [success, setSuccess] = useState('')
+  const [success, setSuccess] = useState(false)
+  const [pendingConfirmation, setPendingConfirmation] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const fieldsByName = useMemo(() => {
@@ -154,6 +165,13 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
   const setField = (name: string, value: string) => {
     const field = fieldsByName[name]
     setValues((prev) => ({ ...prev, [name]: field ? applyMask(field, value) : value }))
+    // Typing clears the red mark on that field only — the rest of the form keeps its messages.
+    setFieldErrors((prev) => {
+      if (!prev[name]) return prev
+      const next = { ...prev }
+      delete next[name]
+      return next
+    })
   }
 
   /** CEP autofill via ViaCEP (public, CORS-enabled, no key). Silent on failure. */
@@ -183,21 +201,45 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError('')
+    setFieldErrors({})
     setEmailTaken(false)
-    setSuccess('')
 
     const missingConsent = profile.consents.find((consent) => consent.required && !consents[consent.name])
-    if (missingConsent) {
-      setError('Você deve aceitar todas as declarações obrigatórias.')
-      return
+
+    /*
+     * Field-level validation (Miro board 11/11/2026, "Exemplos de Validações"): the message is
+     * printed under the failing field, the field is marked and **what was typed is kept** — the
+     * client asked for exactly that in the PDF ("marcar o campo e manter os dados digitados").
+     * The form is `noValidate`, so this runs before the browser's native bubbles and every
+     * message below is the client's Portuguese wording.
+     */
+    const nextFieldErrors: Record<string, string> = {}
+    for (const section of profile.sections) {
+      for (const field of section.fields) {
+        if (field.type === 'password') continue // the two password fields are checked below
+        const raw = (values[field.name] ?? '').trim()
+        if (field.required && !raw) nextFieldErrors[field.name] = REQUIRED_MESSAGE
+        else if (field.mask === 'cpf' && onlyDigits(raw).length !== 11) nextFieldErrors[field.name] = CPF_MESSAGE
+      }
     }
     const passwordProblem = validatePassword(values.password ?? '')
-    if (passwordProblem) {
-      setError(passwordProblem)
+    if (passwordProblem) nextFieldErrors.password = passwordProblem
+    if (values.password !== values.confirmar_senha) {
+      nextFieldErrors.confirmar_senha = PASSWORD_MISMATCH_MESSAGE
+    }
+    if (Object.keys(nextFieldErrors).length > 0) {
+      setFieldErrors(nextFieldErrors)
+      const firstInvalid = profile.sections
+        .flatMap((section) => section.fields)
+        .find((field) => nextFieldErrors[field.name])
+      if (firstInvalid) {
+        document.getElementById(firstInvalid.name)?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+      }
       return
     }
-    if (values.password !== values.confirmar_senha) {
-      setError('As senhas não coincidem.')
+
+    if (missingConsent) {
+      setError('Você deve aceitar todas as declarações obrigatórias.')
       return
     }
 
@@ -255,17 +297,16 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
         }
       }
 
-      if (!data.jwt) {
-        setSuccess(
-          'Conta criada com sucesso! Enviamos um link mágico de confirmação para o seu e-mail. Por favor, acesse sua caixa de entrada para ativar sua conta antes de fazer o login!',
-        )
-        setValues({})
-        setConsents(Object.fromEntries(profile.consents.map((consent) => [consent.name, false])))
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-      } else {
-        // Miro board 21/09/26: registration hands the visitor to the login screen.
-        router.push('/login')
-      }
+      /*
+       * Miro board 11/11/2026 ("Tela de Sucesso (após o envio)"): the flow ends on this screen —
+       * no redirect to /login. Clearing the form is the board's "Limpar os campos após envio";
+       * `pendingConfirmation` only covers the Strapi setup that also requires e-mail confirmation.
+       */
+      setPendingConfirmation(!data.jwt)
+      setSuccess(true)
+      setValues({})
+      setConsents(Object.fromEntries(profile.consents.map((consent) => [consent.name, false])))
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (err) {
       setError(translateError(err instanceof Error ? err.message : String(err)))
     } finally {
@@ -282,13 +323,25 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
           <div className="mx-auto mb-5 grid h-14 w-14 place-items-center rounded-full bg-emerald-50">
             <CheckCircleIcon className="h-8 w-8 text-emerald-600" />
           </div>
-          <h1 className="text-xl font-bold text-slate-900">Cadastro enviado!</h1>
-          <p className="mt-3 text-sm leading-relaxed text-slate-600">{success}</p>
+          {/* Verbatim from the Miro board 11/11/2026, "Tela de Sucesso (após o envio)" —
+              "Inserir esse texto ao final do cadastro". */}
+          <h1 className="text-xl font-bold text-slate-900">Cadastro recebido!</h1>
+          <p className="mt-3 text-sm leading-relaxed text-slate-600">
+            Suas informações foram enviadas para análise.
+          </p>
+          <p className="mt-1 text-sm leading-relaxed text-slate-600">
+            Nossa equipe entrará em contato em até 24 horas.
+          </p>
+          {pendingConfirmation && (
+            <p className="mt-4 rounded-xl bg-slate-50 px-4 py-3 text-xs leading-relaxed text-slate-500">
+              Enviamos um link de confirmação para o seu e-mail. Ative a conta antes de fazer o login.
+            </p>
+          )}
           <Link
-            href="/login"
+            href="/"
             className="mt-8 inline-flex rounded-xl bg-secondary px-6 py-3 text-sm font-bold uppercase tracking-wide text-white hover:bg-secondary/90"
           >
-            Ir para o login
+            Voltar para o início
           </Link>
         </div>
       </div>
@@ -299,7 +352,11 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
     <div className="force-light min-h-screen bg-gradient-to-b from-[#eef4fd] via-[#f7fafe] to-white">
       <RegisterBanner profile={profile} />
 
-      <form onSubmit={handleSubmit} className="mx-auto mt-6 w-full max-w-5xl space-y-5 px-4 pb-16 sm:px-6">
+      <form
+        onSubmit={handleSubmit}
+        noValidate
+        className="mx-auto mt-6 w-full max-w-5xl space-y-5 px-4 pb-16 sm:px-6"
+      >
         {error && (
           <div
             role="alert"
@@ -339,6 +396,7 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
                   key={field.name}
                   field={field}
                   value={values[field.name] ?? ''}
+                  error={fieldErrors[field.name]}
                   onChange={setField}
                   onCepLookup={lookupCep}
                   cepLoading={cepLoading}
@@ -440,6 +498,7 @@ const AUTOCOMPLETE: Record<string, string> = {
 function Field({
   field,
   value,
+  error,
   onChange,
   onCepLookup,
   cepLoading,
@@ -448,6 +507,7 @@ function Field({
 }: {
   field: RegisterField
   value: string
+  error?: string
   onChange: (name: string, value: string) => void
   onCepLookup: (cep: string) => void
   cepLoading: boolean
@@ -461,11 +521,26 @@ function Field({
   const inputType = isPassword ? (showPassword ? 'text' : 'password') : (field.type ?? 'text')
   const spanClass = SPAN_CLASSES[field.span ?? 3] ?? SPAN_CLASSES[3]
   const inputClasses = [
-    'w-full rounded-lg border border-slate-200 bg-white py-3 pl-11 text-sm font-medium text-slate-900',
-    'shadow-sm transition-colors placeholder:text-slate-400 focus:border-primary focus:outline-none',
-    'focus:ring-2 focus:ring-primary/20',
+    'w-full rounded-lg border bg-white py-3 pl-11 text-sm font-medium text-slate-900',
+    'shadow-sm transition-colors placeholder:text-slate-400 focus:outline-none focus:ring-2',
+    error
+      ? 'border-red-300 focus:border-red-400 focus:ring-red-100'
+      : 'border-slate-200 focus:border-primary focus:ring-primary/20',
     isPassword ? 'pr-11' : isCep ? 'pr-12' : isSelect ? 'pr-9' : 'pr-3',
   ].join(' ')
+  const errorId = `${field.name}-error`
+  /*
+   * Miro board 11/11/2026, "Observações para o programador": "Impedir copiar e colar o texto do
+   * campo". Applied to the two password fields only — blocking paste on CPF/phone would force
+   * people to retype numbers a second time. Remove this block if the client meant every field.
+   */
+  const noClipboard = isPassword
+    ? {
+        onPaste: (event: ReactClipboardEvent<HTMLInputElement>) => event.preventDefault(),
+        onCopy: (event: ReactClipboardEvent<HTMLInputElement>) => event.preventDefault(),
+        onCut: (event: ReactClipboardEvent<HTMLInputElement>) => event.preventDefault(),
+      }
+    : {}
 
   return (
     <div className={spanClass}>
@@ -488,6 +563,8 @@ function Field({
             required={field.required}
             value={value}
             onChange={(event) => onChange(field.name, event.target.value)}
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? errorId : undefined}
             className={`${inputClasses} appearance-none ${value ? 'text-slate-900' : 'text-slate-400'}`}
           >
             <option value="">{field.placeholder ?? 'Selecione'}</option>
@@ -505,11 +582,15 @@ function Field({
             required={field.required}
             value={value}
             placeholder={field.placeholder}
+            maxLength={MAX_FIELD_LENGTH}
             onChange={(event) => onChange(field.name, event.target.value)}
             onBlur={isCep ? () => onCepLookup(value) : undefined}
             inputMode={field.mask === 'phone' ? 'tel' : field.mask ? 'numeric' : undefined}
             autoComplete={AUTOCOMPLETE[field.name] ?? 'off'}
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? errorId : undefined}
             className={inputClasses}
+            {...noClipboard}
           />
         )}
 
@@ -536,6 +617,11 @@ function Field({
           </button>
         )}
       </div>
+      {error && (
+        <p id={errorId} role="alert" className="mt-1.5 text-xs font-semibold text-red-600">
+          {error}
+        </p>
+      )}
     </div>
   )
 }
