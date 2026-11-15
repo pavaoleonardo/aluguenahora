@@ -198,6 +198,16 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
     }
   }, [])
 
+  /*
+   * Miro board 11/11/2026, "Exemplos de Validações" → the third example is the *positive* one:
+   * a green "Senhas seguras" tick once the password meets the rule and both fields agree. It is
+   * evaluated while typing, so the visitor sees the form react before pressing the button.
+   */
+  const passwordsSecure =
+    Boolean(values.password) &&
+    !validatePassword(values.password ?? '') &&
+    values.password === values.confirmar_senha
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError('')
@@ -405,6 +415,24 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
                 />
               ))}
             </div>
+
+            {section.fields.some((field) => field.type === 'password') && (
+              <div className="mt-4 space-y-2">
+                <p className="flex items-start gap-2 text-xs leading-relaxed text-slate-500 sm:text-sm">
+                  <LockClosedIcon className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" aria-hidden="true" />
+                  <span>Use uma senha longa e exclusiva. Recomendamos pelo menos 15 caracteres.</span>
+                </p>
+                {passwordsSecure && (
+                  <p
+                    role="status"
+                    className="flex items-center gap-2 text-xs font-bold text-emerald-600 sm:text-sm"
+                  >
+                    <CheckCircleIcon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                    Senhas seguras
+                  </p>
+                )}
+              </div>
+            )}
           </section>
         ))}
 
@@ -674,6 +702,12 @@ function RegisterBanner({ profile }: { profile: RegisterProfile }) {
             {titleLead} <span className="text-secondary">{titleAccent}</span>
           </h1>
           <p className="mt-4 max-w-md text-sm leading-relaxed text-slate-600 sm:text-base">{subtitle}</p>
+          {/* Miro board 11/11/2026 — the green arrow under the title ("fazer as inclusões nas setas
+              verde") points at this line, and the mobile mock carries it too. */}
+          <p className="mt-2 text-xs leading-relaxed text-slate-500 sm:text-sm">
+            Os campos com <span className="font-bold text-secondary">*</span> são obrigatórios. Leva apenas alguns
+            minutos.
+          </p>
         </div>
       </div>
     </header>
