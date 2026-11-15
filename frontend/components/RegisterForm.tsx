@@ -115,6 +115,21 @@ type ViaCepResponse = {
   uf?: string
 }
 
+/**
+ * Client spec (AlugueNaHora.pdf, p8 — "4. Senha segura?"): at least 8 characters with
+ * an uppercase letter, a lowercase letter, a number and a special character. The error
+ * message is the client's wording, verbatim.
+ */
+const PASSWORD_RULE = /^(?=.*\p{Ll})(?=.*\p{Lu})(?=.*\d)(?=.*[^\p{L}\d]).{8,}$/u
+
+function validatePassword(password: string): string | null {
+  if (!password) return 'Informe uma senha.'
+  if (!PASSWORD_RULE.test(password)) {
+    return 'A senha deve ter no mínimo 8 caracteres, com letra maiúscula, minúscula, número e caractere especial'
+  }
+  return null
+}
+
 export default function RegisterForm({ profile }: { profile: RegisterProfile }) {
   const router = useRouter()
   const [values, setValues] = useState<Record<string, string>>({})
@@ -124,6 +139,7 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
   const [showPassword, setShowPassword] = useState(false)
   const [cepLoading, setCepLoading] = useState(false)
   const [error, setError] = useState('')
+  const [emailTaken, setEmailTaken] = useState(false)
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -167,6 +183,7 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError('')
+    setEmailTaken(false)
     setSuccess('')
 
     const missingConsent = profile.consents.find((consent) => consent.required && !consents[consent.name])
@@ -174,8 +191,9 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
       setError('Você deve aceitar todas as declarações obrigatórias.')
       return
     }
-    if ((values.password ?? '').length < 6) {
-      setError('A senha deve ter no mínimo 6 caracteres.')
+    const passwordProblem = validatePassword(values.password ?? '')
+    if (passwordProblem) {
+      setError(passwordProblem)
       return
     }
     if (values.password !== values.confirmar_senha) {
@@ -211,10 +229,11 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
       const data = await res.json()
 
       if (!res.ok) {
-        const message =
-          data.error?.message === 'An error occurred during account creation'
-            ? 'Este e-mail já está cadastrado.'
-            : data.error?.message || 'Erro ao cadastrar conta'
+        const duplicate = data.error?.message === 'An error occurred during account creation'
+        if (duplicate) setEmailTaken(true)
+        const message = duplicate
+          ? 'Este e-mail já está cadastrado.'
+          : data.error?.message || 'Erro ao cadastrar conta'
         throw new Error(message)
       }
 
@@ -287,6 +306,16 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
             className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
           >
             {error}
+            {emailTaken && (
+              <p className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1">
+                <Link href="/login" className="font-bold underline underline-offset-2 hover:no-underline">
+                  Já tenho conta
+                </Link>
+                <Link href="/esqueci-senha" className="font-bold underline underline-offset-2 hover:no-underline">
+                  Recuperar senha
+                </Link>
+              </p>
+            )}
           </div>
         )}
 
