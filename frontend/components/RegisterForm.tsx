@@ -134,8 +134,57 @@ function validatePassword(password: string): string | null {
  * failed, not only in the banner at the top. Wording is the client's, verbatim.
  */
 const CPF_MESSAGE = 'Informe um CPF válido (11 dígitos).'
+const CPF_INVALID_MESSAGE = 'Informe um CPF válido.'
+const CNPJ_MESSAGE = 'Informe um CNPJ válido (14 dígitos).'
+const CNPJ_INVALID_MESSAGE = 'Informe um CNPJ válido.'
 const REQUIRED_MESSAGE = 'Campo obrigatório.'
 const PASSWORD_MISMATCH_MESSAGE = 'As senhas não coincidem.'
+
+/*
+ * The board's own invalid example is `123.456.789-00` — **eleven digits**, still marked invalid.
+ * A length check alone therefore does not implement the client's validation, so the mod-11 check
+ * digits are verified here (Receita Federal algorithm, same one used by every Brazilian form).
+ * CNPJ gets the same treatment: `/registro/imobiliaria` collects it.
+ */
+function isValidCpf(digits: string): boolean {
+  if (digits.length !== 11 || /^(\d)\1{10}$/.test(digits)) return false
+  const checkDigit = (length: number) => {
+    let sum = 0
+    for (let i = 0; i < length; i += 1) sum += Number(digits[i]) * (length + 1 - i)
+    const rest = (sum * 10) % 11
+    return rest === 10 ? 0 : rest
+  }
+  return checkDigit(9) === Number(digits[9]) && checkDigit(10) === Number(digits[10])
+}
+
+const CNPJ_WEIGHTS: [number[], number[]] = [
+  [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2],
+  [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2],
+]
+
+function isValidCnpj(digits: string): boolean {
+  if (digits.length !== 14 || /^(\d)\1{13}$/.test(digits)) return false
+  const checkDigit = (weights: number[]) => {
+    const sum = weights.reduce((total, weight, index) => total + Number(digits[index]) * weight, 0)
+    const rest = sum % 11
+    return rest < 2 ? 0 : 11 - rest
+  }
+  return checkDigit(CNPJ_WEIGHTS[0]) === Number(digits[12]) && checkDigit(CNPJ_WEIGHTS[1]) === Number(digits[13])
+}
+
+/** Length first (the client's wording), then the check digits. `null` means "nothing to report". */
+function maskError(field: RegisterField, raw: string): string | null {
+  const digits = onlyDigits(raw)
+  if (field.mask === 'cpf') {
+    if (digits.length !== 11) return CPF_MESSAGE
+    if (!isValidCpf(digits)) return CPF_INVALID_MESSAGE
+  }
+  if (field.mask === 'cnpj') {
+    if (digits.length !== 14) return CNPJ_MESSAGE
+    if (!isValidCnpj(digits)) return CNPJ_INVALID_MESSAGE
+  }
+  return null
+}
 
 /** "Controle de caracteres no campo de texto" — one cap for every free-text input. */
 const MAX_FIELD_LENGTH = 160
@@ -167,6 +216,34 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
     setValues((prev) => ({ ...prev, [name]: field ? applyMask(field, value) : value }))
     // Typing clears the red mark on that field only — the rest of the form keeps its messages.
     setFieldErrors((prev) => {
+      if (!prev[name]) return prev
+      const next = { ...prev }
+      delete next[name]
+      return next
+    })
+  }
+
+  /*
+   * Live validation (board `11/11/2026`, *Exemplos de Validações*): leaving a field that has
+   * something in it prints the message immediately, without waiting for the button. Empty fields
+   * stay silent on purpose — otherwise tabbing through the form on a phone paints it all red.
+   */
+  const validateOnBlur = (name: string) => {
+    const field = fieldsByName[name]
+    if (!field) return
+    const raw = (values[name] ?? '').trim()
+    let message: string | null = null
+    if (field.type === 'password') {
+      if (name === 'confirmar_senha') {
+        if (raw && values.password !== values.confirmar_senha) message = PASSWORD_MISMATCH_MESSAGE
+      } else if (raw) {
+        message = validatePassword(raw)
+      }
+    } else if (raw) {
+      message = maskError(field, raw)
+    }
+    setFieldErrors((prev) => {
+      if (message) return prev[name] === message ? prev : { ...prev, [name]: message }
       if (!prev[name]) return prev
       const next = { ...prev }
       delete next[name]
@@ -229,7 +306,10 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
         if (field.type === 'password') continue // the two password fields are checked below
         const raw = (values[field.name] ?? '').trim()
         if (field.required && !raw) nextFieldErrors[field.name] = REQUIRED_MESSAGE
-        else if (field.mask === 'cpf' && onlyDigits(raw).length !== 11) nextFieldErrors[field.name] = CPF_MESSAGE
+        else if (raw) {
+          const maskProblem = maskError(field, raw)
+          if (maskProblem) nextFieldErrors[field.name] = maskProblem
+        }
       }
     }
     const passwordProblem = validatePassword(values.password ?? '')
@@ -408,6 +488,7 @@ export default function RegisterForm({ profile }: { profile: RegisterProfile }) 
                   value={values[field.name] ?? ''}
                   error={fieldErrors[field.name]}
                   onChange={setField}
+                  onFieldBlur={validateOnBlur}
                   onCepLookup={lookupCep}
                   cepLoading={cepLoading}
                   showPassword={showPassword}
@@ -528,6 +609,7 @@ function Field({
   value,
   error,
   onChange,
+  onFieldBlur,
   onCepLookup,
   cepLoading,
   showPassword,
@@ -537,6 +619,7 @@ function Field({
   value: string
   error?: string
   onChange: (name: string, value: string) => void
+  onFieldBlur: (name: string) => void
   onCepLookup: (cep: string) => void
   cepLoading: boolean
   showPassword: boolean
@@ -549,7 +632,11 @@ function Field({
   const inputType = isPassword ? (showPassword ? 'text' : 'password') : (field.type ?? 'text')
   const spanClass = SPAN_CLASSES[field.span ?? 3] ?? SPAN_CLASSES[3]
   const inputClasses = [
-    'w-full rounded-lg border bg-white py-3 pl-11 text-sm font-medium text-slate-900',
+    /*
+     * `text-base` on phones, `text-sm` from `sm` up: iOS Safari zooms the whole page when a
+     * focused input is smaller than 16px, which reads as "the form is not responsive on mobile".
+     */
+    'w-full rounded-lg border bg-white py-3 pl-11 text-base font-medium text-slate-900 sm:text-sm',
     'shadow-sm transition-colors placeholder:text-slate-400 focus:outline-none focus:ring-2',
     error
       ? 'border-red-300 focus:border-red-400 focus:ring-red-100'
@@ -594,6 +681,7 @@ function Field({
             aria-invalid={error ? true : undefined}
             aria-describedby={error ? errorId : undefined}
             className={`${inputClasses} appearance-none ${value ? 'text-slate-900' : 'text-slate-400'}`}
+            onBlur={() => onFieldBlur(field.name)}
           >
             <option value="">{field.placeholder ?? 'Selecione'}</option>
             {field.options?.map((option) => (
@@ -612,7 +700,10 @@ function Field({
             placeholder={field.placeholder}
             maxLength={MAX_FIELD_LENGTH}
             onChange={(event) => onChange(field.name, event.target.value)}
-            onBlur={isCep ? () => onCepLookup(value) : undefined}
+            onBlur={() => {
+              onFieldBlur(field.name)
+              if (isCep) onCepLookup(value)
+            }}
             inputMode={field.mask === 'phone' ? 'tel' : field.mask ? 'numeric' : undefined}
             autoComplete={AUTOCOMPLETE[field.name] ?? 'off'}
             aria-invalid={error ? true : undefined}

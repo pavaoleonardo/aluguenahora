@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import type { SVGProps } from 'react'
 import { whatsappDisplayNumber, whatsappLink } from '@/lib/contact'
 
 
@@ -15,14 +16,15 @@ const navigation = {
     { name: 'Corretores', href: '/corretores' },
   ],
   legal: [
-    { name: 'Privacidade', href: '#' },
-    { name: 'Termos', href: '#' },
+    // These used to be `#`; the pages shipped with D27 exist and the consent checkboxes link to them.
+    { name: 'Privacidade', href: '/privacidade' },
+    { name: 'Termos', href: '/termos' },
   ],
   social: [
     {
       name: 'Facebook',
       href: '#',
-      icon: (props: any) => (
+      icon: (props: SVGProps<SVGSVGElement>) => (
         <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
           <path
             fillRule="evenodd"
@@ -35,7 +37,7 @@ const navigation = {
     {
       name: 'Instagram',
       href: '#',
-      icon: (props: any) => (
+      icon: (props: SVGProps<SVGSVGElement>) => (
         <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
           <path
             fillRule="evenodd"
@@ -86,7 +88,7 @@ export default function Footer() {
               ))}
             </div>
           </div>
-          <div className="mt-16 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
+          <div className="mt-16 grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-8 xl:col-span-2 xl:mt-0">
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
                 <h3 className="text-sm font-semibold leading-6 text-white">Navegação</h3>
@@ -105,9 +107,9 @@ export default function Footer() {
                 <ul role="list" className="mt-6 space-y-4">
                   {navigation.legal.map((item) => (
                     <li key={item.name}>
-                      <a href={item.href} className="text-sm leading-6 text-gray-300 hover:text-white">
+                      <Link href={item.href} className="text-sm leading-6 text-gray-300 hover:text-white">
                         {item.name}
-                      </a>
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -120,7 +122,7 @@ export default function Footer() {
                   <li className="text-sm leading-6 text-gray-300">
                     Campo Grande, MS - Brasil
                   </li>
-                  <li className="text-sm leading-6 text-gray-300">
+                  <li className="break-words text-sm leading-6 text-gray-300">
                     contato@aluguenahora.com.br
                   </li>
                   <li className="text-sm leading-6 text-gray-300">
