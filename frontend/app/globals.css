@@ -78,3 +78,32 @@ body {
 .gallery-slide { width: 100%; }
 @media (min-width: 640px) { .gallery-slide { width: 50%; } }
 @media (min-width: 1024px) { .gallery-slide { width: 33.333%; } }
+
+/*
+ * "Anunciar imóvel" step track (Miro, Página Anunciar Imóvel — orientation 09: on the phone
+ * the blocks slide sideways instead of stacking into one long scroll).
+ *
+ * Below 1024px the six blocks are one row moved by `--ahn-step-shift`, which the page sets
+ * inline per step. From 1024px up the same children become a plain vertical stack with no
+ * transform at all, so the desktop page keeps every block open — the board's desktop mock.
+ * The shift lives in CSS (not an inline `transform`) precisely so the media query can win:
+ * an inline style would outrank it. The track must carry **no `gap`**: the shift is a
+ * percentage of the track's own width, so a gap would misalign every step by (gap x index).
+ */
+.property-steps {
+  display: flex;
+  transition: translate 300ms ease-out;
+  translate: var(--ahn-step-shift, 0%) 0;
+}
+
+@media (min-width: 1024px) {
+  .property-steps {
+    display: block;
+    transition: none;
+    translate: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .property-steps { transition: none; }
+}
